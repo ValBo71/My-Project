@@ -1,0 +1,16 @@
+# Binaries
+**/*.class
+**/out/
+.vscode
+
+# User-specific stuff
+**/.idea/**/workspace.xml
+**/.idea/**/tasks.xml
+**/.idea/**/checkstyle-idea.xml
+**/*.iml
+**/*.ipr
+**/.idea/**/*.iml
+**/.idea/**/modules
+**/.idea/**/modules.xml
+**/.vscode
+.vscode

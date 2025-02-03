@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: testCases.E_ExplorePostsTests
+-------------------------------------------------------------------------------
+Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 13.461 s - in testCases.E_ExplorePostsTests

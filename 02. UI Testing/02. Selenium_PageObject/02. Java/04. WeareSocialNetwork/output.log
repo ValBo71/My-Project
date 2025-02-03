@@ -1,0 +1,60 @@
+2021-08-17 15:14:15,500 INFO  [main] Initializing WebDriver
+2021-08-17 15:14:18,283 INFO  [main] Initializing WebDriver
+2021-08-17 15:14:18,283 INFO  [main] Initializing WebDriver
+2021-08-17 15:14:18,283 INFO  [main] Initializing WebDriver
+2021-08-17 15:14:18,283 INFO  [main] Initializing WebDriver
+2021-08-17 15:14:18,283 INFO  [main] Initializing WebDriver
+2021-08-17 15:14:18,283 INFO  [main] Initializing WebDriver
+2021-08-17 15:14:18,284 INFO  [main] Initializing WebDriver
+2021-08-17 15:14:18,285 INFO  [main] Initializing WebDriver
+2021-08-17 15:14:21,285 INFO  [main] Clicking on element mainPage.navigationBar.signInButton
+2021-08-17 15:14:22,457 INFO  [main] Clicking on element signInPage.loginButton
+2021-08-17 15:14:22,842 INFO  [main] Clicking on element mainPage.navigationBar.personalProfileButton
+2021-08-17 15:14:23,379 INFO  [main] Clicking on element personalProfilePage.editButton
+2021-08-17 15:14:24,398 INFO  [main] Clicking on element personalProfilePage.personalProfileSection.updateMyProfileButton
+2021-08-17 15:14:26,206 INFO  [main] Quitting WebDriver
+2021-08-17 15:14:26,816 INFO  [main] Initializing WebDriver
+2021-08-17 15:14:28,274 INFO  [main] Initializing WebDriver
+2021-08-17 15:14:28,274 INFO  [main] Initializing WebDriver
+2021-08-17 15:14:28,274 INFO  [main] Initializing WebDriver
+2021-08-17 15:14:28,275 INFO  [main] Initializing WebDriver
+2021-08-17 15:14:28,275 INFO  [main] Initializing WebDriver
+2021-08-17 15:14:28,275 INFO  [main] Initializing WebDriver
+2021-08-17 15:14:28,275 INFO  [main] Initializing WebDriver
+2021-08-17 15:14:28,275 INFO  [main] Initializing WebDriver
+2021-08-17 15:14:28,991 INFO  [main] Clicking on element mainPage.navigationBar.signInButton
+2021-08-17 15:14:30,162 INFO  [main] Clicking on element signInPage.loginButton
+2021-08-17 15:14:30,585 INFO  [main] Clicking on element mainPage.navigationBar.personalProfileButton
+2021-08-17 15:14:31,010 INFO  [main] Clicking on element personalProfilePage.editButton
+2021-08-17 15:14:31,692 INFO  [main] Clicking on element personaProfilePage.industrySection.updateButton
+2021-08-17 15:14:32,529 INFO  [main] Quitting WebDriver
+2021-08-17 15:14:33,175 INFO  [main] Initializing WebDriver
+2021-08-17 15:14:34,552 INFO  [main] Initializing WebDriver
+2021-08-17 15:14:34,552 INFO  [main] Initializing WebDriver
+2021-08-17 15:14:34,553 INFO  [main] Initializing WebDriver
+2021-08-17 15:14:34,553 INFO  [main] Initializing WebDriver
+2021-08-17 15:14:34,553 INFO  [main] Initializing WebDriver
+2021-08-17 15:14:34,553 INFO  [main] Initializing WebDriver
+2021-08-17 15:14:34,553 INFO  [main] Initializing WebDriver
+2021-08-17 15:14:34,554 INFO  [main] Initializing WebDriver
+2021-08-17 15:14:35,239 INFO  [main] Clicking on element mainPage.navigationBar.signInButton
+2021-08-17 15:14:36,395 INFO  [main] Clicking on element signInPage.loginButton
+2021-08-17 15:14:36,797 INFO  [main] Clicking on element mainPage.navigationBar.personalProfileButton
+2021-08-17 15:14:37,312 INFO  [main] Clicking on element personalProfilePage.editButton
+2021-08-17 15:14:38,257 INFO  [main] Clicking on element personalProfilePage.servicesSection.updateButton
+2021-08-17 15:14:39,908 INFO  [main] Quitting WebDriver
+2021-08-17 15:14:40,529 INFO  [main] Initializing WebDriver
+2021-08-17 15:14:41,951 INFO  [main] Initializing WebDriver
+2021-08-17 15:14:41,951 INFO  [main] Initializing WebDriver
+2021-08-17 15:14:41,951 INFO  [main] Initializing WebDriver
+2021-08-17 15:14:41,951 INFO  [main] Initializing WebDriver
+2021-08-17 15:14:41,951 INFO  [main] Initializing WebDriver
+2021-08-17 15:14:41,952 INFO  [main] Initializing WebDriver
+2021-08-17 15:14:41,952 INFO  [main] Initializing WebDriver
+2021-08-17 15:14:41,952 INFO  [main] Initializing WebDriver
+2021-08-17 15:14:42,600 INFO  [main] Clicking on element mainPage.navigationBar.signInButton
+2021-08-17 15:14:43,728 INFO  [main] Clicking on element signInPage.loginButton
+2021-08-17 15:14:44,125 INFO  [main] Clicking on element mainPage.navigationBar.personalProfileButton
+2021-08-17 15:14:44,541 INFO  [main] Clicking on element personalProfilePage.editButton
+2021-08-17 15:14:45,370 INFO  [main] Clicking on element personalProfilePage.personalProfileSection.updateMyProfileButton
+2021-08-17 15:14:47,117 INFO  [main] Quitting WebDriver

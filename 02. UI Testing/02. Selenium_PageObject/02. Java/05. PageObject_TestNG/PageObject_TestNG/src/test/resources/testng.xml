@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="All Test Suite">
+    <test verbose="2" preserve-order="true"
+          name="D:/Programing/My_project/my_projects/02. UI Testing/02. Selenium_PageObject/02. Java/05. PageObject_TestNG/PageObject_TestNG">
+        <classes>
+            <class name="tests.searchapartment.searchApartmentTest">
+                <methods>
+                    <include name="checkIsRedirectToListing"/>
+                </methods>
+            </class>
+        </classes>
+    </test>
+</suite>

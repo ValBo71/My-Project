@@ -1,0 +1,44 @@
+/* Local elements */
+.namesbg {
+    font-size: 28pt;
+    text-align: center;
+    color: white;
+    position: absolute;
+    top: 620px;
+    left: 395px;
+}
+.HobbiesFoto{
+    width: 530px;
+    height: 530px;
+    border: solid 3px #d07325;
+    position: absolute;
+    top: 222px;
+    left: 630px;
+}
+.paragrapheHobby {
+    width: 233px;
+    height: 503px;
+    font-size: 13pt;
+    text-align: justify;
+    color: #6f6f6f;
+    position: absolute;
+    top:  232px;
+    left: 1186px;
+ }
+.orangeLineParagrapheUP {
+    width: 233px;
+    height: 2px;
+    background-color: #d07325;
+    position: absolute;
+    top:  225px;
+    left: 1186px; 
+}
+.orangeLineHobbyParagrapheBottom {
+    width: 233px;
+    height: 2px;
+    background-color: #d07325;
+    position: absolute;
+    top:  755px;
+    left: 1186px; 
+}
+/* Local elements */

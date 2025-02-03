@@ -1,0 +1,43 @@
+-------------------------------------------------------------------------------
+Test set: testCases.F_FriendRequestTests
+-------------------------------------------------------------------------------
+Tests run: 3, Failures: 0, Errors: 3, Skipped: 0, Time elapsed: 32.42 s <<< FAILURE! - in testCases.F_FriendRequestTests
+TC_F_02_AcceptFriendRequest(testCases.F_FriendRequestTests)  Time elapsed: 13.742 s  <<< ERROR!
+org.openqa.selenium.NoSuchElementException: 
+no such element: Unable to locate element: {"method":"xpath","selector":"//input[@value='New Friend Requsts']"}
+  (Session info: headless chrome=92.0.4515.131)
+For documentation on this error, please visit: https://selenium.dev/exceptions/#no_such_element
+Build info: version: '4.0.0-alpha-7', revision: 'de8579b6d5'
+System info: host: 'DESKTOP-CD9N1D0', ip: '192.168.56.1', os.name: 'Windows 10', os.arch: 'amd64', os.version: '10.0', java.version: '11.0.10'
+Driver info: org.openqa.selenium.chrome.ChromeDriver
+Capabilities {acceptInsecureCerts: false, browserName: chrome, browserVersion: 92.0.4515.131, chrome: {chromedriverVersion: 92.0.4515.107 (87a818b10553..., userDataDir: C:\Users\ValBo\AppData\Loca...}, goog:chromeOptions: {debuggerAddress: localhost:1121}, javascriptEnabled: true, networkConnectionEnabled: false, pageLoadStrategy: normal, platform: WINDOWS, platformName: WINDOWS, proxy: Proxy(), setWindowRect: true, strictFileInteractability: false, timeouts: {implicit: 0, pageLoad: 300000, script: 30000}, unhandledPromptBehavior: dismiss and notify, webauthn:extension:credBlob: true, webauthn:extension:largeBlob: true, webauthn:virtualAuthenticators: true}
+Session ID: b8bfa4b1e8aeb4ae939ca25f5c918270
+*** Element info: {Using=xpath, value=//input[@value='New Friend Requsts']}
+	at testCases.F_FriendRequestTests.TC_F_02_AcceptFriendRequest(F_FriendRequestTests.java:35)
+
+TC_F_03_Disconnect(testCases.F_FriendRequestTests)  Time elapsed: 9.317 s  <<< ERROR!
+org.openqa.selenium.NoSuchElementException: 
+no such element: Unable to locate element: {"method":"xpath","selector":"//h2[@class='mr-3 text-black' and text() = "Dragancho Draganchev"]"}
+  (Session info: headless chrome=92.0.4515.131)
+For documentation on this error, please visit: https://selenium.dev/exceptions/#no_such_element
+Build info: version: '4.0.0-alpha-7', revision: 'de8579b6d5'
+System info: host: 'DESKTOP-CD9N1D0', ip: '192.168.56.1', os.name: 'Windows 10', os.arch: 'amd64', os.version: '10.0', java.version: '11.0.10'
+Driver info: org.openqa.selenium.chrome.ChromeDriver
+Capabilities {acceptInsecureCerts: false, browserName: chrome, browserVersion: 92.0.4515.131, chrome: {chromedriverVersion: 92.0.4515.107 (87a818b10553..., userDataDir: C:\Users\ValBo\AppData\Loca...}, goog:chromeOptions: {debuggerAddress: localhost:1156}, javascriptEnabled: true, networkConnectionEnabled: false, pageLoadStrategy: normal, platform: WINDOWS, platformName: WINDOWS, proxy: Proxy(), setWindowRect: true, strictFileInteractability: false, timeouts: {implicit: 0, pageLoad: 300000, script: 30000}, unhandledPromptBehavior: dismiss and notify, webauthn:extension:credBlob: true, webauthn:extension:largeBlob: true, webauthn:virtualAuthenticators: true}
+Session ID: 7d21e1e3464bb9de95e65137498c1d0f
+*** Element info: {Using=xpath, value=//h2[@class='mr-3 text-black' and text() = "Dragancho Draganchev"]}
+	at testCases.F_FriendRequestTests.TC_F_03_Disconnect(F_FriendRequestTests.java:55)
+
+TC_F_01_SendFriendRequest(testCases.F_FriendRequestTests)  Time elapsed: 9.356 s  <<< ERROR!
+org.openqa.selenium.NoSuchElementException: 
+no such element: Unable to locate element: {"method":"xpath","selector":"//h2[@class='mr-3 text-black' and text() = "Dragancho Draganchev"]"}
+  (Session info: headless chrome=92.0.4515.131)
+For documentation on this error, please visit: https://selenium.dev/exceptions/#no_such_element
+Build info: version: '4.0.0-alpha-7', revision: 'de8579b6d5'
+System info: host: 'DESKTOP-CD9N1D0', ip: '192.168.56.1', os.name: 'Windows 10', os.arch: 'amd64', os.version: '10.0', java.version: '11.0.10'
+Driver info: org.openqa.selenium.chrome.ChromeDriver
+Capabilities {acceptInsecureCerts: false, browserName: chrome, browserVersion: 92.0.4515.131, chrome: {chromedriverVersion: 92.0.4515.107 (87a818b10553..., userDataDir: C:\Users\ValBo\AppData\Loca...}, goog:chromeOptions: {debuggerAddress: localhost:17073}, javascriptEnabled: true, networkConnectionEnabled: false, pageLoadStrategy: normal, platform: WINDOWS, platformName: WINDOWS, proxy: Proxy(), setWindowRect: true, strictFileInteractability: false, timeouts: {implicit: 0, pageLoad: 300000, script: 30000}, unhandledPromptBehavior: dismiss and notify, webauthn:extension:credBlob: true, webauthn:extension:largeBlob: true, webauthn:virtualAuthenticators: true}
+Session ID: 6fc0bedd2d08d17392e319394131efd2
+*** Element info: {Using=xpath, value=//h2[@class='mr-3 text-black' and text() = "Dragancho Draganchev"]}
+	at testCases.F_FriendRequestTests.TC_F_01_SendFriendRequest(F_FriendRequestTests.java:18)
+

@@ -1,0 +1,12 @@
+-------------------------------------------------------------------------------
+Test set: testCases.C_PersonalProfileTests
+-------------------------------------------------------------------------------
+Tests run: 4, Failures: 2, Errors: 0, Skipped: 0, Time elapsed: 29.07 s <<< FAILURE! - in testCases.C_PersonalProfileTests
+TC_P_01_UserSuccessfullyUpdatePersonalProfileInformation_When_AllRequiredFieldsAreFilledWithValidInformation(testCases.C_PersonalProfileTests)  Time elapsed: 7.093 s  <<< FAILURE!
+org.junit.ComparisonFailure: Attribute value was not as expected. expected:<Pencho[]> but was:<Pencho[PenchoPencho]>
+	at testCases.C_PersonalProfileTests.TC_P_01_UserSuccessfullyUpdatePersonalProfileInformation_When_AllRequiredFieldsAreFilledWithValidInformation(C_PersonalProfileTests.java:41)
+
+TC_P_01_SecondUserSuccessfullyUpdatePersonalProfileInformation_When_AllRequiredFieldsAreFilledWithValidInformation(testCases.C_PersonalProfileTests)  Time elapsed: 7.177 s  <<< FAILURE!
+org.junit.ComparisonFailure: Attribute value was not as expected. expected:<Dragancho[]> but was:<Dragancho[DraganchoDragancho]>
+	at testCases.C_PersonalProfileTests.TC_P_01_SecondUserSuccessfullyUpdatePersonalProfileInformation_When_AllRequiredFieldsAreFilledWithValidInformation(C_PersonalProfileTests.java:107)
+

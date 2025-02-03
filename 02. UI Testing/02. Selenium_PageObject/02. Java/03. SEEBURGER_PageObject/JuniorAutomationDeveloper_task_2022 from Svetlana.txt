@@ -1,0 +1,6 @@
+1. Implement a Junit test using Java and Selenium with the following steps:
+    * Load https://www.abv.bg/ in Chrome browser;
+    * Enter wrong user credentials and click the ‘Submit’ button;
+    * Ensure the correct error message is displayed;
+
+2. Define a class Person and class MyPersonality that extends Person and defines some of your personal character traits. Write Junit test for the methods in MyPersonality. 
