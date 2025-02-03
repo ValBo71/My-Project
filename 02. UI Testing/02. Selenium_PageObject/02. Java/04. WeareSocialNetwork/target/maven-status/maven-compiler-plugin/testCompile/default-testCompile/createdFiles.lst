@@ -1,0 +1,10 @@
+testCases\C_PersonalProfileTests.class
+testCases\D_PostsTests.class
+testCases\G_AdminTests.class
+testCases\A_RegistrationTests.class
+testCases\E_ExplorePostsTests.class
+testCases\F_FriendRequestTests.class
+testCases\DataConstants.class
+testCases\BaseTest.class
+testCases\PageHeaderText.class
+testCases\B_LoginTests.class

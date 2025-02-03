@@ -1,0 +1,28 @@
+body {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+    cursor: url(https://res.cloudinary.com/dspfsamgq/image/upload/v1579257122/5a3755ce3a48f0.7723702415135758862387_jvy9hf.png), default;
+   }
+   .table {
+    width: 90%;
+    border-bottom: 10px solid brown;
+    display: flex;
+    justify-content: space-around;
+    height: 150px;
+    align-items:flex-end;
+   }
+   .beer {
+    width: 70px;
+    height: 125px;
+    background: url(https://res.cloudinary.com/dspfsamgq/image/upload/v1576677836/sprite2_vcnzd8.png) center bottom/100px auto no-repeat;
+    padding:25px 25px 0;
+    transform-origin: 50% bottom;
+    transition:.5s;
+   }
+   
+   .die {
+    transform: rotateX(80deg);
+   }

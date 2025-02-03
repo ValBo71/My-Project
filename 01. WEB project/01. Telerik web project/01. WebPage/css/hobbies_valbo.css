@@ -1,0 +1,59 @@
+
+
+/* Elements Hobbies   */
+
+.hobby {
+    margin: 0px;
+    width: 313px;
+    height: 166px;
+    position: absolute;
+    top: 200px;
+    left: 630px;
+}
+.fotoHobbies {
+    margin: 0px;
+    width: 313px;
+    height: 166px;
+    border: solid 3px #d07325;
+}
+.hobbiesNames{
+    font-size: 20pt;
+    color: #6f6f6f;
+    position: relative;
+    top:-163px;
+    left: 333px;
+}
+.orangeLineHobby {
+    width: 455px;
+    height: 2px;
+    background-color: #d07325;
+    position: relative;
+    top: -153px;
+    left: 333px;
+}
+.paragrapheHobby{
+        width: 455px;
+        height: 112px;
+        font-size: 13pt;
+        text-align: justify;
+        color: #6f6f6f;
+        position: relative;
+        top: -153px;
+        left: 333px;
+}
+.hobbyTwo {
+    margin: 0px;
+    width: 313px;
+    height: 166px;
+    position: absolute;
+    top: 390px;
+    left: 630px;
+}
+.hobbyТhree{
+    margin: 0px;
+    width: 313px;
+    height: 166px;
+    position: absolute;
+    top: 583px;
+    left: 630px;  
+}

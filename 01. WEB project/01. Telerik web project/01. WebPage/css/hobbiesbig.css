@@ -1,0 +1,260 @@
+
+
+/* Permanent elements  */
+body{
+    margin: 0px;
+}
+.modal{
+    width: 1800px;
+    height: 900px;
+    font-family: 'Arial Narrow', Arial, sans-serif;
+    font-weight: 300;
+    margin: 0 auto;
+    position: relative;
+}
+/* Orange rectangle   */
+.rectangleInsadePages  {
+    margin: 0;
+   width: 230px;
+   height: 510px;
+   background-color: #d07325;
+   position: absolute;
+   top: 177px;
+   left: 380px;
+}
+.graylogo {
+   width: 171px;
+   height: 241px;
+   position: absolute;
+   top: 182px;
+   left: 385px;
+}
+.lightOrangeLine{
+   width: 151px;
+   height: 2px;
+   background-color: #dd9c5c;
+   position: absolute;
+   top: 600px;
+   left: 419px;
+}
+.names {
+   font-size: 30pt;
+   text-align: center;
+   color: white;
+   position: absolute;
+   top: 620px;
+   left: 435px;
+}
+.names2 {
+   font-size: 25pt;
+   text-align: center;
+   color: white;
+   position: absolute;
+   top: 555px;
+   left: 446px;
+}
+/* Header names  */
+.bigNames {
+   font-size: 40pt;
+   text-align: left;
+   color: #6f6f6f;
+   position: absolute;
+   top: 73px;
+   left: 380px;
+}
+.orangeLineUp {
+    margin: 0;
+   width: 789px;
+   height: 2px;
+   background-color: #d07325;
+   position: absolute;
+   top: 177px;
+   left: 630px;
+}
+/* Menue  */
+.menueHomePage{
+    width: 90px;
+    height: 45px;
+    position:absolute;
+    top: 177px;
+    left: 1157px;
+}
+.menuename{
+    font-size: 12pt;
+    color: #6f6f6f;
+    text-align: center;
+    position: relative;
+    top: 15px;
+}
+.OrangeLineUp {
+    width: 2px;
+    height: 30px;
+    background-color: #d07325;
+    position: absolute;
+    top: 10px;
+    left: 90px;
+}
+.menueAboutMe{
+    width: 90px;
+    height: 45px;
+    text-decoration-color: #d07325;
+    position:absolute;
+    top: 177px;
+    left: 1247px;
+}
+.menueHobbies{
+    width: 90px;
+    height: 45px;
+    position:absolute;
+    top: 177px;
+    left: 1337px;
+}
+/* Mail  */
+.mailto{
+    font-size: 12pt;
+    text-align: right;
+    color: #6f6f6f;
+    position: absolute;
+    top: 108px;
+    left: 1125px;
+ }
+/* Permanent elements  */
+
+/* Local elements */
+.HobbiesFoto{
+    width: 530px;
+    height: 530px;
+    border: solid 3px #d07325;
+    position: absolute;
+    top: 222px;
+    left: 637px;
+}
+.paragrapheHobby {
+    width: 790px;
+    height: 233px;
+    font-size: 13pt;
+    text-align: justify;
+    color: #6f6f6f;
+    position: absolute;
+    top:  232px;
+    left: 630px;
+ }
+
+ .gallery_container {
+    margin: 0;
+   width: 790px;
+   height: 287px;
+   background-color: #d07325;
+   position: absolute;
+   top: 400px;
+   left: 630px;
+}
+
+
+
+.orangeLineParagrapheUP {
+    width: 260px;
+    height: 2px;
+    background-color: #d07325;
+    position: absolute;
+    top:  225px;
+    left: 1157px; 
+}
+.orangeLineHobbyParagrapheBottom {
+    width: 789px;
+    height: 2px;
+    background-color: #d07325;
+    position: absolute;
+    top:  755px;
+    left: 630px; 
+}
+/* Local elements */
+
+/* Footer */
+.grayRectangleBotom {
+    width: 1040px;
+    height: 2px;
+    background-color: #6f6f6f;
+    position: absolute;
+    top: 825px;
+    left: 380px;
+}
+.welcome{
+    font-size: 12pt;
+    text-align: center;
+    color: #6f6f6f;
+    position: absolute;
+    top: 800px;
+    left: 651px;
+}
+.footerToni {
+    width: 60px;
+    height: 45px;
+    position:absolute;
+    top: 824px;
+    left: 720px;
+}
+.footername{
+    font-size: 12pt;
+    color: #6f6f6f;
+    text-align: center;
+    position: relative;
+    top: 15px;
+}
+.OrangeLine {
+    width: 2px;
+    height: 30px;
+    background-color: #d07325;
+    position: absolute;
+    top: 10px;
+    left: 60px;
+}
+.footerEli{
+    width: 60px;
+    height: 45px;
+    position:absolute;
+    top: 824px;
+    left: 780px;
+}
+.footerNati{
+    width: 60px;
+    height: 45px;
+    position:absolute;
+    top: 824px;
+    left: 840px;
+}
+.footerNiki{
+    width: 60px;
+    height: 45px;
+    position:absolute;
+    top: 824px;
+    left: 900px;
+}
+.footerValyo{
+    width: 60px;
+    height: 45px;
+    position:absolute;
+    top: 824px;
+    left: 960px;
+}
+.footer{
+    width: 60px;
+    height: 45px;
+    position:absolute;
+    top: 824px;
+    left: 1020px;
+}
+.flagBg{
+    width: 30px;
+    height: 15px;
+    position: absolute;
+    top: 834px;
+    left: 1357px;
+}
+.flagEng{
+    width: 30px;
+    height: 15px;
+    position: absolute;
+    top: 834px;
+    left: 1390px;
+}

@@ -1,0 +1,1 @@
+newman run BEDE_Test_RestAPI.postman_collection.json -e BEDE_Env.postman_environment.json -r htmlextra

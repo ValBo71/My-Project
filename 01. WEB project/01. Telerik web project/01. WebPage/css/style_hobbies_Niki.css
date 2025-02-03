@@ -1,0 +1,271 @@
+body {
+    font-family: 'Arial Narrow', Arial, sans-serif;
+}
+
+.head-container {
+    background-color: white;
+    display: flex;
+    flex: 1 100%;
+    padding-left: 20%;
+    padding-right: 20%;
+    padding-bottom: 10px;
+}
+
+.header-left {
+    display: flex;
+    flex-direction: column;
+}
+
+.header-right {
+    font-size: 18pt;
+    color: #6f6f6f;
+    text-align: right;
+    flex-grow: 1;
+    padding-top: 20px;
+}
+
+#header-name {
+    font-size: 50pt;
+    text-align: left;
+    color: #6f6f6f;
+}
+
+#mailto {
+    font-size: 18pt;
+    color: #6f6f6f;
+    padding-top: 20px; 
+}
+
+#studentAt {
+    font-size: 18pt;
+    text-align: left;
+    color: #b1b1b1;
+    padding-top: 10px;
+}
+
+.middle-container {
+    display: flex;
+    margin-left: 20%;
+    margin-right: 20%;
+    flex-direction: row;
+    border-top: 3px solid #d07325;
+}
+
+.hobby-container {
+    padding-left: 20px;
+}
+
+.aside {
+    width: 230px;
+    height: 700px;
+    background-color: #d07325;
+    padding: 30px;
+    flex-shrink: 0;
+    color: #e2d0be
+}
+
+.aside-logo {
+    position: relative;
+}
+
+.lightOrangeLine {
+    background-color: #dd9c5c;
+    height: 1px;
+    width: 100%;
+    margin-left: 20%;
+    margin-top: 20%;
+    border-width: 0;
+}
+
+#aside-hobbies {
+    font-size: 30pt;
+    color: white;
+    text-align: center;
+    padding-top: 90px;
+    padding-bottom: 5%;
+    margin: 0;
+    color: #e2d0be
+}
+
+#separateLine {
+    width: 50%;
+    border:  2px white;
+}
+
+#aside-name {
+    font-size: 40pt;
+    color: white;
+    text-align: center;
+    padding-top: 20px;
+    margin: 0;
+
+}
+
+.text {
+    text-align: justify;
+    overflow: auto;
+}
+
+.links {
+    text-align: right; 
+    padding-top: 10px;
+    text-decoration: none;
+    padding-right: 7px;
+    color: black;
+    padding-bottom: 10px;
+}
+
+.hobby {
+    display: flex;
+    flex-direction: row;
+    padding-bottom: 20px;
+}
+
+.hobby-image {
+    width: 313px;
+    flex-shrink: 0;
+}
+
+.hobby-image img {
+    width: 100%;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+  
+.hobby-image img:hover {
+    opacity: 0.7;
+}
+
+.hobby-content {
+    padding-left: 20px;
+}
+
+.hobby-content h2 {
+    margin-top: 0;
+    color: #6f6f6f;
+}
+
+.text {
+    color: #6f6f6f;
+    font-size: 15pt;
+}
+
+/* The Modal (background) */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    padding-top: 100px; /* Location of the box */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.9); /* Black w/ opacity */
+}
+
+/* Modal Content (image) */
+.modal-content {
+    margin: auto;
+    display: block;
+    width: 80%;
+    max-width: 700px;
+}
+
+/* Add Animation */
+.modal-content {  
+    -webkit-animation-name: zoom;
+    -webkit-animation-duration: 0.6s;
+    animation-name: zoom;
+    animation-duration: 0.6s;
+}
+
+@-webkit-keyframes zoom {
+    from {-webkit-transform:scale(0)} 
+    to {-webkit-transform:scale(1)}
+}
+
+@keyframes zoom {
+    from {transform:scale(0)} 
+    to {transform:scale(1)}
+}
+
+/* The Close Button */
+.close {
+    position: absolute;
+    top: 15px;
+    right: 35px;
+    color: #f1f1f1;
+    font-size: 40px;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+.close:hover,
+.close:focus {
+    color: #bbb;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/* The Modal (background) */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    padding-top: 100px; /* Location of the box */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.9); /* Black w/ opacity */
+}
+
+/* Modal Content (image) */
+.modal-content {
+    margin: auto;
+    display: block;
+    width: 80%;
+    max-width: 700px;
+}
+
+/* Add Animation */
+.modal-content {  
+    -webkit-animation-name: zoom;
+    -webkit-animation-duration: 0.6s;
+    animation-name: zoom;
+    animation-duration: 0.6s;
+}
+
+@-webkit-keyframes zoom {
+    from {-webkit-transform:scale(0)} 
+    to {-webkit-transform:scale(1)}
+}
+
+@keyframes zoom {
+    from {transform:scale(0)} 
+    to {transform:scale(1)}
+}
+
+/* The Close Button */
+.close {
+    position: absolute;
+    top: 15px;
+    right: 35px;
+    color: #f1f1f1;
+    font-size: 40px;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+.close:hover,
+.close:focus {
+    color: #bbb;
+    text-decoration: none;
+    cursor: pointer;
+}
+

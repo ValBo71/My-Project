@@ -1,0 +1,30 @@
+-------------------------------------------------------------------------------
+Test set: testCases.G_AdminTests
+-------------------------------------------------------------------------------
+Tests run: 4, Failures: 0, Errors: 2, Skipped: 0, Time elapsed: 35.927 s <<< FAILURE! - in testCases.G_AdminTests
+TC_A_02_AdministratorSuccessfullyEnableUser_When_UserIsDisabled(testCases.G_AdminTests)  Time elapsed: 9.069 s  <<< ERROR!
+org.openqa.selenium.NoSuchElementException: 
+no such element: Unable to locate element: {"method":"xpath","selector":"//h2[@class='mr-3 text-black' and text() = "Dragancho Draganchev"]"}
+  (Session info: headless chrome=92.0.4515.131)
+For documentation on this error, please visit: https://selenium.dev/exceptions/#no_such_element
+Build info: version: '4.0.0-alpha-7', revision: 'de8579b6d5'
+System info: host: 'DESKTOP-CD9N1D0', ip: '192.168.56.1', os.name: 'Windows 10', os.arch: 'amd64', os.version: '10.0', java.version: '11.0.10'
+Driver info: org.openqa.selenium.chrome.ChromeDriver
+Capabilities {acceptInsecureCerts: false, browserName: chrome, browserVersion: 92.0.4515.131, chrome: {chromedriverVersion: 92.0.4515.107 (87a818b10553..., userDataDir: C:\Users\ValBo\AppData\Loca...}, goog:chromeOptions: {debuggerAddress: localhost:32195}, javascriptEnabled: true, networkConnectionEnabled: false, pageLoadStrategy: normal, platform: WINDOWS, platformName: WINDOWS, proxy: Proxy(), setWindowRect: true, strictFileInteractability: false, timeouts: {implicit: 0, pageLoad: 300000, script: 30000}, unhandledPromptBehavior: dismiss and notify, webauthn:extension:credBlob: true, webauthn:extension:largeBlob: true, webauthn:virtualAuthenticators: true}
+Session ID: 6bcf33949a5b18467db8df0bf8a3ac97
+*** Element info: {Using=xpath, value=//h2[@class='mr-3 text-black' and text() = "Dragancho Draganchev"]}
+	at testCases.G_AdminTests.TC_A_02_AdministratorSuccessfullyEnableUser_When_UserIsDisabled(G_AdminTests.java:37)
+
+TC_A_01_AdministratorSuccessfullyDisableUser_When_UserIsEnabled(testCases.G_AdminTests)  Time elapsed: 9.231 s  <<< ERROR!
+org.openqa.selenium.NoSuchElementException: 
+no such element: Unable to locate element: {"method":"xpath","selector":"//h2[@class='mr-3 text-black' and text() = "Dragancho Draganchev"]"}
+  (Session info: headless chrome=92.0.4515.131)
+For documentation on this error, please visit: https://selenium.dev/exceptions/#no_such_element
+Build info: version: '4.0.0-alpha-7', revision: 'de8579b6d5'
+System info: host: 'DESKTOP-CD9N1D0', ip: '192.168.56.1', os.name: 'Windows 10', os.arch: 'amd64', os.version: '10.0', java.version: '11.0.10'
+Driver info: org.openqa.selenium.chrome.ChromeDriver
+Capabilities {acceptInsecureCerts: false, browserName: chrome, browserVersion: 92.0.4515.131, chrome: {chromedriverVersion: 92.0.4515.107 (87a818b10553..., userDataDir: C:\Users\ValBo\AppData\Loca...}, goog:chromeOptions: {debuggerAddress: localhost:1169}, javascriptEnabled: true, networkConnectionEnabled: false, pageLoadStrategy: normal, platform: WINDOWS, platformName: WINDOWS, proxy: Proxy(), setWindowRect: true, strictFileInteractability: false, timeouts: {implicit: 0, pageLoad: 300000, script: 30000}, unhandledPromptBehavior: dismiss and notify, webauthn:extension:credBlob: true, webauthn:extension:largeBlob: true, webauthn:virtualAuthenticators: true}
+Session ID: 9b25d275c299433667030b11eb3a6a70
+*** Element info: {Using=xpath, value=//h2[@class='mr-3 text-black' and text() = "Dragancho Draganchev"]}
+	at testCases.G_AdminTests.TC_A_01_AdministratorSuccessfullyDisableUser_When_UserIsEnabled(G_AdminTests.java:26)
+

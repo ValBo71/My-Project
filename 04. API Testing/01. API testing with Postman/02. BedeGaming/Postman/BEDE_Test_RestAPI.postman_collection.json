@@ -1,0 +1,968 @@
+{
+	"info": {
+		"_postman_id": "24394897-f1e1-4093-a6c2-8b27816fa946",
+		"name": "BEDE_Test_RestAPI",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "CreateNewBook",
+			"item": [
+				{
+					"name": "GetAllBooks",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const response = pm.response.text();\r",
+									"\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"No books available\", function () {\r",
+									"    var response = pm.response.json();\r",
+									"    pm.expect(response).is.empty;\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/books",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"books"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "CreateBookOne",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"The author's name is the same as the author's name provided\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    var expedtedAuthorName = pm.collectionVariables.get(\"TestAuthor_One\");\r",
+									"    pm.expect(jsonData.Author).to.eql(expedtedAuthorName);\r",
+									"  });\r",
+									"\r",
+									"  pm.test(\"A book with the specified title has been created\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    var expedtedTitle = pm.collectionVariables.get(\"TestTitle_One\");\r",
+									"    pm.expect(jsonData.Title).to.eql(expedtedTitle);\r",
+									"  });\r",
+									"    pm.test(\"A book with the specified description has been created\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    var expedtedDescription = pm.collectionVariables.get(\"TestDescription_One\");\r",
+									"    pm.expect(jsonData.Description).to.eql(expedtedDescription);\r",
+									"  });\r",
+									"        pm.test(\"A book with the specified number has been created\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    var expedtedNumber = pm.collectionVariables.get(\"Number_One\")*1;\r",
+									"    pm.expect(jsonData.Id).to.eql(expedtedNumber);\r",
+									"  });\r",
+									"\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.collectionVariables.set(\"Number_One\", pm.variables.replaceIn('{{$randomInt}}'));\r",
+									"pm.collectionVariables.set(\"TestAuthor_One\", pm.variables.replaceIn('{{$randomFirstName}}'));\r",
+									"pm.collectionVariables.set(\"TestTitle_One\", pm.variables.replaceIn('{{$randomFirstName}}'));\r",
+									"pm.collectionVariables.set(\"TestDescription_One\", pm.variables.replaceIn('{{$randomFirstName}}'));"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\"Id\": \"{{Number_One}}\",\r\n\"Author\": \"{{TestAuthor_One}}\",\r\n\"Title\": \"{{TestTitle_One}}\",\r\n\"Description\": \"{{TestDescription_One}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}//api/books",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"",
+								"api",
+								"books"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "CreateBookTwo",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"The author's name is the same as the author's name provided\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    var expedtedAuthorName = pm.collectionVariables.get(\"TestAuthor_Second\");\r",
+									"    pm.expect(jsonData.Author).to.eql(expedtedAuthorName);\r",
+									"  });\r",
+									"\r",
+									"  pm.test(\"A book with the specified title has been created\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    var expedtedTitle = pm.collectionVariables.get(\"TestTitle_Second\");\r",
+									"    pm.expect(jsonData.Title).to.eql(expedtedTitle);\r",
+									"  });\r",
+									"    pm.test(\"A book with the specified description has been created\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    var expedtedDescription = pm.collectionVariables.get(\"TestDescription_Second\");\r",
+									"    pm.expect(jsonData.Description).to.eql(expedtedDescription);\r",
+									"  });\r",
+									"      pm.test(\"A book with the specified number has been created\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    var expedtedNumber = pm.collectionVariables.get(\"Number_Second\")*1;\r",
+									"    pm.expect(jsonData.Id).to.eql(expedtedNumber);\r",
+									"  });"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.collectionVariables.set(\"Number_Second\", pm.variables.replaceIn('{{$randomInt}}'));\r",
+									"pm.collectionVariables.set(\"TestAuthor_Second\", pm.variables.replaceIn('{{$randomFirstName}}'));\r",
+									"pm.collectionVariables.set(\"TestTitle_Second\", pm.variables.replaceIn('{{$randomFirstName}}'));\r",
+									"pm.collectionVariables.set(\"TestDescription_Second\", pm.variables.replaceIn('{{$randomFirstName}}'));"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\"Id\": \"{{Number_Second}}\",\r\n\"Author\": \"{{TestAuthor_Second}}\",\r\n\"Title\": \"{{TestTitle_Second}}\",\r\n\"Description\": \"{{TestDescription_Second}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}//api/books",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"",
+								"api",
+								"books"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "CreateBookThree",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"The author's name is the same as the author's name provided\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    var expedtedAuthorName = pm.collectionVariables.get(\"TestAuthor_Тhird\");\r",
+									"    pm.expect(jsonData.Author).to.eql(expedtedAuthorName);\r",
+									"  });\r",
+									"\r",
+									"  pm.test(\"A book with the specified title has been created\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    var expedtedTitle = pm.collectionVariables.get(\"TestTitle_Тhird\");\r",
+									"    pm.expect(jsonData.Title).to.eql(expedtedTitle);\r",
+									"  });\r",
+									"    pm.test(\"A book with the specified description has been created\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    var expedtedDescription = pm.collectionVariables.get(\"TestDescription_Тhird\");\r",
+									"    pm.expect(jsonData.Description).to.eql(expedtedDescription);\r",
+									"  });\r",
+									"      pm.test(\"A book with the specified number has been created\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    var expedtedNumber = pm.collectionVariables.get(\"Number_Тhird\")*1;\r",
+									"    pm.expect(jsonData.Id).to.eql(expedtedNumber);\r",
+									"  });"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.collectionVariables.set(\"Number_Тhird\", pm.variables.replaceIn('{{$randomInt}}'));\r",
+									"pm.collectionVariables.set(\"TestAuthor_Тhird\", pm.variables.replaceIn('{{$randomFirstName}}'));\r",
+									"pm.collectionVariables.set(\"TestTitle_Тhird\", pm.variables.replaceIn('{{$randomFirstName}}'));\r",
+									"pm.collectionVariables.set(\"TestDescription_Тhird\", pm.variables.replaceIn('{{$randomFirstName}}'));"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\"Id\": \"{{Number_Тhird}}\",\r\n\"Author\": \"{{TestAuthor_Тhird}}\",\r\n\"Title\": \"{{TestTitle_Тhird}}\",\r\n\"Description\": \"{{TestDescription_Тhird}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}//api/books",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"",
+								"api",
+								"books"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetAllBooksAfterCreating",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const response = pm.response.text();\r",
+									"\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Books is available\", function () {\r",
+									"    var response = pm.response.json();\r",
+									"    pm.expect(response).is.not.empty;\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/books",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"books"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "UpdateContent",
+			"item": [
+				{
+					"name": "GetAllBooks",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const response = pm.response.text();\r",
+									"\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Books is available\", function () {\r",
+									"    var response = pm.response.json();\r",
+									"    pm.expect(response).is.not.empty;\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/books",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"books"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetBookByTitle",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"The author's name is the same as the author's name provided\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    var expedtedAuthorName = pm.collectionVariables.get(\"TestAuthor_Second\");\r",
+									"    pm.expect(jsonData[0].Author).to.eql(expedtedAuthorName);\r",
+									"  });\r",
+									"\r",
+									"  pm.test(\"A book with the specified title has been created\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    var expedtedTitle = pm.collectionVariables.get(\"TestTitle_Second\");\r",
+									"    pm.expect(jsonData[0].Title).to.eql(expedtedTitle);\r",
+									"  });\r",
+									"    pm.test(\"A book with the specified description has been created\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    var expedtedDescription = pm.collectionVariables.get(\"TestDescription_Second\");\r",
+									"    pm.expect(jsonData[0].Description).to.eql(expedtedDescription);\r",
+									"  });\r",
+									"      pm.test(\"A book with the specified number has been created\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    var expedtedNumber = pm.collectionVariables.get(\"Number_Second\")*1;\r",
+									"    pm.expect(jsonData[0].Id).to.eql(expedtedNumber);\r",
+									"  });"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/books?title={{TestTitle_Second}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"books"
+							],
+							"query": [
+								{
+									"key": "title",
+									"value": "{{TestTitle_Second}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UpdateBook",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.collectionVariables.set(\"UpdateAuthor_One\", pm.variables.replaceIn('{{$randomFirstName}}'));\r",
+									"pm.collectionVariables.set(\"UpdateTitle_One\", pm.variables.replaceIn('{{$randomFirstName}}'));\r",
+									"pm.collectionVariables.set(\"UpdateDescription_One\", pm.variables.replaceIn('{{$randomFirstName}}'));"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"The author's name is the same as the author's name provided\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    var expedtedAuthorName = pm.collectionVariables.get(\"UpdateAuthor_One\");\r",
+									"    pm.expect(jsonData.Author).to.eql(expedtedAuthorName);\r",
+									"  });\r",
+									"\r",
+									"  pm.test(\"A book with the specified title has been created\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    var expedtedTitle = pm.collectionVariables.get(\"UpdateTitle_One\");\r",
+									"    pm.expect(jsonData.Title).to.eql(expedtedTitle);\r",
+									"  });\r",
+									"    pm.test(\"A book with the specified description has been created\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    var expedtedDescription = pm.collectionVariables.get(\"UpdateDescription_One\");\r",
+									"    pm.expect(jsonData.Description).to.eql(expedtedDescription);\r",
+									"  });\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\"Id\": \"{{Number_One}}\",\r\n\"Author\": \"{{UpdateAuthor_One}}\",\r\n\"Title\": \"{{UpdateTitle_One}}\",\r\n\"Description\": \"{{UpdateDescription_One}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/books/{{Number_One}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"books",
+								"{{Number_One}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "DeleteBooks",
+			"item": [
+				{
+					"name": "GetAllBook",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const response = pm.response.text();\r",
+									"\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Books is available\", function () {\r",
+									"    var response = pm.response.json();\r",
+									"    pm.expect(response).is.not.empty;\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/books",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"books"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DeleteBookOne",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 204\", function () {\r",
+									"    pm.response.to.have.status(204);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/books/{{Number_One}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"books",
+								"{{Number_One}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "CheckForDeletedBookOne",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const response = pm.response.text();\r",
+									"let parsedResponse = response.split(' ');\r",
+									"\r",
+									"pm.test(\"Status code is 404\", function () {\r",
+									"    pm.response.to.have.status(404);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Username is the same as provided username\", function () {\r",
+									"    var expedtedNumber = pm.collectionVariables.get(\"Number_One\");\r",
+									"    pm.expect(parsedResponse[3]).to.eql(expedtedNumber);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/books/{{Number_One}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"books",
+								"{{Number_One}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DeleteBookTwo",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 204\", function () {\r",
+									"    pm.response.to.have.status(204);\r",
+									"});\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/books/{{Number_Second}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"books",
+								"{{Number_Second}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "CheckForDeletedBookTwo",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const response = pm.response.text();\r",
+									"let parsedResponse = response.split(' ');\r",
+									"\r",
+									"pm.test(\"Status code is 404\", function () {\r",
+									"    pm.response.to.have.status(404);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Username is the same as provided username\", function () {\r",
+									"    var expedtedNumber = pm.collectionVariables.get(\"Number_Second\");\r",
+									"    pm.expect(parsedResponse[3]).to.eql(expedtedNumber);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/books/{{Number_Second}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"books",
+								"{{Number_Second}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DeleteBookThree",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 204\", function () {\r",
+									"    pm.response.to.have.status(204);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/books/{{Number_Тhird}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"books",
+								"{{Number_Тhird}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "CheckForDeletedBookThree",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const response = pm.response.text();\r",
+									"let parsedResponse = response.split(' ');\r",
+									"\r",
+									"pm.test(\"Status code is 404\", function () {\r",
+									"    pm.response.to.have.status(404);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Username is the same as provided username\", function () {\r",
+									"    var expedtedNumber = pm.collectionVariables.get(\"Number_Тhird\");\r",
+									"    pm.expect(parsedResponse[3]).to.eql(expedtedNumber);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/books/{{Number_Тhird}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"books",
+								"{{Number_Тhird}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GetAllBookFinalCheck",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"No books available\", function () {\r",
+									"    var response = pm.response.json();\r",
+									"    pm.expect(response).is.empty;\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/books",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"books"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "TestAuthor_One",
+			"value": ""
+		},
+		{
+			"key": "TestTitle_One",
+			"value": ""
+		},
+		{
+			"key": "TestDescription_One",
+			"value": ""
+		},
+		{
+			"key": "Number_One",
+			"value": ""
+		},
+		{
+			"key": "Number_Second",
+			"value": ""
+		},
+		{
+			"key": "TestAuthor_Second",
+			"value": ""
+		},
+		{
+			"key": "TestTitle_Second",
+			"value": ""
+		},
+		{
+			"key": "TestDescription_Second",
+			"value": ""
+		},
+		{
+			"key": "Number_Тhird",
+			"value": ""
+		},
+		{
+			"key": "TestAuthor_Тhird",
+			"value": ""
+		},
+		{
+			"key": "TestTitle_Тhird",
+			"value": ""
+		},
+		{
+			"key": "TestDescription_Тhird",
+			"value": ""
+		},
+		{
+			"key": "UpdateAuthor_One",
+			"value": ""
+		},
+		{
+			"key": "UpdateTitle_One",
+			"value": ""
+		},
+		{
+			"key": "UpdateDescription_One",
+			"value": ""
+		}
+	]
+}

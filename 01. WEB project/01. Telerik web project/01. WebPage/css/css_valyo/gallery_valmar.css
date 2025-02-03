@@ -1,0 +1,271 @@
+/* Code for gallery 4 window */
+
+.gallery_container{
+  background: #d07325;
+}
+
+div.gallery {
+  margin: 7px;
+  border: 1px solid #ccc;
+  float:left;
+  width: 181px;
+  
+}
+
+div.gallery:hover {
+  border: 1px solid #777;
+}
+
+div.gallery img {
+  width: 100%;
+  height: auto;
+}
+
+div.desc {
+  padding: 15px;
+  text-align: center;
+}
+
+
+/* Hobbies column */
+.column22 {
+  float: left;
+  width: 33.33%;
+}
+
+/* Clear floats after the columns */
+.row22:after {
+  content: "";
+  display: table;
+  clear: both;
+
+}
+
+
+
+/* Centered vertical and horizontal button "Learn more" */
+.container {
+  height: 30px;
+  position: relative;
+  
+}
+
+.center {
+  margin: 0;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  -ms-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+}
+
+body {
+  background: #eee;
+}
+
+/* Code for expand window */
+
+#content {
+  width: 700px;
+  background: #fff;
+  padding: 10px;
+  padding-top: 0;
+  font-family: calibri;
+  font-size: 18px;
+  color: #444;
+  margin: 0 auto;
+  max-height: 270px;
+  overflow: hidden;
+  /* Set transitions up. */
+  -webkit-transition: max-height 0.7s;
+  -moz-transition: max-height 0.7s;
+  transition: max—height 0.7s;
+}
+
+#content.open {
+  max-height: 1200px;
+  /* Set transitions up. */
+  -webkit-transition: max-height 1s;
+  -moz-transition: max-height 1s;
+  transition: max-height 1s;
+}
+
+#show-more {
+  background: #d07325;
+  color: #fff;
+  font-family: calibri;
+  display: block;
+  width: 140px;
+  font-size: 24px;
+  text-transform: uppercase;
+  padding: 10px;
+  text-align: center;
+  margin: 20px auto;
+  cursor: pointer;
+}
+
+/* Code for FLEX design web page */
+
+.container-title {
+  display: flex;
+  justify-content: center;
+}
+
+.box-title {
+  background: #fff;
+  padding: 10px;
+  padding-top: 0;
+  font-family: calibri;
+  font-size: 18px;
+  color: #444;
+}
+
+.stefanie_text {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-style: italic;
+}
+
+.title-text {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.container-1 {
+  display: flex;
+  flex-direction: row;
+  /*
+  align-items:flex-start;
+  align-items:flex-end;
+  align-items:center;*/
+}
+
+.container-1 div {
+  border: 1px #ccc solid;
+  padding: 10px;
+}
+
+.box-1 {
+  background: #fff;
+  padding: 10px;
+  padding-top: 0;
+  font-family: calibri;
+  font-size: 18px;
+  color: #444;
+  flex: 1;
+  order: 1;
+}
+
+.box-2 {
+  background: #fff;
+  padding: 10px;
+  padding-top: 0;
+  font-family: calibri;
+  font-size: 18px;
+  color: #444;
+  flex: 1;
+  order: 1;
+}
+
+.box-3 {
+  background: #fff;
+  padding: 10px;
+  padding-top: 0;
+  font-family: calibri;
+  font-size: 18px;
+  color: #444;
+  flex: 1;
+  order: 3;
+}
+
+/* Clickable Dropdown menu Stefanie */
+/* Dropdown Button */
+.dropbtn {
+  background-color: #3498DB;
+  color: white;
+  padding: 16px;
+  font-size: 16px;
+  border: none;
+  cursor: pointer;
+}
+
+/* Dropdown button on hover & focus */
+.dropbtn:hover, .dropbtn:focus {
+  background-color: #2980B9;
+}
+
+/* The container <div> - needed to position the dropdown content */
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+/* Dropdown Content (Hidden by Default) */
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #f1f1f1;
+  min-width: 250px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+}
+
+/* Links inside the dropdown */
+.dropdown-content a {
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+  
+  
+}
+
+/* Change color of dropdown links on hover */
+.dropdown-content a:hover {background-color: #ddd}
+
+/* Show the dropdown menu (use JS to add this class to the .dropdown-content container when the user clicks on the dropdown button) */
+.show {display:block;}
+
+/* Drone picture center */
+.center-drone {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 50%;
+  width: 200px;
+}
+
+.dron_text{
+  
+  font-family: Arial Narrow, sans-serif;
+  font-size: 20pt;
+  font-weight: 500;
+  text-align:center;
+  color: #6f6f6f;
+  padding-left: 2px;
+  padding-right: 2px;
+  
+}
+.dron_text2{
+font-family: Arial Narrow, sans-serif;
+font-size: 20pt;
+font-weight:300;
+text-align:justify;
+color: #6f6f6f;
+padding-left: 2px;
+padding-right: 5px;
+}
+
+.dron_text3{
+  font-family:Verdana, Geneva, Tahoma, sans-serif;
+  font-size: 35pt;
+  font-weight:300;
+  text-align:center;
+  color: #6f6f6f;
+  padding-left: 8px;
+  padding-right: 8px;
+  }
+

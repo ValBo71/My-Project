@@ -1,0 +1,397 @@
+body{
+    margin: 0px;
+}
+.modal{
+    width: 1800px;
+    height: 900px;
+    font-family: 'Arial Narrow', Arial, sans-serif;
+    font-weight: 300;
+    margin: 0 auto;
+    position: relative;
+}
+.rectangleInsadePages  {
+   width: 230px;
+   height: 580px;
+   background-color: #d07325;
+   position: absolute;
+   top: 177px;
+   left: 380px;
+}
+.graylogo {
+   width: 171px;
+   height: 241px;
+   position: absolute;
+   top: 264px;
+   left: 409px;
+}
+.lightOrangeLine{
+   width: 151px;
+   height: 2px;
+   background-color: #dd9c5c;
+   position: absolute;
+   top: 600px;
+   left: 419px;
+}
+.names {
+   font-size: 30pt;
+   text-align: center;
+   color: white;
+   position: absolute;
+   top: 620px;
+   left: 414px;
+}
+.names2 {
+   font-size: 25pt;
+   text-align: center;
+   color: white;
+   position: absolute;
+   top: 555px;
+   left: 440px;
+}
+.bigNames {
+   font-size: 40pt;
+   text-align: left;
+   color: #6f6f6f;
+   position: absolute;
+   top: 73px;
+   left: 380px;
+}
+.bigNamesStudents {
+   font-size: 18pt;
+   text-align: left;
+   color: #b1b1b1;
+   position: absolute;
+   top: 137px;
+   left: 380px;
+}
+.orangeLineUp {
+   width: 789px;
+   height: 2px;
+   background-color: #d07325;
+   position: absolute;
+   top: 177px;
+   left: 630px;
+}
+.menueHomePage{
+    width: 90px;
+    height: 45px;
+    position:absolute;
+    top: 177px;
+    left: 1157px;
+}
+.menuename{
+    font-size: 12pt;
+    color: #6f6f6f;
+    text-align: center;
+    position: relative;
+    top: 15px;
+}
+.menuename:hover{
+    font-size: 12pt;
+    color: #d07325;
+    text-align: center;
+    position: relative;
+    top: 15px;
+}
+.OrangeLineUp {
+    width: 2px;
+    height: 30px;
+    background-color: #d07325;
+    position: absolute;
+    top: 10px;
+    left: 90px;
+}
+.menueAboutMe{
+    width: 90px;
+    height: 45px;
+    text-decoration-color: #d07325;
+    position:absolute;
+    top: 177px;
+    left: 1247px;
+}
+.menueHobbies{
+    width: 90px;
+    height: 45px;
+    position:absolute;
+    top: 177px;
+    left: 1350px;
+}
+.mailto{
+    font-size: 12pt;
+    text-align: right;
+    color: #6f6f6f;
+    position: absolute;
+    top: 108px;
+    left: 1125px;
+ }
+ .dropbtn {
+    color: #6f6f6f;
+    font-size: 12pt;
+    cursor: pointer;
+    text-align: center;
+    position: relative;
+    top: 15px;
+  }
+  .dropbtn:hover, .dropbtn:focus {
+    color: #d07325;
+  }
+  .dropdown {
+    position: relative;
+    display: inline-block;
+  }
+  .dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: white;
+    min-width: 160px;
+    overflow: auto;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+  }
+  .dropdown-content a {
+    color: #6f6f6f;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+  }
+  
+  .dropdown a:hover {background-color: #dd9c5c;}
+  
+  .show {display: block;}
+/* Permanent elements  */
+
+/* Elements About me   */
+.foto {
+   width: 391px;
+   height: 455px;
+   border: solid 3px #d07325;
+   position: absolute;
+   top: 270px;
+   left: 1029px;
+}
+.about2{
+   font-size: 30pt;
+   text-align: center;
+   color: #6f6f6f;
+   position: absolute;
+   top: 190px;
+   left: 630px;
+}
+.orangeLineAboutMe {
+    width: 150px;
+    height: 2px;
+    background-color: #d07325;
+    position: absolute;
+    top: 245px;
+    left: 630px;
+}
+.orangeLineProfile{
+    width: 300px;
+    height: 2px;
+    background-color: #d07325;
+    position: absolute;
+    top: 672px;
+    left: 630px; 
+}
+.aboutParagraphe{
+   width: 378px;
+   height: 285px;
+   font-size: 13pt;
+   text-align: justify;
+   color: #6f6f6f;
+   position: absolute;
+   top: 250px;
+   left: 631px;
+}
+.facebook{
+   width: 42px;
+   height: 42px;
+   position: absolute;
+   top: 605px;
+   left: 630px;
+}
+.facebook_profile{
+   font-size: 12pt;
+   text-align: left;
+   color: #6f6f6f;
+   position: absolute;
+   top: 605px;
+   left: 706px;
+}
+.facebook_name{
+   font-size: 10pt;
+   text-align: left;
+   color: #6f6f6f;
+   position: absolute;
+   top: 625px;
+   left: 706px;
+} 
+.twitter{
+   width: 42px;
+   height: 42px;
+   position: absolute;
+   top: 693px;
+   left: 630px;
+}
+.twitter_profile{
+   font-size: 12pt;
+   text-align: left;
+   color: #6f6f6f;
+   position: absolute;
+   top: 693px;
+   left: 706px;
+}
+.twitter_name{
+   font-size: 10pt;
+   text-align: left;
+   color: #6f6f6f;
+   position: absolute;
+   top: 716px;
+   left: 706px;
+}
+.dot {
+   height: 21px;
+   width: 21px;
+   position: absolute;
+   top: 735px;
+   left: 1180px;
+}
+.dot1 {
+    height: 21px;
+    width: 21px;
+    position: absolute;
+    top: 735px;
+    left: 1215px;
+}
+.dot2 {
+    height: 21px;
+    width: 21px;
+    position: absolute;
+    top: 735px;
+    left: 1249px;
+}
+/* Elements About me   */
+
+/* Footer   */
+.grayRectangleBotom {
+    width: 1040px;
+    height: 2px;
+    background-color: #6f6f6f;
+    position: absolute;
+    top: 825px;
+    left: 380px;
+}
+.welcome{
+    font-size: 12pt;
+    text-align: center;
+    color: #6f6f6f;
+    position: absolute;
+    top: 800px;
+    left: 651px;
+}
+.footerToni {
+    width: 60px;
+    height: 45px;
+    position:absolute;
+    top: 824px;
+    left: 720px;
+}
+.footername{
+    font-size: 12pt;
+    color: #6f6f6f;
+    text-align: center;
+    position: relative;
+    top: 0px;
+}
+.OrangeLine {
+    width: 2px;
+    height: 30px;
+    background-color: #d07325;
+    position: absolute;
+    top: 10px;
+    left: 60px;
+}
+.dropbtn2 {
+    color: #6f6f6f;
+    padding: 16px;
+    font-size: 14px;
+    cursor: pointer;
+    border: none;
+} 
+  .dropup {
+    position: relative;
+    display: inline-block;
+}  
+  .dropup-content {
+    display: none;
+    position: absolute;
+    background-color: white;
+    min-width: 160px;
+    bottom: 50px;
+    box-shadow: 0px 8px 8px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+}
+    .dropup-content a {
+    color: #6f6f6f;
+    padding: 12px 10px;
+    text-decoration: none;
+    display: block;
+}
+    .dropup-content a:hover {background-color: #dd9c5c}
+  
+  .dropup:hover .dropup-content {
+    display: block;
+}
+  
+  .dropup:hover .dropbtn {
+    background-color: white;
+}
+.footerEli{
+    width: 60px;
+    height: 45px;
+    position:absolute;
+    top: 824px;
+    left: 780px;
+}
+.footerNati{
+    width: 60px;
+    height: 45px;
+    position:absolute;
+    top: 824px;
+    left: 840px;
+}
+.footerNiki{
+    width: 60px;
+    height: 45px;
+    position:absolute;
+    top: 824px;
+    left: 900px;
+}
+.footerValyo{
+    width: 60px;
+    height: 45px;
+    position:absolute;
+    top: 824px;
+    left: 955px;
+}
+.footer{
+    width: 60px;
+    height: 45px;
+    position:absolute;
+    top: 824px;
+    left: 1010px;
+}
+.flagBg{
+    width: 30px;
+    height: 15px;
+    position: absolute;
+    top: 834px;
+    left: 1357px;
+}
+.flagEng{
+    width: 30px;
+    height: 15px;
+    position: absolute;
+    top: 834px;
+    left: 1390px;
+}

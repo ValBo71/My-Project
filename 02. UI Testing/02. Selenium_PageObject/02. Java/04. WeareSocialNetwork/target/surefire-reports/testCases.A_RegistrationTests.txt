@@ -1,0 +1,16 @@
+-------------------------------------------------------------------------------
+Test set: testCases.A_RegistrationTests
+-------------------------------------------------------------------------------
+Tests run: 3, Failures: 3, Errors: 0, Skipped: 0, Time elapsed: 19.566 s <<< FAILURE! - in testCases.A_RegistrationTests
+TC_R_01_UserAccountSuccessfullyCreatedAsAdmin_When_RequiredFieldsFilledWithValidData(testCases.A_RegistrationTests)  Time elapsed: 9.159 s  <<< FAILURE!
+org.junit.ComparisonFailure: expected:<[Welcome to our community.]> but was:<[Join our community]>
+	at testCases.A_RegistrationTests.TC_R_01_UserAccountSuccessfullyCreatedAsAdmin_When_RequiredFieldsFilledWithValidData(A_RegistrationTests.java:43)
+
+TC_R_01_SecondUserAccountSuccessfullyCreated_When_ValidValuesAreProvided(testCases.A_RegistrationTests)  Time elapsed: 5.042 s  <<< FAILURE!
+org.junit.ComparisonFailure: expected:<[Welcome to our community.]> but was:<[Join our community]>
+	at testCases.A_RegistrationTests.TC_R_01_SecondUserAccountSuccessfullyCreated_When_ValidValuesAreProvided(A_RegistrationTests.java:32)
+
+TC_R_01_UserAccountSuccessfullyCreated_When_ValidValuesAreProvided(testCases.A_RegistrationTests)  Time elapsed: 5.23 s  <<< FAILURE!
+org.junit.ComparisonFailure: expected:<[Welcome to our community.]> but was:<[Join our community]>
+	at testCases.A_RegistrationTests.TC_R_01_UserAccountSuccessfullyCreated_When_ValidValuesAreProvided(A_RegistrationTests.java:21)
+

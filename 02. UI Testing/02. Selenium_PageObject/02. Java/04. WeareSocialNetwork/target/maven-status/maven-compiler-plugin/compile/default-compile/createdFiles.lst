@@ -1,0 +1,14 @@
+com\telerikacademy\testframework\UserActions.class
+pages\BasePage.class
+pages\PostPage.class
+pages\UsersResultPage.class
+com\telerikacademy\testframework\PropertiesManager.class
+pages\LoginPage.class
+com\telerikacademy\testframework\PropertiesManager$PropertiesManagerEnum.class
+pages\ExplorePostsPage.class
+com\telerikacademy\testframework\Utils.class
+pages\PersonalProfilePage.class
+pages\RegistrationPage.class
+com\telerikacademy\testframework\CustomWebDriverManager.class
+com\telerikacademy\testframework\CustomWebDriverManager$CustomWebDriverManagerEnum.class
+com\telerikacademy\testframework\Driver.class

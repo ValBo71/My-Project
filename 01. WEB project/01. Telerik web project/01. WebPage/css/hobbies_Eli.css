@@ -1,0 +1,235 @@
+.pictureHobby1 {
+    grid-column: 2/ 4;
+    grid-row: 3/4;
+    margin-left: 10px;
+    margin-right: 10px;
+    margin-top: 10px;
+    margin-bottom: 10px; 
+}
+
+.pictureHobby2 {
+    grid-column: 2/ 4;
+    grid-row: 4/6;
+    margin-left: 10px;
+    margin-right: 10px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.pictureHobby3 {
+    grid-column: 2/ 4;
+    grid-row: 6/9;
+    margin-left: 10px;
+    margin-right: 10px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.button {
+  padding: 15px 25px;
+  font-size: 24px;
+  text-align: center;
+  cursor: pointer;
+  outline: none;
+  color: #fff;
+  background-color: #d07325;
+  border: none;
+  border-radius: 15px;
+  box-shadow: 0 9px #999;
+  width: 100%;
+}
+
+.button:hover {background-color: #b15a13}
+
+.button:active {
+  background-color: #ec7412;
+  box-shadow: 0 5px #666;
+  transform: translateY(4px);
+}
+
+
+.hobby-folklore {
+    grid-column: 4/ 10;
+    grid-row: 3/ 4;
+    color: #6f6f6f;
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+.hobby-mountaine {
+    grid-column: 4/ 10;
+    grid-row: 4/ 6;
+    color: #6f6f6f;
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+.hobby-sewing {
+    grid-column: 4/ 10;
+    grid-row: 6/ 9;
+    color: #6f6f6f;
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+.hobby-name {
+    text-align: left;
+    font-size: 25px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.hobby-text{
+    text-align: justify;
+    font-size: 15pt;
+    /* font-weight: 500; */
+    /* margin-top: 10%; */
+    margin-bottom: 10px;
+}
+
+.row {
+    grid-column: 2/ 4;
+    grid-row: 3/9;
+    margin-left: 10px;
+    margin-right: 10px;
+    margin-top: 10%;
+}
+
+.hobby {
+    grid-column: 4/ 10;
+    grid-row: 3/ 9;
+    color: #6f6f6f;
+    margin-top: 10%;
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+  .modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    padding-top: 10px;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(12, 11, 11, 0.938);
+  }
+  
+  /* Modal Content */
+  .modal-content {
+    position: relative;
+    margin: auto;
+    padding: 0;
+    width: 70%;
+    max-width: 1050px;
+  }
+  
+  /* The Close Button */
+  .close {
+    color: white;
+    position: absolute;
+    top: 10px;
+    right: 25px;
+    font-size: 35px;
+    font-weight: bold;
+  }
+  
+  .close:hover,
+  .close:focus {
+    color: #999;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  
+  /* Hide the slides by default */
+  .mySlides {
+    display: none;
+  }
+  
+  /* Next & previous buttons */
+  .prev,
+  .next {
+    cursor: pointer;
+    position: absolute;
+    top: 50%;
+    width: auto;
+    padding: 16px;
+    margin-top: -50px;
+    color: white;
+    font-weight: bold;
+    font-size: 20px;
+    transition: 0.6s ease;
+    border-radius: 0 3px 3px 0;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  
+  /* Position the "next button" to the right */
+  .prev {
+    left: 0;
+    border-radius: 3px 0 0 3px;
+  }
+  .next {
+    right: 0;
+    border-radius: 3px 0 0 3px;
+  }
+  
+  /* On hover, add a black background color with a little bit see-through */
+  .prev:hover,
+  .next:hover {
+    background-color: rgba(0, 0, 0, 0.8);
+  }
+  
+  /* Number text (1/3 etc) */
+  .numbertext {
+    color: #f2f2f2;
+    font-size: 16px;
+    padding: 8px 12px;
+    position: absolute;
+    top: 0;
+  }
+  
+  img.demo {
+    opacity: 0.6;
+  }
+  
+  .active,
+  .demo:hover {
+    opacity: 1;
+  }
+  
+  img.hover-shadow {
+    transition: 0.3s;
+    border: solid 2px #d07325;
+  }
+  
+  .hover-shadow:hover {
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  }
+
+  .collapsible {
+    background-color: #eee;
+    color: #444;
+    cursor: pointer;
+    padding: 18px;
+    width: 100%;
+    border: none;
+    text-align: left;
+    outline: none;
+    font-size: 15px;
+  }
+  
+  /* Add a background color to the button if it is clicked on (add the .active class with JS), and when you move the mouse over it (hover) */
+  .active, .collapsible:hover {
+    background-color: #ccc;
+  }
+  
+  /* Style the collapsible content. Note: hidden by default */
+  .content {
+    padding: 0 18px;
+    display: none;
+    overflow: hidden;
+    background-color: #f1f1f1;
+  }
