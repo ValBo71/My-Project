@@ -1,44 +1,177 @@
 <!doctype html>
-<html>
+<html lang="bg">
 <head>	
-	<meta charset ="UTF-8">
-	<title>Sea Chess</title>
-	
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Морски шах</title>
+	<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 	<style>	
-		.wrap{
-			line-height: 0px;
+		* {
+			box-sizing: border-box;
+			margin: 0;
+			padding: 0;
+		}
+
+		body {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+			min-height: 100vh;
+			font-family: 'Poppins', sans-serif;
+			background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+			color: #ffffff;
+			overflow-x: hidden;
+		}
+		
+		h1 {
+			font-size: 3rem;
+			margin-bottom: 20px;
+			text-transform: uppercase;
+			letter-spacing: 2px;
+			text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+		}
+
+		.score-board {
+			font-size: 1.2rem;
+			margin-bottom: 30px;
+			display: flex;
+			gap: 40px;
+			background: rgba(255, 255, 255, 0.1);
+			padding: 15px 30px;
+			border-radius: 20px;
+			backdrop-filter: blur(10px);
+			box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+			border: 1px solid rgba(255, 255, 255, 0.1);
+		}
+
+		.score-board div {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+		}
+
+		.score-board span {
+			font-size: 2rem;
+			font-weight: 700;
+			color: #00d2d3;
+			text-shadow: 0 0 10px rgba(0, 210, 211, 0.5);
+		}
+
+		.board {
+			display: grid;
+			grid-template-columns: repeat(3, 100px);
+			grid-template-rows: repeat(3, 100px);
+			gap: 15px;
+			background: rgba(255, 255, 255, 0.05);
+			padding: 20px;
+			border-radius: 20px;
+			box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+			backdrop-filter: blur(10px);
+			border: 1px solid rgba(255, 255, 255, 0.1);
 		}
 	
-		.cell{
-			border: 1px solid black;
-			width: 100px;
-			height: 100px;
-			display: table-cell;
-			background-color: tan;
-			font: bold 60px comic sans ms;
-			text-align: center;
-			color: green;
+		.cell {
+			width: 100%;
+			height: 100%;
+			background: rgba(255, 255, 255, 0.1);
+			border-radius: 12px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			font-size: 60px;
+			font-weight: 700;
+			cursor: pointer;
+			transition: all 0.3s ease;
+			box-shadow: inset 0 0 10px rgba(0,0,0,0.1);
+			user-select: none;
+		}
+
+		.cell:hover {
+			background: rgba(255, 255, 255, 0.2);
+			transform: translateY(-2px);
+			box-shadow: 0 5px 15px rgba(0,0,0,0.2), inset 0 0 10px rgba(255,255,255,0.1);
+		}
+
+		.cell:active {
+			transform: translateY(0);
+		}
+
+		.btn {
+			font-family: 'Poppins', sans-serif;
+			font-size: 1.1rem;
+			font-weight: 600;
+			padding: 12px 35px;
+			cursor: pointer;
+			margin-top: 40px;
+			background: linear-gradient(135deg, #00d2d3, #0097e6);
+			color: white;
+			border: none;
+			border-radius: 30px;
+			box-shadow: 0 4px 15px rgba(0, 210, 211, 0.4);
+			transition: all 0.3s ease;
+			text-transform: uppercase;
+			letter-spacing: 1px;
+		}
+		
+		.btn:hover {
+			transform: translateY(-3px);
+			box-shadow: 0 6px 20px rgba(0, 210, 211, 0.6);
+		}
+
+		.btn:active {
+			transform: translateY(1px);
+		}
+		
+		@media (max-width: 500px) {
+			.board {
+				grid-template-columns: repeat(3, 80px);
+				grid-template-rows: repeat(3, 80px);
+				gap: 10px;
+				padding: 15px;
+			}
+			.cell {
+				font-size: 45px;
+			}
+			h1 {
+				font-size: 2.2rem;
+			}
 		}
 	</style>
-	
 </head>
 	
 <body>
-<div class="wrap">
+	<h1>Морски шах</h1>
+	<div class="score-board">
+		<div>Човек <span id="human-score">0</span></div>
+		<div>Компютър <span id="computer-score">0</span></div>
+	</div>
+
+<div class="board">
 	<div class="cell" data-num="0"></div>
 	<div class="cell" data-num="1"></div>
 	<div class="cell" data-num="2"></div>
-	<br>
 	<div class="cell" data-num="3"></div>
 	<div class="cell" data-num="4"></div>
 	<div class="cell" data-num="5"></div>
-	<br>
 	<div class="cell" data-num="6"></div>
 	<div class="cell" data-num="7"></div>
 	<div class="cell" data-num="8"></div>
 </div>
 
+<button id="new-game-btn" class="btn">Нова игра</button>
+
 <script>
+
+var humanScore = parseInt(sessionStorage.getItem('humanScore')) || 0;
+var computerScore = parseInt(sessionStorage.getItem('computerScore')) || 0;
+
+var updateScoreDisplay = function() {
+	document.getElementById('human-score').textContent = humanScore;
+	document.getElementById('computer-score').textContent = computerScore;
+}
+
+updateScoreDisplay();
 
 var stop = false
 
@@ -56,30 +189,40 @@ var concat = function(a, b, c){
 	switch (result){
 		case "xxnull":
 			return ["x", c]
-			
 		case "xnullx":
 			return ["x", b]
-			
 		case "nullxx":
 			return ["x", a]
-			
 		case "oonull":
 			return ["o", c]
-			
 		case "onullo":
 			return ["o", b]
-			
 		case "nulloo":
 			return ["o", a]
 	}
 }
 
-var changeColorAndStop = function(a, b, c){
-	arrData[a].style.color = "red"
-	arrData[b].style.color = "red"
-	arrData[c].style.color = "red"
+var changeColorAndStop = function(a, b, c, winner){
+	if (stop === true) return;
+
+	arrData[a].style.color = "#ff4757"
+	arrData[b].style.color = "#ff4757"
+	arrData[c].style.color = "#ff4757"
+	
+	arrData[a].style.textShadow = "0 0 15px rgba(255, 71, 87, 0.8)";
+	arrData[b].style.textShadow = "0 0 15px rgba(255, 71, 87, 0.8)";
+	arrData[c].style.textShadow = "0 0 15px rgba(255, 71, 87, 0.8)";
 	
 	stop = true
+	
+	if (winner === "x") {
+		humanScore++;
+		sessionStorage.setItem('humanScore', humanScore);
+	} else if (winner === "o") {
+		computerScore++;
+		sessionStorage.setItem('computerScore', computerScore);
+	}
+	updateScoreDisplay();
 }
 
 var checkWin = function(){
@@ -87,7 +230,7 @@ var checkWin = function(){
 		var result = concat(i, i + 3, i + 6)
 		
 		if (result === "xxx" || result === "ooo"){
-			changeColorAndStop(i, i + 3, i + 6)
+			changeColorAndStop(i, i + 3, i + 6, result[0])
 		}
 	}
 	
@@ -95,30 +238,35 @@ var checkWin = function(){
 		var result = concat(i, i + 1, i + 2)
 		
 		if (result === "xxx" || result === "ooo"){
-			changeColorAndStop(i, i + 1, i + 2)
+			changeColorAndStop(i, i + 1, i + 2, result[0])
 		}
 	}
 	
 	result = concat(0, 4, 8)
 	if (result === "xxx" || result === "ooo"){
-		changeColorAndStop(0, 4, 8)
+		changeColorAndStop(0, 4, 8, result[0])
 	}
 	
 	result = concat(2, 4, 6)
 	if (result === "xxx" || result === "ooo"){
-		changeColorAndStop(2, 4, 6)
+		changeColorAndStop(2, 4, 6, result[0])
 	}	
 }
 
 var botZero = function(){
+	var putO = function(index) {
+		arrData[index].innerHTML = "o"
+		arrData[index].style.color = "#ff9f43" // Orange for computer
+		arrData[index].style.textShadow = "0 0 10px rgba(255, 159, 67, 0.5)"
+		arr[index] = "o"
+	}
 	
 	//Checking combinations of two "oo" 
 	for (var i = 0; i < 3; i++){
 		var result = concat(i, i + 3, i + 6)
 		
 		if (typeof(result) === "object" && result[0] === "o"){
-			arrData[result[1]].innerHTML = "o"
-			arr[result[1]] = "o"
+			putO(result[1])
 			return
 		}
 	}
@@ -127,23 +275,20 @@ var botZero = function(){
 		var result = concat(i, i + 1, i + 2)
 		
 		if (typeof(result) === "object" && result[0] === "o"){
-			arrData[result[1]].innerHTML = "o"
-			arr[result[1]] = "o"
+			putO(result[1])
 			return
 		}
 	}
 	
 	result = concat(0, 4, 8)
 	if (typeof(result) === "object" && result[0] === "o"){
-		arrData[result[1]].innerHTML = "o"
-		arr[result[1]] = "o"
+		putO(result[1])
 		return
 	}
 	
 	result = concat(2, 4, 6)
 	if (typeof(result) === "object" && result[0] === "o"){
-		arrData[result[1]].innerHTML = "o"
-		arr[result[1]] = "o"
+		putO(result[1])
 		return
 	}	
 	
@@ -152,8 +297,7 @@ var botZero = function(){
 		var result = concat(i, i + 3, i + 6)
 		
 		if (typeof(result) === "object" && result[0] === "x"){
-			arrData[result[1]].innerHTML = "o"
-			arr[result[1]] = "o"
+			putO(result[1])
 			return
 		}
 	}
@@ -162,23 +306,20 @@ var botZero = function(){
 		var result = concat(i, i + 1, i + 2)
 		
 		if (typeof(result) === "object" && result[0] === "x"){
-			arrData[result[1]].innerHTML = "o"
-			arr[result[1]] = "o"
+			putO(result[1])
 			return
 		}
 	}
 	
 	result = concat(0, 4, 8)
 	if (typeof(result) === "object" && result[0] === "x"){
-		arrData[result[1]].innerHTML = "o"
-		arr[result[1]] = "o"
+		putO(result[1])
 		return
 	}
 	
 	result = concat(2, 4, 6)
 	if (typeof(result) === "object" && result[0] === "x"){
-		arrData[result[1]].innerHTML = "o"
-		arr[result[1]] = "o"
+		putO(result[1])
 		return
 	}
 	
@@ -195,20 +336,22 @@ var botZero = function(){
 	
 	var randNull = tempArr[randIndexTempArr]
 	
-	arrData[randNull].innerHTML = "o"
-	arr[randNull] = "o"	
+	if (randNull !== undefined) {
+		putO(randNull)
+	} else {
+		stop = true
+	}
 }
 
 addEventListener("click", function(event){
 	if (stop === true){return}
 	
 	if (event.target.className === "cell" && event.target.textContent === ""){
-		event.target.style.color = "blue"
+		event.target.style.color = "#00d2d3" // Cyan for human
+		event.target.style.textShadow = "0 0 10px rgba(0, 210, 211, 0.5)"
 		event.target.innerHTML = "x"
 		
 		arr[event.target.dataset.num] = "x"
-		
-		//console.log (arr)
 		
 	}else{
 		return
@@ -221,6 +364,16 @@ addEventListener("click", function(event){
 	botZero()
 	
 	checkWin()
+})
+
+document.getElementById('new-game-btn').addEventListener('click', function() {
+	arr = [null, null, null, null, null, null, null, null, null]
+	stop = false
+	for (var i = 0; i < arrData.length; i++) {
+		arrData[i].innerHTML = ""
+		arrData[i].style.color = ""
+		arrData[i].style.textShadow = "none"
+	}
 })
 
 </script>

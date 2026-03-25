@@ -230,3 +230,51 @@ a:link {
     /* margin-left: 2.5%; */
     margin-right: 4.5%;
   }
+
+/* Responsive Media Queries */
+@media (max-width: 1200px) {
+    body {
+        padding-left: 5%;
+        padding-right: 5%;
+    }
+    #headSection {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+    .title, .studentAt, .mailto {
+        text-align: center;
+    }
+    #middleSection {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    .graylogo, .orangeLineUp, .orangeLineMiddle, .orangeLineVertical, .orangeLineBottom, .grayRectangleBottomAbout {
+        display: none !important;
+    }
+    .about, .aboutParagraphe, .orangeBanner {
+        grid-column: auto;
+        margin: 10px 0;
+        padding: 20px;
+        text-align: justify;
+        width: 90%;
+    }
+    .slideshow {
+        grid-column: auto;
+        width: 100%;
+        max-width: 400px;
+        margin-top: 20px;
+    }
+    .image {
+        width: 100%;
+        height: auto;
+    }
+    #footerSection {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 15px;
+    }
+}

@@ -244,3 +244,65 @@ ul#horizontal-list ul.dropdown a {
 ul#horizontal-list li.footer-name:hover .dropdown {
     display: flex;
 }
+
+/* Responsive Media Queries */
+@media (max-width: 1024px) {
+    .grayRectangle {
+        display: none;
+    }
+    .person {
+        margin: 20px;
+    }
+}
+
+@media (max-width: 768px) {
+    html, body {
+        overflow-x: hidden;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+    }
+    .groupOne {
+        flex-direction: column;
+        align-items: center;
+        flex-wrap: nowrap;
+    }
+    .logoFirstPage img {
+        max-width: 90vw;
+        height: auto;
+    }
+    ul#horizontal-list {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 0;
+    }
+    ul#horizontal-list .separatorOrangeLine {
+        display: none;
+    }
+    ul#horizontal-list li {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+    .grayRectangleBottom {
+        width: 80%;
+        margin-left: 10%;
+    }
+    .person {
+        width: 90vw;
+        max-width: 320px;
+        margin: 10px auto;
+    }
+    .foto img {
+        width: 100%;
+        height: auto;
+    }
+    .lightOrangeLine {
+        width: 80%;
+        margin-left: 10%;
+    }
+    .welcome {
+        font-size: 1rem;
+        padding: 0 10px;
+    }
+}
