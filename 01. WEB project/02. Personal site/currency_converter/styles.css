@@ -1,0 +1,111 @@
+:root {
+    --primary-color: #4a90e2;
+    --secondary-color: #50e3c2;
+    --bg-color: #f0f2f5;
+    --card-bg: rgba(255, 255, 255, 0.95);
+    --text-color: #333;
+    --text-light: #666;
+    --border-radius: 16px;
+    --shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+body {
+    font-family: 'Outfit', sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+    color: var(--text-color);
+}
+
+.converter-card {
+    background: var(--card-bg);
+    padding: 2rem;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    width: 90%;
+    max-width: 400px;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 2rem;
+    font-weight: 600;
+    font-size: 1.8rem;
+    color: #2c3e50;
+}
+
+.input-group {
+    margin-bottom: 1.5rem;
+}
+
+label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    color: var(--text-light);
+    font-weight: 500;
+}
+
+.input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+input {
+    width: 100%;
+    padding: 1rem;
+    padding-right: 3.5rem; /* Space for flag */
+    border: 2px solid #e1e1e1;
+    border-radius: 12px;
+    font-size: 1.2rem;
+    font-family: inherit;
+    transition: border-color 0.3s ease;
+    outline: none;
+}
+
+input:focus {
+    border-color: var(--primary-color);
+}
+
+.currency-flag {
+    position: absolute;
+    right: 1rem;
+    font-size: 1.5rem;
+    pointer-events: none;
+}
+
+.exchange-icon {
+    text-align: center;
+    margin: 1rem 0;
+    color: var(--text-light);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.rate-info {
+    font-size: 0.85rem;
+    background: rgba(0,0,0,0.05);
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+    font-weight: 500;
+}
+
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+}

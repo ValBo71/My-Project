@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Аз обичам Ваня 💕</title>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #1a0010 0%, #3d0030 40%, #1a0010 100%);
+      overflow: hidden;
+      font-family: 'Dancing Script', cursive;
+    }
+
+    /* Floating particles */
+    .particles {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .particle {
+      position: absolute;
+      font-size: 1.2rem;
+      opacity: 0;
+      animation: float-up linear infinite;
+    }
+
+    @keyframes float-up {
+      0%   { transform: translateY(110vh) rotate(0deg); opacity: 0; }
+      10%  { opacity: 0.7; }
+      90%  { opacity: 0.7; }
+      100% { transform: translateY(-10vh) rotate(360deg); opacity: 0; }
+    }
+
+    /* Main card */
+    .card {
+      position: relative;
+      z-index: 1;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 100, 150, 0.3);
+      border-radius: 30px;
+      padding: 60px 80px;
+      text-align: center;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 0 60px rgba(255, 60, 120, 0.3), 0 0 120px rgba(255, 60, 120, 0.1);
+    }
+
+    /* Heart */
+    .heart-wrapper {
+      margin-bottom: 30px;
+    }
+
+    .heart {
+      display: inline-block;
+      font-size: 6rem;
+      animation: heartbeat 1.2s ease-in-out infinite;
+      filter: drop-shadow(0 0 20px rgba(255, 60, 120, 0.9));
+    }
+
+    @keyframes heartbeat {
+      0%   { transform: scale(1); }
+      14%  { transform: scale(1.25); }
+      28%  { transform: scale(1); }
+      42%  { transform: scale(1.15); }
+      70%  { transform: scale(1); }
+      100% { transform: scale(1); }
+    }
+
+    /* Text */
+    .love-text {
+      font-size: 3.5rem;
+      font-weight: 700;
+      background: linear-gradient(90deg, #ff80ab, #ff1744, #ff80ab);
+      background-size: 200%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: shimmer 3s linear infinite;
+      letter-spacing: 2px;
+      text-shadow: none;
+    }
+
+    @keyframes shimmer {
+      0%   { background-position: 0% center; }
+      100% { background-position: 200% center; }
+    }
+
+    /* Glow ring around card */
+    .card::before {
+      content: '';
+      position: absolute;
+      inset: -2px;
+      border-radius: 32px;
+      background: linear-gradient(135deg, #ff1744, #ff80ab, #ff1744);
+      background-size: 300%;
+      z-index: -1;
+      animation: border-glow 3s linear infinite;
+      filter: blur(4px);
+      opacity: 0.6;
+    }
+
+    @keyframes border-glow {
+      0%   { background-position: 0% 50%; }
+      50%  { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Floating hearts background -->
+  <div class="particles" id="particles"></div>
+
+  <!-- Main content -->
+  <div class="card">
+    <div class="heart-wrapper">
+      <span class="heart">❤️</span>
+    </div>
+    <div class="love-text">Аз обичам Ваня</div>
+  </div>
+
+  <script>
+    const emojis = ['❤️', '💕', '💖', '💗', '💓', '🌹', '💝'];
+    const container = document.getElementById('particles');
+
+    function createParticle() {
+      const el = document.createElement('span');
+      el.className = 'particle';
+      el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+      el.style.left = Math.random() * 100 + 'vw';
+      el.style.fontSize = (0.8 + Math.random() * 1.4) + 'rem';
+      const duration = 6 + Math.random() * 8;
+      el.style.animationDuration = duration + 's';
+      el.style.animationDelay = Math.random() * 5 + 's';
+      container.appendChild(el);
+      setTimeout(() => el.remove(), (duration + 5) * 1000);
+    }
+
+    // Create initial batch
+    for (let i = 0; i < 20; i++) createParticle();
+    // Keep spawning
+    setInterval(createParticle, 600);
+  </script>
+</body>
+</html>
