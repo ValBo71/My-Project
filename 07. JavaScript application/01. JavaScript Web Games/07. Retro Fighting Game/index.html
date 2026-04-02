@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Retro Fighting Game</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="game-container">
+        <!-- Overlay UI (Health Bars and Timer) -->
+        <div class="ui-layer">
+            <!-- Player Healthbar -->
+            <div class="health-bar-container player-health-container">
+                <div class="player-name">PLAYER 1</div>
+                <div class="health-bar-bg"></div>
+                <div id="playerHealth" class="health-bar-fill player-fill"></div>
+            </div>
+
+            <div class="timer-container" id="timer">VS</div>
+
+            <!-- Enemy Healthbar -->
+            <div class="health-bar-container enemy-health-container">
+                <div class="player-name">CPU</div>
+                <div class="health-bar-bg"></div>
+                <div id="enemyHealth" class="health-bar-fill enemy-fill"></div>
+            </div>
+        </div>
+
+        <!-- Overlays for Start/End screens -->
+        <div id="overlay" class="overlay active">
+            <h1 id="overlayText">RETRO KOMBAT</h1>
+            <p id="overlaySubtext">Press ANY KEY to Start</p>
+            <div class="controls-info">
+                A / D : Move Left/Right<br><br>
+                J : Punch<br><br>
+                K : Kick<br><br>
+                L : Block<br><br>
+                P : Pause<br><br>
+                R : Restart
+            </div>
+        </div>
+
+        <canvas id="gameCanvas"></canvas>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
