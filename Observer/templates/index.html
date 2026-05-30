@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="bg-BG">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Automation QA Jobs Tracker - dev.bg</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="icon" type="image/png" href="https://dev.bg/wp-content/themes/jobsdevbg/images/favicon.png">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <div class="brand-section">
+                <h1>Automation QA Jobs Tracker</h1>
+                <p>Проследяване на нови обяви за работа в реално време</p>
+            </div>
+            <div class="header-actions">
+                <div class="status-indicator">
+                    <span class="status-dot"></span>
+                    <span>Свързан с база данни (SQLite)</span>
+                </div>
+                <button id="refreshBtn" class="btn btn-primary">
+                    <svg class="spinner" id="refreshSpinner" style="display: none;" viewBox="0 0 50 50">
+                        <circle class="path" cx="25" cy="25" r="20" fill="none" stroke-width="5"></circle>
+                    </svg>
+                    <svg id="refreshIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path>
+                    </svg>
+                    <span id="refreshBtnText">Обнови обявите</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Notification banner for automatic scrape status on page load -->
+        {% if refresh_error %}
+        <div class="notification-banner error" id="statusBanner">
+            <div class="notification-message">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                </svg>
+                <span>Грешка при обновяване: {{ refresh_error }}. Заредени са кешираните данни.</span>
+            </div>
+            <button class="notification-close" onclick="document.getElementById('statusBanner').remove()">×</button>
+        </div>
+        {% elif new_jobs_count > 0 %}
+        <div class="notification-banner success" id="statusBanner">
+            <div class="notification-message">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                </svg>
+                <span>Намерени и добавени <strong>{{ new_jobs_count }}</strong> нови обяви!</span>
+            </div>
+            <button class="notification-close" onclick="document.getElementById('statusBanner').remove()">×</button>
+        </div>
+        {% endif %}
+
+        <div class="dashboard-grid">
+            <!-- Sidebar: Filters -->
+            <aside class="filters-card">
+                <h2>Филтриране</h2>
+                
+                <!-- Search Input -->
+                <div class="filter-group">
+                    <label for="searchInput">Търсене в обявите</label>
+                    <input type="text" id="searchInput" class="input-control" placeholder="Фирма, заглавие, технология...">
+                </div>
+
+                <!-- Company Selector -->
+                <div class="filter-group">
+                    <label for="companySelect">Филтър по фирма</label>
+                    <select id="companySelect" class="input-control">
+                        <option value="all">Всички фирми</option>
+                        {% set unique_companies = [] %}
+                        {% for job in jobs %}
+                            {% if job.company not in unique_companies %}
+                                {% if unique_companies.append(job.company) %}{% endif %}
+                            {% endif %}
+                        {% endfor %}
+                        {% for comp in unique_companies|sort %}
+                            <option value="{{ comp|lower }}">{{ comp }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Location Selector -->
+                <div class="filter-group">
+                    <label>Локация</label>
+                    <div class="checkbox-group">
+                        <label class="checkbox-label">
+                            <input type="radio" name="locationFilter" value="all" checked> Всички
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="radio" name="locationFilter" value="remote"> Изцяло Remote
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="radio" name="locationFilter" value="hybrid"> Hybrid / София
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Source Selector -->
+                <div class="filter-group">
+                    <label>Източник</label>
+                    <div class="checkbox-group">
+                        <label class="checkbox-label">
+                            <input type="radio" name="sourceFilter" value="all" checked> Всички
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="radio" name="sourceFilter" value="dev.bg"> dev.bg
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="radio" name="sourceFilter" value="linkedin"> LinkedIn
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="radio" name="sourceFilter" value="jobs.bg"> jobs.bg
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Date Selector -->
+                <div class="filter-group">
+                    <label>Публикувани</label>
+                    <div class="checkbox-group">
+                        <label class="checkbox-label">
+                            <input type="radio" name="dateFilter" value="all" checked> Всички
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="radio" name="dateFilter" value="today"> Само днес
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="radio" name="dateFilter" value="3days"> Последните 3 дни
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="radio" name="dateFilter" value="7days"> Последните 7 дни
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Disclosed metrics selectors -->
+                <div class="filter-group">
+                    <label>Допълнителни</label>
+                    <div class="checkbox-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="salaryFilter"> Само със заплата
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="leaveFilter"> Само с упоменат отпуск
+                        </label>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Vertical Divider -->
+            <div class="vertical-divider"></div>
+
+            <!-- Main Content Area -->
+            <main>
+                <!-- Quick Metrics Grid -->
+                <section class="metrics-row">
+                    <div class="metric-box">
+                        <span class="metric-title">Общо обяви в базата</span>
+                        <span class="metric-value highlight-blue" id="totalJobsMetric">{{ jobs|length }}</span>
+                    </div>
+                    <div class="metric-box">
+                        <span class="metric-title">С обявена заплата</span>
+                        <span class="metric-value highlight-green" id="salaryJobsMetric">
+                            {{ jobs|selectattr('salary_from', 'ne', None)|list|length }}
+                        </span>
+                    </div>
+                    <div class="metric-box">
+                        <span class="metric-title">С обявен отпуск</span>
+                        <span class="metric-value highlight-purple" id="leaveJobsMetric">
+                            {{ jobs|selectattr('leave_days', 'ne', None)|list|length }}
+                        </span>
+                    </div>
+                </section>
+
+                <!-- Jobs Table Card -->
+                <section class="listings-card">
+                    <div class="card-header">
+                        <h2>Обяви за Automation QA</h2>
+                        <span id="filteredCountText" style="font-size: 0.85rem; color: var(--text-secondary);">Показани: <strong id="visibleCount">{{ jobs|length }}</strong> от <strong id="totalCount">{{ jobs|length }}</strong></span>
+                    </div>
+
+                    <div class="table-wrapper">
+                        <table id="jobsTable">
+                            <thead>
+                                <tr>
+                                    <th>Източник</th>
+                                    <th>Компания</th>
+                                    <th>Позиция</th>
+                                    <th>Дата</th>
+                                    <th>Изисквания (Tech stack)</th>
+                                    <th>Отпуск</th>
+                                    <th>Заплата От</th>
+                                    <th>Заплата До</th>
+                                    <th style="text-align: right;">Линк / Детайли</th>
+                                </tr>
+                            </thead>
+                            <tbody id="jobsTableBody">
+                                {% if jobs %}
+                                    {% for job in jobs %}
+                                    <tr class="job-row" 
+                                        data-company="{{ job.company|lower }}" 
+                                        data-title="{{ job.title|lower }}" 
+                                        data-reqs="{{ job.requirements|lower }}" 
+                                        data-location="{% if 'remote' in job.date_published|lower or 'remote' in job.title|lower or (job.requirements and 'remote' in job.requirements|lower) %}remote{% elif 'hybrid' in job.date_published|lower %}hybrid{% else %}sofia{% endif %}"
+                                        data-has-salary="{% if job.salary_from %}true{% else %}false{% endif %}"
+                                        data-has-leave="{% if job.leave_days %}true{% else %}false{% endif %}"
+                                        data-source="{{ job.source|lower if job.source else 'dev.bg' }}"
+                                        data-url="{{ job.url }}"
+                                        data-date-timestamp="{{ job.published_at if job.published_at else job.scraped_at }}">
+                                        
+                                        <td class="col-source">
+                                            <span class="badge-source {{ 'linkedin' if job.source and job.source|lower == 'linkedin' else ('jobsbg' if job.source and job.source|lower == 'jobs.bg' else 'devbg') }}">
+                                                {{ job.source if job.source else 'dev.bg' }}
+                                            </span>
+                                        </td>
+                                        <td class="col-company">{{ job.company }}</td>
+                                        <td class="col-position">{{ job.title }}</td>
+                                        <td class="col-date">{{ job.date_published }}</td>
+                                        <td>
+                                            <div class="tech-tags-container">
+                                                {% if job.requirements and job.requirements != 'N/A' %}
+                                                    {% for tech in job.requirements.split(', ') %}
+                                                        <span class="tech-tag">{{ tech }}</span>
+                                                    {% endfor %}
+                                                {% else %}
+                                                    <span class="badge-na">N/A</span>
+                                                {% endif %}
+                                            </div>
+                                        </td>
+                                        <td>
+                                            {% if job.leave_days %}
+                                                <span class="badge-leave">{{ job.leave_days }} дни</span>
+                                            {% else %}
+                                                <span class="badge-na">N/A</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if job.salary_from %}
+                                                <span class="badge-salary">{{ "{:,}".format(job.salary_from).replace(',', ' ') }} лв.</span>
+                                            {% else %}
+                                                <span class="badge-na">N/A</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if job.salary_to %}
+                                                <span class="badge-salary">{{ "{:,}".format(job.salary_to).replace(',', ' ') }} лв.</span>
+                                            {% else %}
+                                                <span class="badge-na">N/A</span>
+                                            {% endif %}
+                                        </td>
+                                        <td style="text-align: right;">
+                                            <div class="action-links">
+                                                <button class="btn-icon view-btn" onclick="openJobDetails({{ job|tojson|forceescape }})" title="Преглед на описанието">
+                                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                                        <circle cx="12" cy="12" r="3"></circle>
+                                                    </svg>
+                                                </button>
+                                                <a href="{{ job.url }}" target="_blank" class="btn-icon link-btn" title="Отвори оригиналната обява">
+                                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                                                        <polyline points="15 3 21 3 21 9"></polyline>
+                                                        <line x1="10" y1="14" x2="21" y2="3"></line>
+                                                    </svg>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    <tr id="noJobsRow">
+                                        <td colspan="9">
+                                            <div class="empty-state">
+                                                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                                    <circle cx="12" cy="12" r="10"></circle>
+                                                    <line x1="8" y1="12" x2="16" y2="12"></line>
+                                                </svg>
+                                                <h3>Няма записани обяви</h3>
+                                                <p>Натиснете бутона "Обнови обявите" горе вдясно, за да заредите данни от dev.bg и LinkedIn.</p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <!-- Job Description Modal -->
+    <div id="detailsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <h3 id="modalJobTitle">Senior Quality Assurance Engineer</h3>
+                    <p id="modalCompany">Company Name</p>
+                </div>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-body-meta">
+                    <div>
+                        <span>Публикувана</span>
+                        <span id="modalDate">28 май</span>
+                    </div>
+                    <div>
+                        <span>Платен отпуск</span>
+                        <span id="modalLeave">N/A</span>
+                    </div>
+                    <div>
+                        <span>Заплащане</span>
+                        <span id="modalSalary">N/A</span>
+                    </div>
+                    <div>
+                        <span>Технологии</span>
+                        <span id="modalTech">N/A</span>
+                    </div>
+                </div>
+                <div class="modal-desc-text" id="modalDescription">
+                    Full description goes here...
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a id="modalExternalLink" href="#" target="_blank" class="btn btn-primary">
+                    <span id="modalExternalLinkText">Отвори в dev.bg</span>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                        <polyline points="15 3 21 3 21 9"></polyline>
+                        <line x1="10" y1="14" x2="21" y2="3"></line>
+                    </svg>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Client-side logic for Refresh & Filtering -->
+    <script>
+        // Store all jobs in JavaScript array for dynamic updates
+        let jobsData = [];
+        
+        // Modal functions
+        function openJobDetails(job) {
+            document.getElementById('modalJobTitle').innerText = job.title;
+            document.getElementById('modalCompany').innerText = job.company;
+            document.getElementById('modalDate').innerText = job.date_published;
+            
+            // Format Leave
+            document.getElementById('modalLeave').innerText = job.leave_days ? `${job.leave_days} дни годишно` : 'Не е упоменат';
+            
+            // Format Salary
+            let salaryText = 'Не е упоменато';
+            if (job.salary_from && job.salary_to) {
+                salaryText = `${job.salary_from.toLocaleString('bg-BG')} - ${job.salary_to.toLocaleString('bg-BG')} лв.`;
+            } else if (job.salary_from) {
+                salaryText = `от ${job.salary_from.toLocaleString('bg-BG')} лв.`;
+            }
+            document.getElementById('modalSalary').innerText = salaryText;
+            
+            // Format Tech Stack
+            document.getElementById('modalTech').innerText = job.requirements && job.requirements !== 'N/A' ? job.requirements : 'Няма посочени';
+            
+            // Set Description
+            document.getElementById('modalDescription').innerText = job.description && job.description !== 'N/A' ? job.description : 'Няма описание.';
+            
+            // Set External link & text
+            const source = job.source || 'dev.bg';
+            document.getElementById('modalExternalLink').href = job.url;
+            document.getElementById('modalExternalLinkText').innerText = `Отвори в ${source}`;
+            
+            document.getElementById('detailsModal').classList.add('show');
+        }
+
+        function closeModal() {
+            document.getElementById('detailsModal').classList.remove('show');
+        }
+
+        // Close modal on click outside content
+        window.onclick = function(event) {
+            let modal = document.getElementById('detailsModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+        
+        // Close modal on ESC key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeModal();
+            }
+        });
+
+        // Dynamic Filtering logic
+        const searchInput = document.getElementById('searchInput');
+        const companySelect = document.getElementById('companySelect');
+        const locationFilters = document.getElementsByName('locationFilter');
+        const sourceFilters = document.getElementsByName('sourceFilter');
+        const dateFilters = document.getElementsByName('dateFilter');
+        const salaryFilter = document.getElementById('salaryFilter');
+        const leaveFilter = document.getElementById('leaveFilter');
+        
+        function applyFilters() {
+            const query = searchInput.value.toLowerCase().trim();
+            const selectedCompany = companySelect.value;
+            
+            let selectedLocation = 'all';
+            for (const radio of locationFilters) {
+                if (radio.checked) {
+                    selectedLocation = radio.value;
+                    break;
+                }
+            }
+            
+            let selectedSource = 'all';
+            for (const radio of sourceFilters) {
+                if (radio.checked) {
+                    selectedSource = radio.value;
+                    break;
+                }
+            }
+
+            let selectedDateRange = 'all';
+            for (const radio of dateFilters) {
+                if (radio.checked) {
+                    selectedDateRange = radio.value;
+                    break;
+                }
+            }
+            
+            const onlySalary = salaryFilter.checked;
+            const onlyLeave = leaveFilter.checked;
+            
+            const rows = document.querySelectorAll('.job-row');
+            let visibleCount = 0;
+            
+            rows.forEach(row => {
+                const title = row.getAttribute('data-title');
+                const company = row.getAttribute('data-company');
+                const reqs = row.getAttribute('data-reqs');
+                const location = row.getAttribute('data-location'); // 'remote', 'hybrid', 'sofia'
+                const source = row.getAttribute('data-source') || 'dev.bg';
+                const hasSalary = row.getAttribute('data-has-salary') === 'true';
+                const hasLeave = row.getAttribute('data-has-leave') === 'true';
+                const timestampStr = row.getAttribute('data-date-timestamp');
+                
+                // Text search match
+                const matchesText = title.includes(query) || company.includes(query) || reqs.includes(query);
+                
+                // Location match
+                let matchesLocation = true;
+                if (selectedLocation === 'remote') {
+                    matchesLocation = location === 'remote' || title.includes('remote') || reqs.includes('remote');
+                } else if (selectedLocation === 'hybrid') {
+                    matchesLocation = location === 'hybrid' || location === 'sofia';
+                }
+                
+                // Source match
+                const matchesSource = selectedSource === 'all' || source === selectedSource;
+                
+                // Company match
+                const matchesCompany = selectedCompany === 'all' || company === selectedCompany;
+                
+                // Salary & Leave match
+                const matchesSalary = !onlySalary || hasSalary;
+                const matchesLeave = !onlyLeave || hasLeave;
+
+                // Date range match
+                let matchesDate = true;
+                if (selectedDateRange !== 'all') {
+                    if (timestampStr) {
+                        const pubDate = new Date(timestampStr.replace(' ', 'T'));
+                        const now = new Date();
+                        
+                        const pubDateCopy = new Date(pubDate.getFullYear(), pubDate.getMonth(), pubDate.getDate());
+                        const nowCopy = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                        const diffDays = Math.round((nowCopy - pubDateCopy) / (1000 * 60 * 60 * 24));
+                        
+                        if (selectedDateRange === 'today') {
+                            matchesDate = diffDays <= 0;
+                        } else if (selectedDateRange === '3days') {
+                            matchesDate = diffDays <= 3;
+                        } else if (selectedDateRange === '7days') {
+                            matchesDate = diffDays <= 7;
+                        }
+                    } else {
+                        matchesDate = false;
+                    }
+                }
+                
+                if (matchesText && matchesLocation && matchesCompany && matchesSalary && matchesLeave && matchesSource && matchesDate) {
+                    row.style.display = '';
+                    visibleCount++;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+            
+            document.getElementById('visibleCount').innerText = visibleCount;
+        }
+        
+        // Add event listeners to controls
+        searchInput.addEventListener('input', applyFilters);
+        companySelect.addEventListener('change', applyFilters);
+        locationFilters.forEach(radio => radio.addEventListener('change', applyFilters));
+        sourceFilters.forEach(radio => radio.addEventListener('change', applyFilters));
+        dateFilters.forEach(radio => radio.addEventListener('change', applyFilters));
+        salaryFilter.addEventListener('change', applyFilters);
+        leaveFilter.addEventListener('change', applyFilters);
+
+        // AJAX Refresh logic
+        const refreshBtn = document.getElementById('refreshBtn');
+        const refreshSpinner = document.getElementById('refreshSpinner');
+        const refreshIcon = document.getElementById('refreshIcon');
+        const refreshBtnText = document.getElementById('refreshBtnText');
+        
+        refreshBtn.addEventListener('click', async function() {
+            // Disable button and show spinner
+            refreshBtn.disabled = true;
+            refreshSpinner.style.display = 'inline-block';
+            refreshIcon.style.display = 'none';
+            refreshBtnText.innerText = 'Обновяване...';
+            
+            try {
+                const response = await fetch('/api/refresh', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Update table HTML dynamically
+                    updateTable(data.jobs);
+                    
+                    // Update metrics
+                    document.getElementById('totalJobsMetric').innerText = data.total_jobs_count;
+                    document.getElementById('salaryJobsMetric').innerText = data.jobs.filter(j => j.salary_from !== null).length;
+                    document.getElementById('leaveJobsMetric').innerText = data.jobs.filter(j => j.leave_days !== null).length;
+                    document.getElementById('totalCount').innerText = data.total_jobs_count;
+                    
+                    // Show a custom success banner
+                    showToastBanner(true, `Обновяването приключи успешно! Добавени са ${data.new_jobs_count} нови обяви.`);
+                } else {
+                    showToastBanner(false, `Възникна грешка: ${data.error}`);
+                }
+            } catch (error) {
+                console.error('Error refreshing listings:', error);
+                showToastBanner(false, `Възникна мрежова грешка при свързване със сървъра.`);
+            } finally {
+                // Restore button state
+                refreshBtn.disabled = false;
+                refreshSpinner.style.display = 'none';
+                refreshIcon.style.display = 'inline-block';
+                refreshBtnText.innerText = 'Обнови обявите';
+            }
+        });
+        
+        function showToastBanner(isSuccess, message) {
+            // Remove existing status banner if any
+            const existingBanner = document.getElementById('statusBanner');
+            if (existingBanner) existingBanner.remove();
+            
+            const banner = document.createElement('div');
+            banner.id = 'statusBanner';
+            banner.className = `notification-banner ${isSuccess ? 'success' : 'error'}`;
+            
+            const iconSvg = isSuccess ? 
+                `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                </svg>` : 
+                `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                </svg>`;
+                
+            banner.innerHTML = `
+                <div class="notification-message">
+                    ${iconSvg}
+                    <span>${message}</span>
+                </div>
+                <button class="notification-close" onclick="document.getElementById('statusBanner').remove()">×</button>
+            `;
+            
+            // Insert banner after the header element
+            const header = document.querySelector('header');
+            header.parentNode.insertBefore(banner, header.nextSibling);
+            
+            // Automatically remove after 8 seconds
+            setTimeout(() => {
+                if (banner.parentNode) {
+                    banner.remove();
+                }
+            }, 8000);
+        }
+        
+        function updateTable(jobs) {
+            const tbody = document.getElementById('jobsTableBody');
+            tbody.innerHTML = '';
+            
+            if (!jobs || jobs.length === 0) {
+                tbody.innerHTML = `
+                    <tr id="noJobsRow">
+                        <td colspan="9">
+                            <div class="empty-state">
+                                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <line x1="8" y1="12" x2="16" y2="12"></line>
+                                </svg>
+                                <h3>Няма записани обяви</h3>
+                                <p>Натиснете бутона "Обнови обявите" горе вдясно, за да заредите данни от dev.bg.</p>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                document.getElementById('visibleCount').innerText = 0;
+                return;
+            }
+            
+            jobs.forEach(job => {
+                const tr = document.createElement('tr');
+                tr.className = 'job-row';
+                
+                // Set data attributes
+                const titleLower = job.title.toLowerCase();
+                const companyLower = job.company.toLowerCase();
+                const reqsLower = (job.requirements || '').toLowerCase();
+                const source = (job.source || 'dev.bg').toLowerCase();
+                
+                let location = 'sofia';
+                const dateLower = (job.date_published || '').toLowerCase();
+                if (dateLower.includes('remote') || titleLower.includes('remote') || reqsLower.includes('remote')) {
+                    location = 'remote';
+                } else if (dateLower.includes('hybrid')) {
+                    location = 'hybrid';
+                }
+                
+                tr.setAttribute('data-company', companyLower);
+                tr.setAttribute('data-title', titleLower);
+                tr.setAttribute('data-reqs', reqsLower);
+                tr.setAttribute('data-location', location);
+                tr.setAttribute('data-source', source);
+                tr.setAttribute('data-has-salary', job.salary_from ? 'true' : 'false');
+                tr.setAttribute('data-has-leave', job.leave_days ? 'true' : 'false');
+                tr.setAttribute('data-url', job.url);
+                tr.setAttribute('data-date-timestamp', job.published_at || job.scraped_at);
+                
+                // Build Tech tags
+                let techHtml = '<span class="badge-na">N/A</span>';
+                if (job.requirements && job.requirements !== 'N/A') {
+                    const tags = job.requirements.split(', ').map(t => `<span class="tech-tag">${t}</span>`).join('');
+                    techHtml = `<div class="tech-tags-container">${tags}</div>`;
+                }
+                
+                // Build Leave Badge
+                const leaveHtml = job.leave_days ? 
+                    `<span class="badge-leave">${job.leave_days} дни</span>` : 
+                    '<span class="badge-na">N/A</span>';
+                    
+                // Build Salary badges
+                const salaryFromHtml = job.salary_from ? 
+                    `<span class="badge-salary">${job.salary_from.toLocaleString('bg-BG').replace(/,/g, ' ')} лв.</span>` : 
+                    '<span class="badge-na">N/A</span>';
+                    
+                const salaryToHtml = job.salary_to ? 
+                    `<span class="badge-salary">${job.salary_to.toLocaleString('bg-BG').replace(/,/g, ' ')} лв.</span>` : 
+                    '<span class="badge-na">N/A</span>';
+                
+                // Build Source badge
+                const sourceDisplay = job.source || 'dev.bg';
+                const sourceClass = sourceDisplay.toLowerCase() === 'linkedin' ? 'linkedin' : (sourceDisplay.toLowerCase() === 'jobs.bg' ? 'jobsbg' : 'devbg');
+                const sourceBadgeHtml = `<span class="badge-source ${sourceClass}">${sourceDisplay}</span>`;
+                
+                // Escape job object data to safely pass to openJobDetails in onclick
+                const jobEscaped = JSON.stringify(job).replace(/"/g, '&quot;');
+                
+                tr.innerHTML = `
+                    <td class="col-source">${sourceBadgeHtml}</td>
+                    <td class="col-company">${job.company}</td>
+                    <td class="col-position">${job.title}</td>
+                    <td class="col-date">${job.date_published || 'N/A'}</td>
+                    <td>${techHtml}</td>
+                    <td>${leaveHtml}</td>
+                    <td>${salaryFromHtml}</td>
+                    <td>${salaryToHtml}</td>
+                    <td style="text-align: right;">
+                        <div class="action-links">
+                            <button class="btn-icon view-btn" onclick="openJobDetails(${jobEscaped})" title="Преглед на описанието">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                    <circle cx="12" cy="12" r="3"></circle>
+                                </svg>
+                            </button>
+                            <a href="${job.url}" target="_blank" class="btn-icon link-btn" title="Отвори оригиналната обява">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                                    <polyline points="15 3 21 3 21 9"></polyline>
+                                    <line x1="10" y1="14" x2="21" y2="3"></line>
+                                </svg>
+                            </a>
+                        </div>
+                    </td>
+                `;
+                
+                tbody.appendChild(tr);
+            });
+            
+            // Update company dropdown options dynamically based on the updated job list
+            updateCompanyDropdown(jobs);
+            
+            // Reapply filters
+            applyFilters();
+        }
+
+        function updateCompanyDropdown(jobs) {
+            const select = document.getElementById('companySelect');
+            const currentValue = select.value;
+            
+            select.innerHTML = '<option value="all">Всички фирми</option>';
+            
+            // Extract unique companies
+            const companies = [...new Set(jobs.map(j => j.company))].sort();
+            companies.forEach(comp => {
+                const opt = document.createElement('option');
+                opt.value = comp.toLowerCase();
+                opt.text = comp;
+                select.appendChild(opt);
+            });
+            
+            // Restore previous selection if it still exists
+            if (companies.map(c => c.toLowerCase()).includes(currentValue)) {
+                select.value = currentValue;
+            } else {
+                select.value = 'all';
+            }
+        }
+    </script>
+</body>
+</html>
