@@ -1,86 +1,86 @@
 # QA Automation & Software Engineering Portfolio
 
-Добре дошли в моето портфолио! Тук са събрани различни проекти, задачи и практически разработки в областта на софтуерното тестване, автоматизацията и уеб разработката, създадени по време на обучението ми в **Telerik Academy** и като лични практически проекти.
+Welcome to my portfolio! Here you will find various projects, tasks, and practical applications in the fields of software testing, automation, and web development, created during my training at **Telerik Academy** as well as personal practice projects.
 
 ---
 
-## 📂 Структура на хранилището
+## 📂 Repository Structure
 
-Проектите са организирани логически по категории и технологичен стек:
+The projects are logically organized by categories and technology stack:
 
 ### 🔍 1. Web Projects (`01. WEB project`)
-* **01. Telerik web project**: Уеб проекти, разработени като част от обучението в Telerik.
-* **02. Personal site**: Персонален уебсайт (HTML, CSS, JavaScript).
+* **01. Telerik web project**: Web projects developed as part of my training at Telerik.
+* **02. Personal site**: A personal website built using HTML, CSS, and JavaScript.
 
 ### 🖥️ 2. UI Automation (`02. UI Testing`)
-* **01. Cucumber**: Автоматизирани тестове за потребителски интерфейс, написани с помощта на BDD фреймуърка Cucumber.
-* **02. Selenium_PageObject**: Тестове с Selenium WebDriver, реализиращи дизайна **Page Object Model (POM)** за по-лесна поддръжка и преизползваемост на кода.
+* **01. Cucumber**: Automated UI tests written using the Cucumber BDD framework.
+* **02. Selenium_PageObject**: Tests built with Selenium WebDriver implementing the **Page Object Model (POM)** design pattern for improved maintainability and code reusability.
 
 ### 🖼️ 3. Sikuli GUI Automation (`03. Sikuli`)
-* **ValentinBogdanov.sikuli**: Скриптове за автоматизация на десктоп приложения, базирани на разпознаване на изображения (Image Recognition) с инструмента Sikuli.
+* **ValentinBogdanov.sikuli**: Desktop automation scripts based on image recognition using Sikuli.
 
 ### 🔌 4. API Testing (`04. API Testing`)
-Колекции и проекти за автоматизирано тестване на REST API услуги:
-* **01. API testing with Postman**: Колекции с тестове и среди за автоматизация в Postman.
-* **02. API testing with RestAssured**: Тестови сценарии на Java, използващи библиотеката REST Assured.
-* **03. API testing with RestSharp**: Тестване на API на C# чрез библиотеката RestSharp.
+Collections and projects for automated REST API testing:
+* **01. API testing with Postman**: Test collections and environments for automated testing in Postman.
+* **02. API testing with RestAssured**: Test scenarios in Java using the REST Assured library.
+* **03. API testing with RestSharp**: API testing in C# using the RestSharp library.
 
 ### ⚡ 5. Performance & Load Testing (`06. Performance Tests`)
-* **01. JMeter**: Тестови планове (JMX) за натоварване и производителност с Apache JMeter.
-* **02. K6**: Модерни скриптове за натоварване на JavaScript, изпълнявани с инструмента Grafana k6.
+* **01. JMeter**: Test plans (JMX) for performance and load testing with Apache JMeter.
+* **02. K6**: Modern JavaScript-based load testing scripts executed with Grafana k6.
 
 ### 🎮 6. JavaScript Applications (`07. JavaScript application`)
-* **01. JavaScript Web Games**: Интерактивни уеб игри и приложения, написани на чист JavaScript (Vanilla JS).
+* **01. JavaScript Web Games**: Interactive web games and applications built with pure JavaScript (Vanilla JS).
 
 ### 🎭 7. Playwright Automation (`08.Playwright`)
-Проекти с Playwright — един от най-модерните инструменти за UI и API автоматизация:
-* **1. FirstProject**: Начални тестови сценарии и запознаване с възможностите на Playwright.
-* **2. Api testing**: Автоматизация на API заявки директно през Playwright контекста.
-* **3. TS and Playwright project**: Тестови структури, използващи TypeScript и Playwright Test Runner.
+Projects using Playwright — a modern tool for UI and API automation:
+* **1. FirstProject**: Introductory test scenarios demonstrating Playwright capabilities.
+* **2. Api testing**: Automating API requests directly through Playwright context.
+* **3. TS and Playwright project**: Test structures utilizing TypeScript and Playwright Test Runner.
 
 ---
 
-## 🚀 Основен проект: **Observer (Automation QA Jobs Tracker)**
+## 🚀 Main Project: **Observer (Automation QA Jobs Tracker)**
 
-`Observer` е пълнофункционално уеб приложение (Dashboard), създадено за автоматично проследяване на нови обяви за работа в сферата на **Automation QA** в България.
+`Observer` is a full-featured web application (Dashboard) designed to automatically track new **Automation QA** job listings in Bulgaria.
 
-### 💡 Основни възможности:
-* **Мултиплатформено сканиране (Scraping)**:
-  * Извлича данни за обяви от **dev.bg**, **LinkedIn** (чрез Playwright с байпас на сесия/бисквитки) и **jobs.bg** (чрез Playwright с байпас на DataDome бот защита).
-* **Интелигентно парсване на детайли**:
-  * Автоматично извлича информация за заплата, брой дни платен годишен отпуск и изисквани технологии (Tech Stack).
-  * Поддържа двата формата на jobs.bg (custom HTML в iframe и стандартни темплейти).
-* **База данни**: Записва обявите в SQLite база с автоматична валидация за избягване на дублиране на записи.
-* **Филтриране и търсене в реално време (Frontend)**:
-  * Търсене по свободен текст (технология, фирма, заглавие).
-  * Филтриране по компания и локация (Remote / Hybrid / София).
-  * Филтриране по източник (`dev.bg`, `LinkedIn`, `jobs.bg`).
-  * Филтриране по допълнителни изисквания (само със заплата, само с упоменат отпуск).
-  * **Филтриране по дата**: Бързи бутони за показване на обяви от „Само днес“, „Последните 3 дни“ или „Последните 7 дни“ (базирано на календарни изчисления).
-* **Сортиране**: Всички обяви се подреждат автоматично хронологично с най-новите най-отгоре.
+### 💡 Core Features:
+* **Multi-Platform Scraping**:
+  * Scrapes job listings from **dev.bg**, **LinkedIn** (using Playwright with session/cookie persistence), and **jobs.bg** (using Playwright with DataDome bot-protection evasion).
+* **Smart Detail Parsing**:
+  * Automatically extracts salary details, annual paid leave days, and required technologies (Tech Stack).
+  * Supports dual detail formats for jobs.bg (custom HTML in a sandboxed iframe and standard templates).
+* **Database**: Saves listings to a SQLite database with automatic validation to prevent duplicate entries.
+* **Real-Time Frontend Filtering & Search**:
+  * Free-text search (technology, company, job title).
+  * Filter by company and location (Remote / Hybrid / Sofia).
+  * Filter by source (`dev.bg`, `LinkedIn`, `jobs.bg`).
+  * Filter by disclosed metrics (only with salary, only with specified paid leave).
+  * **Date Filtering**: Preset filters for "Today only", "Last 3 days", or "Last 7 days" (based on calendar date calculations).
+* **Sorting**: All listings are automatically sorted chronologically with the newest postings at the top.
 
-### 🛠️ Технологичен стек:
+### 🛠️ Tech Stack:
 * **Backend**: Python, Flask, Playwright, SQLite, BeautifulSoup (lxml).
-* **Frontend**: HTML5, Vanilla CSS (Premium Light Theme, Glassmorphic ефекти), JavaScript (AJAX).
+* **Frontend**: HTML5, Vanilla CSS (Premium Light Theme, Glassmorphic effects), JavaScript (AJAX).
 
 ---
 
-## 🛠️ Как да стартирате проекта `Observer` локално:
+## 🛠️ How to Run the `Observer` Project Locally:
 
-1. **Клонирайте хранилището**:
+1. **Clone the repository**:
    ```bash
    git clone https://github.com/ValBo71/My-Project.git
    cd My-Project/Observer
    ```
 
-2. **Инсталирайте нужните библиотеки**:
+2. **Install the required dependencies**:
    ```bash
    pip install -r requirements.txt
    playwright install chromium
    ```
 
-3. **Конфигурирайте данните за LinkedIn**:
-   В директорията `Observer/` създайте файл `linkedin_credentials.json` с Вашия имейл и парола:
+3. **Configure LinkedIn Credentials**:
+   Create a `linkedin_credentials.json` file inside the `Observer/` directory with your email and password:
    ```json
    {
      "email": "your_email@example.com",
@@ -88,14 +88,14 @@
    }
    ```
 
-4. **Стартирайте приложението**:
-   Изпълнете файла `run.bat` или стартирайте директно с:
+4. **Start the application**:
+   Run the `run.bat` file or start directly with:
    ```bash
    python app.py
    ```
-   Отворете браузъра си на адрес [http://127.0.0.1:5000](http://127.0.0.1:5000).
+   Open your browser and navigate to [http://127.0.0.1:5000](http://127.0.0.1:5000).
 
 ---
 
-✉️ **Контакти**:
-Ако имате въпроси относно проектите или искате да се свържете с мен, можете да го направите чрез моя GitHub профил [ValBo71](https://github.com/ValBo71).
+✉️ **Contacts**:
+If you have any questions about the projects or would like to get in touch, feel free to visit my GitHub profile [ValBo71](https://github.com/ValBo71).
