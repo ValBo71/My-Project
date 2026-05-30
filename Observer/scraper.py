@@ -265,20 +265,38 @@ def scrape_jobs_bg_jobs():
     
     scraped_jobs = []
     
+    # Dynamically calculate window position to place it in the bottom-right corner of the screen
+    win_x = 1000
+    win_y = 600
+    try:
+        import tkinter as tk
+        root = tk.Tk()
+        root.withdraw()
+        width = root.winfo_screenwidth()
+        height = root.winfo_screenheight()
+        root.destroy()
+        if width > 500 and height > 400:
+            win_x = width - 420
+            win_y = height - 320
+    except Exception:
+        pass
+
     with sync_playwright() as p:
-        # Launch browser in headful mode to bypass DataDome
+        # Launch browser in headful mode but tiny and tucked away at the bottom-right corner to pass DataDome
         browser = p.chromium.launch(
             headless=False,
             args=[
                 "--disable-blink-features=AutomationControlled",
                 "--disable-features=IsolateOrigins,site-per-process",
                 "--no-sandbox",
-                "--disable-setuid-sandbox"
+                "--disable-setuid-sandbox",
+                "--window-size=400,280",
+                f"--window-position={win_x},{win_y}"
             ]
         )
         context = browser.new_context(
+            no_viewport=True,
             user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-            viewport={"width": 1440, "height": 900},
             locale="bg-BG",
             timezone_id="Europe/Sofia"
         )
