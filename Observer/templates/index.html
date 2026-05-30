@@ -220,7 +220,7 @@
                                                 {{ job.source if job.source else 'dev.bg' }}
                                             </span>
                                         </td>
-                                        <td class="col-company">{{ job.company }}</td>
+                                        <td class="col-company" onclick="openCompanyStats({{ job.company|tojson|forceescape }})" title="Виж статистика за фирмата">{{ job.company }}</td>
                                         <td class="col-position">{{ job.title }}</td>
                                         <td class="col-date">{{ job.date_published }}</td>
                                         <td>
@@ -342,10 +342,77 @@
         </div>
     </div>
 
+    <!-- Company Stats Modal -->
+    <div id="companyStatsModal" class="modal">
+        <div class="modal-content" style="max-width: 700px;">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <h3 id="statsCompanyName">Име на фирмата</h3>
+                    <p style="font-size: 0.9rem; color: var(--text-secondary); margin-top: 0.2rem;">Статистика за публикувани обяви и повторения</p>
+                </div>
+                <button class="close-btn" onclick="closeCompanyStatsModal()">&times;</button>
+            </div>
+            <div class="modal-body" style="padding: 1.5rem 2rem;">
+                <div class="stats-grid">
+                    <!-- Week Card -->
+                    <div class="stats-period-card">
+                        <h4>Последна седмица</h4>
+                        <div class="stats-metric">
+                            <span class="label">Общо обяви:</span>
+                            <span class="value" id="statsWeekTotal">0</span>
+                        </div>
+                        <div class="stats-metric">
+                            <span class="label">Повторения:</span>
+                            <span class="value" id="statsWeekRepeated">0</span>
+                        </div>
+                        <div class="stats-repeats-list" id="statsWeekList">
+                            <!-- List of repeated positions -->
+                        </div>
+                    </div>
+                    
+                    <!-- Month Card -->
+                    <div class="stats-period-card">
+                        <h4>Последен месец</h4>
+                        <div class="stats-metric">
+                            <span class="label">Общо обяви:</span>
+                            <span class="value" id="statsMonthTotal">0</span>
+                        </div>
+                        <div class="stats-metric">
+                            <span class="label">Повторения:</span>
+                            <span class="value" id="statsMonthRepeated">0</span>
+                        </div>
+                        <div class="stats-repeats-list" id="statsMonthList">
+                            <!-- List of repeated positions -->
+                        </div>
+                    </div>
+                    
+                    <!-- Year Card -->
+                    <div class="stats-period-card">
+                        <h4>Последна година</h4>
+                        <div class="stats-metric">
+                            <span class="label">Общо обяви:</span>
+                            <span class="value" id="statsYearTotal">0</span>
+                        </div>
+                        <div class="stats-metric">
+                            <span class="label">Повторения:</span>
+                            <span class="value" id="statsYearRepeated">0</span>
+                        </div>
+                        <div class="stats-repeats-list" id="statsYearList">
+                            <!-- List of repeated positions -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="padding: 1rem 2rem;">
+                <button class="btn btn-primary" onclick="closeCompanyStatsModal()">Затвори</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Client-side logic for Refresh & Filtering -->
     <script>
         // Store all jobs in JavaScript array for dynamic updates
-        let jobsData = [];
+        let jobsData = {{ jobs|tojson|safe }};
         
         // Modal functions
         function openJobDetails(job) {
@@ -383,11 +450,95 @@
             document.getElementById('detailsModal').classList.remove('show');
         }
 
+        // Company statistics functions
+        function openCompanyStats(companyName) {
+            document.getElementById('statsCompanyName').innerText = companyName;
+            
+            const now = new Date();
+            const oneDay = 24 * 60 * 60 * 1000;
+            
+            // Calculate date limits
+            const limitWeek = new Date(now.getTime() - 7 * oneDay);
+            const limitMonth = new Date(now.getTime() - 30 * oneDay);
+            const limitYear = new Date(now.getTime() - 365 * oneDay);
+            
+            // Filter all jobs for this company
+            const companyJobs = jobsData.filter(job => job.company.toLowerCase() === companyName.toLowerCase());
+            
+            // Initialize structures
+            const periods = [
+                { key: 'week', limit: limitWeek, totalId: 'statsWeekTotal', repeatedId: 'statsWeekRepeated', listId: 'statsWeekList' },
+                { key: 'month', limit: limitMonth, totalId: 'statsMonthTotal', repeatedId: 'statsMonthRepeated', listId: 'statsMonthList' },
+                { key: 'year', limit: limitYear, totalId: 'statsYearTotal', repeatedId: 'statsYearRepeated', listId: 'statsYearList' }
+            ];
+            
+            periods.forEach(period => {
+                let total = 0;
+                let repeated = 0;
+                const positionCounts = {};
+                
+                companyJobs.forEach(job => {
+                    const dateStr = job.published_at || job.scraped_at;
+                    if (!dateStr) return;
+                    
+                    const pubDate = new Date(dateStr.replace(' ', 'T'));
+                    if (pubDate >= period.limit) {
+                        total++;
+                        const title = job.title.trim();
+                        positionCounts[title] = (positionCounts[title] || 0) + 1;
+                    }
+                });
+                
+                // Calculate repetitions
+                const repeatItems = [];
+                Object.keys(positionCounts).forEach(title => {
+                    const count = positionCounts[title];
+                    if (count > 1) {
+                        repeated += (count - 1);
+                        repeatItems.push({ title: title, count: count });
+                    }
+                });
+                
+                // Update UI elements
+                document.getElementById(period.totalId).innerText = total;
+                document.getElementById(period.repeatedId).innerText = repeated;
+                
+                const listEl = document.getElementById(period.listId);
+                listEl.innerHTML = '';
+                
+                if (repeatItems.length > 0) {
+                    repeatItems.sort((a, b) => b.count - a.count); // Sort by highest count
+                    repeatItems.forEach(item => {
+                        const itemEl = document.createElement('div');
+                        itemEl.className = 'stats-repeat-item';
+                        itemEl.title = `${item.title} (публикувана ${item.count} пъти)`;
+                        itemEl.innerHTML = `
+                            <span class="title">${item.title}</span>
+                            <span class="count">${item.count} обяви</span>
+                        `;
+                        listEl.appendChild(itemEl);
+                    });
+                } else {
+                    listEl.innerHTML = '<div style="color: var(--text-muted); text-align: center; margin-top: 0.5rem;">Няма повторения</div>';
+                }
+            });
+            
+            document.getElementById('companyStatsModal').classList.add('show');
+        }
+
+        function closeCompanyStatsModal() {
+            document.getElementById('companyStatsModal').classList.remove('show');
+        }
+
         // Close modal on click outside content
         window.onclick = function(event) {
-            let modal = document.getElementById('detailsModal');
-            if (event.target === modal) {
+            let detailsModal = document.getElementById('detailsModal');
+            let statsModal = document.getElementById('companyStatsModal');
+            if (event.target === detailsModal) {
                 closeModal();
+            }
+            if (event.target === statsModal) {
+                closeCompanyStatsModal();
             }
         }
         
@@ -395,6 +546,7 @@
         document.addEventListener('keydown', function(event) {
             if (event.key === 'Escape') {
                 closeModal();
+                closeCompanyStatsModal();
             }
         });
 
@@ -539,6 +691,9 @@
                 const data = await response.json();
                 
                 if (data.success) {
+                    // Update local cache
+                    jobsData = data.jobs;
+                    
                     // Update table HTML dynamically
                     updateTable(data.jobs);
                     
@@ -685,9 +840,11 @@
                 // Escape job object data to safely pass to openJobDetails in onclick
                 const jobEscaped = JSON.stringify(job).replace(/"/g, '&quot;');
                 
+                const companyEscaped = JSON.stringify(job.company).replace(/"/g, '&quot;');
+                
                 tr.innerHTML = `
                     <td class="col-source">${sourceBadgeHtml}</td>
-                    <td class="col-company">${job.company}</td>
+                    <td class="col-company" onclick="openCompanyStats(${companyEscaped})" title="Виж статистика за фирмата">${job.company}</td>
                     <td class="col-position">${job.title}</td>
                     <td class="col-date">${job.date_published || 'N/A'}</td>
                     <td>${techHtml}</td>
