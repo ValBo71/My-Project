@@ -268,18 +268,20 @@ def scrape_jobs_bg_jobs():
     # Dynamically calculate window position to place it in the bottom-right corner of the screen
     win_x = 1000
     win_y = 600
-    try:
-        import tkinter as tk
-        root = tk.Tk()
-        root.withdraw()
-        width = root.winfo_screenwidth()
-        height = root.winfo_screenheight()
-        root.destroy()
-        if width > 500 and height > 400:
-            win_x = width - 420
-            win_y = height - 320
-    except Exception:
-        pass
+    import threading
+    if threading.current_thread() is threading.main_thread():
+        try:
+            import tkinter as tk
+            root = tk.Tk()
+            root.withdraw()
+            width = root.winfo_screenwidth()
+            height = root.winfo_screenheight()
+            root.destroy()
+            if width > 500 and height > 400:
+                win_x = width - 420
+                win_y = height - 320
+        except Exception:
+            pass
 
     with sync_playwright() as p:
         # Launch browser in headful mode but tiny and tucked away at the bottom-right corner to pass DataDome
