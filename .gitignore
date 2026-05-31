@@ -35,5 +35,27 @@ rad.json
 *.g.xlf
 #License-file
 *.flf
-#Test results file
 TestResults.xml
+
+# Global C# / .NET Ignore Patterns
+**/[Bb]in/
+**/[Oo]bj/
+**/.vs/
+**/*.user
+**/*.suo
+**/*.userosscache
+**/*.sln.docstates
+**/[Tt]est[Rr]esults/
+**/*.trx
+
+# Global Python Ignore Patterns
+**/__pycache__/
+**/*.py[cod]
+**/*.pyo
+**/*.pyd
+**/.pytest_cache/
+**/.venv/
+**/venv/
+**/ENV/
+**/env/
+
