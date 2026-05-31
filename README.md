@@ -17,7 +17,7 @@ The projects are logically organized by categories and technology stack:
 * **02. Selenium_PageObject**: Tests built with Selenium WebDriver implementing the **Page Object Model (POM)** design pattern for improved maintainability and code reusability.
 
 ### 🖼️ 3. Sikuli GUI Automation (`03. Sikuli`)
-* **ValentinBogdanov.sikuli**: Desktop automation scripts based on image recognition using Sikuli.
+* **01. ValentinBogdanov.sikuli**: Desktop automation scripts based on image recognition using Sikuli.
 
 ### 🔌 4. API Testing (`04. API Testing`)
 Collections and projects for automated REST API testing:
@@ -25,23 +25,24 @@ Collections and projects for automated REST API testing:
 * **02. API testing with RestAssured**: Test scenarios in Java using the REST Assured library.
 * **03. API testing with RestSharp**: API testing in C# using the RestSharp library.
 
-### ⚡ 5. Performance & Load Testing (`06. Performance Tests`)
+### ⚡ 5. Performance & Load Testing (`05. Performance Tests`)
 * **01. JMeter**: Test plans (JMX) for performance and load testing with Apache JMeter.
 * **02. K6**: Modern JavaScript-based load testing scripts executed with Grafana k6.
 
-### 🎮 6. JavaScript Applications (`07. JavaScript application`)
+### 🎮 6. JavaScript Applications (`06. JavaScript application`)
 * **01. JavaScript Web Games**: Interactive web games and applications built with pure JavaScript (Vanilla JS).
 
-### 🎭 7. Playwright Automation (`08.Playwright`)
+### 🎭 7. Playwright Automation (`07.Playwright`)
 Projects using Playwright — a modern tool for UI and API automation:
 * **1. FirstProject**: Introductory test scenarios demonstrating Playwright capabilities.
 * **2. Api testing**: Automating API requests directly through Playwright context.
 * **3. TS and Playwright project**: Test structures utilizing TypeScript and Playwright Test Runner.
 * **4. Automation at automationexercise.com**: Complete automated C# Playwright & NUnit test suite (26/26 test cases) featuring the Page Object Model (POM) design pattern, automated overload-resilience checks, custom SlowMo debugging, and Allure reporting.
+* **5. API Testing on automationexercise.com**: Automated API tests for automationexercise.com using Playwright (under development).
 
 ---
 
-## 🚀 Main Project: **Observer (Automation QA Jobs Tracker)**
+## 🚀 Main Project: **Observer (Automation QA Jobs Tracker)** (`08.Observer`)
 
 `Observer` is a full-featured web application (Dashboard) designed to automatically track new **Automation QA** job listings in Bulgaria.
 
@@ -71,7 +72,7 @@ Projects using Playwright — a modern tool for UI and API automation:
 1. **Clone the repository**:
    ```bash
    git clone https://github.com/ValBo71/My-Project.git
-   cd My-Project/Observer
+   cd My-Project/08.Observer
    ```
 
 2. **Install the required dependencies**:
@@ -81,7 +82,7 @@ Projects using Playwright — a modern tool for UI and API automation:
    ```
 
 3. **Configure LinkedIn Credentials**:
-   Create a `linkedin_credentials.json` file inside the `Observer/` directory with your email and password:
+   Create a `linkedin_credentials.json` file inside the `08.Observer/` directory with your email and password:
    ```json
    {
      "email": "your_email@example.com",
