@@ -23,12 +23,14 @@ namespace AutomationExercise.ApiTests.Helpers
                 sb.AppendLine(body);
             }
 
-            AllureApi.AddAttachment("API Request Details", "text/plain", sb.ToString());
+            var contentBytes = Encoding.UTF8.GetBytes(sb.ToString());
+            AllureApi.AddAttachment("API Request Details", "text/plain", contentBytes, ".txt");
         }
 
         public static void AttachResponse(int statusCode, string? headers = null, string? body = null)
         {
-            AllureApi.AddAttachment("API Response Details", "application/json", body ?? string.Empty);
+            var contentBytes = Encoding.UTF8.GetBytes(body ?? string.Empty);
+            AllureApi.AddAttachment("API Response Details", "application/json", contentBytes, ".json");
         }
 
         public static void LogStep(string stepName, Action action)
