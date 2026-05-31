@@ -38,6 +38,8 @@ rad.json
 TestResults.xml
 
 # Global C# / .NET Ignore Patterns
+**/allure-results/
+**/allure-report/
 **/[Bb]in/
 **/[Oo]bj/
 **/.vs/
