@@ -38,7 +38,7 @@ Projects using Playwright — a modern tool for UI and API automation:
 * **2. Api testing**: Automating API requests directly through Playwright context.
 * **3. TS and Playwright project**: Test structures utilizing TypeScript and Playwright Test Runner.
 * **4. Automation at automationexercise.com**: Complete automated C# Playwright & NUnit test suite (26/26 test cases) featuring the Page Object Model (POM) design pattern, automated overload-resilience checks, custom SlowMo debugging, and Allure reporting.
-* **5. API Testing on automationexercise.com**: Automated API tests for automationexercise.com using Playwright (under development).
+* **5. API Testing on automationexercise.com**: Complete automated C# Playwright & NUnit API test framework covering all 14 API scenarios from the official practice list. Features a clean client-based architecture, request/response payload capture, Allure attachments, and full state integration tests for account lifecycle orchestration.
 
 ---
 

@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Playwright;
 using NUnit.Framework;
+using Allure.NUnit;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
@@ -8,6 +9,7 @@ using AutomationExercise.ApiTests.Config;
 
 namespace AutomationExercise.ApiTests.Base
 {
+    [AllureNUnit]
     public class BaseApiTest
     {
         protected static IPlaywright PlaywrightInstance = null!;
