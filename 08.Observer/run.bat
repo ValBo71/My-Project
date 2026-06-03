@@ -11,7 +11,7 @@ python -m pip install flask beautifulsoup4 lxml --quiet
 echo [2/3] Отваряне на уеб приложението в браузъра...
 :: Give the Flask server 2 seconds to start before opening the browser
 timeout /t 2 /nobreak > nul
-start "" "http://127.0.0.1:5000"
+start firefox "http://127.0.0.1:5000"
 
 echo [3/3] Стартиране на сървъра...
 echo -------------------------------------------------------------------
