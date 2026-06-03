@@ -59,6 +59,69 @@ def init_db():
                 if to_update:
                     logger.info(f"Backfilling published_at for {len(to_update)} existing records.")
                     conn.executemany("UPDATE jobs SET published_at = ? WHERE url = ?", to_update)
+                    
+            # Migration to convert all date_published values to DD.MM.YYYY format
+            cursor.execute("SELECT url, date_published, published_at, scraped_at FROM jobs")
+            all_rows = cursor.fetchall()
+            dates_to_update = []
+            from datetime import datetime
+            import re
+            
+            for row in all_rows:
+                url = row['url']
+                raw_date = row['date_published']
+                pub_at = row['published_at']
+                scraped = row['scraped_at']
+                
+                # Check if it's already in DD.MM.YYYY format
+                if raw_date and re.match(r'^\d{2}\.\d{2}\.\d{4}$', raw_date.strip()):
+                    continue
+                    
+                # If not, let's determine the correct formatted date
+                new_date_str = None
+                
+                # 1. Try to use published_at if available
+                if pub_at:
+                    try:
+                        if ' ' in pub_at:
+                            dt = datetime.strptime(pub_at, '%Y-%m-%d %H:%M:%S')
+                        else:
+                            dt = datetime.strptime(pub_at, '%Y-%m-%d')
+                        new_date_str = dt.strftime('%d.%m.%Y')
+                    except Exception:
+                        pass
+                
+                # 2. If published_at was not parsed, try to parse raw_date itself
+                if not new_date_str and raw_date and raw_date != "N/A":
+                    from parser import parse_date_to_timestamp
+                    ts = parse_date_to_timestamp(raw_date)
+                    if ts:
+                        try:
+                            dt = datetime.strptime(ts, '%Y-%m-%d %H:%M:%S')
+                            new_date_str = dt.strftime('%d.%m.%Y')
+                        except Exception:
+                            pass
+                            
+                # 3. Fallback to scraped_at
+                if not new_date_str and scraped:
+                    try:
+                        if ' ' in scraped:
+                            dt = datetime.strptime(scraped, '%Y-%m-%d %H:%M:%S')
+                        else:
+                            dt = datetime.strptime(scraped, '%Y-%m-%d')
+                        new_date_str = dt.strftime('%d.%m.%Y')
+                    except Exception:
+                        pass
+                        
+                # 4. Final fallback to today's date
+                if not new_date_str:
+                    new_date_str = datetime.now().strftime('%d.%m.%Y')
+                    
+                dates_to_update.append((new_date_str, url))
+                
+            if dates_to_update:
+                logger.info(f"Migrating date_published to DD.MM.YYYY format for {len(dates_to_update)} records.")
+                conn.executemany("UPDATE jobs SET date_published = ? WHERE url = ?", dates_to_update)
                 
         logger.info("Database initialized successfully.")
     except Exception as e:
@@ -77,7 +140,24 @@ def save_job(job_data):
     try:
         with conn:
             from parser import parse_date_to_timestamp
-            published_at = parse_date_to_timestamp(job_data.get('date_published'))
+            from datetime import datetime
+            
+            raw_date = job_data.get('date_published')
+            published_at = parse_date_to_timestamp(raw_date)
+            
+            if published_at:
+                try:
+                    dt = datetime.strptime(published_at, '%Y-%m-%d %H:%M:%S')
+                    formatted_date = dt.strftime('%d.%m.%Y')
+                except Exception as ex:
+                    logger.error(f"Error parsing date {published_at} for formatting: {ex}")
+                    now = datetime.now()
+                    formatted_date = now.strftime('%d.%m.%Y')
+                    published_at = now.strftime('%Y-%m-%d %H:%M:%S')
+            else:
+                now = datetime.now()
+                formatted_date = now.strftime('%d.%m.%Y')
+                published_at = now.strftime('%Y-%m-%d %H:%M:%S')
             
             # We use INSERT OR IGNORE to prevent duplicate entries based on the URL primary key
             cursor = conn.execute("""
@@ -89,7 +169,7 @@ def save_job(job_data):
                 job_data['url'],
                 job_data['company'],
                 job_data['title'],
-                job_data['date_published'],
+                formatted_date,
                 job_data['requirements'],
                 job_data['leave_days'],
                 job_data['salary_from'],

@@ -50,12 +50,57 @@ def parse_job_listings(html_content):
             
             requirements = ", ".join(tech_stack) if tech_stack else "N/A"
             
+            # 6. Salary (direct from listing badge)
+            salary_from = None
+            salary_to = None
+            
+            badges = item.find_all(class_=lambda c: c and "badge" in c)
+            for badge in badges:
+                badge_text = badge.get_text(strip=True)
+                if any(curr in badge_text for curr in ["BGN", "лв", "EUR", "€"]):
+                    import copy
+                    badge_clone = copy.copy(badge)
+                    for child in badge_clone.find_all(class_=["hidden-text", "badge-tooltip", "tooltip"]):
+                        child.decompose()
+                    clean_text = badge_clone.get_text(strip=True)
+                    clean_text = re.sub(r'\s+', ' ', clean_text).strip()
+                    
+                    range_match = re.search(r'(\d[\d\s]*)\s*[-–—]\s*(\d[\d\s]*)', clean_text)
+                    if range_match:
+                        try:
+                            val_from = int(re.sub(r'\s+', '', range_match.group(1)))
+                            val_to = int(re.sub(r'\s+', '', range_match.group(2)))
+                            
+                            is_eur = any(curr in clean_text for curr in ["EUR", "€"])
+                            if is_eur:
+                                val_from = int(val_from * 1.95583)
+                                val_to = int(val_to * 1.95583)
+                                
+                            salary_from = val_from
+                            salary_to = val_to
+                            break
+                        except ValueError:
+                            pass
+                    else:
+                        single_match = re.search(r'(\d[\d\s]*)\+', clean_text)
+                        if single_match:
+                            try:
+                                val = int(re.sub(r'\s+', '', single_match.group(1)))
+                                if any(curr in clean_text for curr in ["EUR", "€"]):
+                                    val = int(val * 1.95583)
+                                salary_from = val
+                                break
+                            except ValueError:
+                                pass
+            
             parsed_jobs.append({
                 'company': company,
                 'title': title,
                 'url': url,
                 'date_published': date_published,
-                'requirements': requirements
+                'requirements': requirements,
+                'salary_from': salary_from,
+                'salary_to': salary_to
             })
         except Exception as e:
             logger.error(f"Error parsing job list item: {e}")
@@ -113,6 +158,12 @@ def extract_salary(text, soup):
                 try:
                     val_from = int(re.sub(r'\s+', '', range_match.group(1)))
                     val_to = int(re.sub(r'\s+', '', range_match.group(2)))
+                    
+                    is_eur = any(curr in badge_text for curr in ["EUR", "€"])
+                    if is_eur:
+                        val_from = int(val_from * 1.95583)
+                        val_to = int(val_to * 1.95583)
+                        
                     return val_from, val_to
                 except ValueError:
                     pass
@@ -120,7 +171,11 @@ def extract_salary(text, soup):
             single_match = re.search(r'(\d[\d\s]*)\+', badge_text)
             if single_match:
                 try:
-                    return int(re.sub(r'\s+', '', single_match.group(1))), None
+                    val = int(re.sub(r'\s+', '', single_match.group(1)))
+                    is_eur = any(curr in badge_text for curr in ["EUR", "€"])
+                    if is_eur:
+                        val = int(val * 1.95583)
+                    return val, None
                 except ValueError:
                     pass
                     
@@ -135,7 +190,7 @@ def extract_salary(text, soup):
             # Currency first: "EUR 3000 - 5000"
             r'(?:BGN|EUR|лв|лв\.|Euro|€)\s*(\d[\d\s,]*)\s*(?:-|to|–|—)\s*(\d[\d\s,]*)',
             # Word-based: "заплата от 3000 до 5000"
-            r'(?:заплат[аи]|salary|възнаграждение|чисто)\s*(?:от|from)?\s*(\d[\d\s,]*)\s*(?:до|to)\s*(\d[\d\s,]*)'
+            r'(?:заплат[аи]|salary|възнаграждение|чисто)\s*(?:от|from)?\s*(\d[\d\s,]*)\s*(?:до|to)\s*(\d[\d\s]*)'
         ]
         
         for pattern in patterns:
@@ -150,6 +205,11 @@ def extract_salary(text, soup):
                     val_to = int(to_str)
                     
                     if 500 <= val_from <= 50000 and 500 <= val_to <= 50000:
+                        matched_text = match.group(0).upper()
+                        is_eur = any(curr in matched_text for curr in ["EUR", "EURO", "€"])
+                        if is_eur:
+                            val_from = int(val_from * 1.95583)
+                            val_to = int(val_to * 1.95583)
                         return val_from, val_to
                 except ValueError:
                     pass
@@ -246,6 +306,22 @@ def parse_date_to_timestamp(date_str):
     if re.match(r'^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$', date_str):
         return date_str
         
+    # YYYY-MM-DD
+    if re.match(r'^\d{4}-\d{2}-\d{2}$', date_str):
+        return f"{date_str} 12:00:00"
+        
+    # DD.MM.YYYY
+    match_dd_mm_yyyy = re.match(r'^(\d{2})\.(\d{2})\.(\d{4})$', date_str)
+    if match_dd_mm_yyyy:
+        day = int(match_dd_mm_yyyy.group(1))
+        month = int(match_dd_mm_yyyy.group(2))
+        year = int(match_dd_mm_yyyy.group(3))
+        try:
+            dt = datetime(year, month, day, 12, 0, 0)
+            return dt.strftime('%Y-%m-%d %H:%M:%S')
+        except ValueError:
+            pass
+            
     now = datetime.now()
     ds = date_str.lower().strip()
     

@@ -1,78 +1,83 @@
 # dev.bg, LinkedIn & jobs.bg Automation QA Jobs Tracker
 
-Това е уеб приложение, разработено на **Python (Flask)** и **SQLite**, което автоматично извлича (scrape-ва), обработва и визуализира обяви за работа за **Automation QA** роли от **dev.bg**, **LinkedIn** и **jobs.bg**.
+This is a web application developed in **Python (Flask)** and **SQLite** that automatically scrapes, processes, and visualizes job advertisements for **Automation QA** roles from **dev.bg**, **LinkedIn**, and **jobs.bg**.
 
 ---
 
-## Основни функционалности
+## Key Features
 
-1. **Извличане от множество източници (Multi-Source Scraping):**
-   * **dev.bg**: Бързо паралелно извличане (`ThreadPoolExecutor`) на детайлни данни за заплата, отпуск и технологии.
-   * **LinkedIn**: Автоматизиран скрапинг с **Playwright** с поддръжка на бисквитки (session cookies) за избягване на логин бариери и CAPTCHA.
-   * **jobs.bg**: Специализиран скрапер, заобикалящ DataDome защитите, с поддръжка на извличане на описания както от стандартни елементи, така и от вградени пясъчници (iframe).
+1. **Multi-Source Scraping:**
+   * **dev.bg**: Rapid parallel scraping (`ThreadPoolExecutor`) of detail pages, enhanced by direct salary badge extraction from main listing pages with automatic BGN conversion.
+   * **LinkedIn**: Automated scraping using **Playwright** with session cookies support to bypass login walls and CAPTCHAs.
+   * **jobs.bg**: Specialized scraper bypassing DataDome protection, with support for extracting descriptions from both standard elements and inline sandboxes (iframes).
 
-2. **Нормализация на дати и хронологично сортиране:**
-   * Автоматичен превод и парсване на дати (напр. *„днес“*, *„вчера“*, *„28 май“*, *„28.05.26“*, *„Posted 12 hours ago“*) до стандартизирани ISO timestamps.
-   * Сортиране на обявите глобално с най-новите най-отгоре.
+2. **Date Standardization & Chronological Sorting:**
+   * Standardized date storage and display in `DD.MM.YYYY` format (e.g., `03.06.2026`) rather than relative times (e.g. *"15 minutes ago"*, *"today"*), preventing data from becoming outdated.
+   * Automatic database migration during initialization to backfill and convert old relative dates.
+   * Global chronological sorting with the newest listings at the top.
 
-3. **Интерактивна статистика за всяка фирма (Company Stats):**
-   * Кликването върху името на фирма в таблицата отваря модален прозорец.
-   * Показва се брой обяви, пуснати от нея през **последната седмица, месец и година**.
-   * Изчислява се **колко пъти е повторена една и съща обява** (заглавие) в съответните периоди, със списък на дублираните обяви и броя им.
+3. **Disclosed Salary & Currency Standardization:**
+   * Direct parsing of salary ranges from the listing page badges (dev.bg).
+   * Automatic conversion of salaries published in Euro (€/EUR) to Bulgarian Lev (BGN) at the BNB exchange rate (1.95583) for UI consistency.
 
-4. **Умно филтриране и търсене в реално време:**
-   * Търсене по фирма, позиция или технология.
-   * Филтриране по източник (`dev.bg` / `LinkedIn` / `jobs.bg`).
-   * Филтриране по дата на публикуване (Само днес / Последните 3 дни / Последните 7 дни).
-   * Филтриране по локация (Remote / Hybrid / Sofia) и допълнителни показатели (Само със заплата / Само с отпуск).
+4. **Premium UI with Layout Optimization:**
+   * Modern light dashboard interface with Glassmorphism effects and statistic cards.
+   * Layout optimized for widescreen displays (max width `1650px` with tight cell padding) to display all columns cleanly on desktop without horizontal viewport scrollbars.
+   * Interactive modal window showing company advertisement statistics (total ads and duplicate count over the past week, month, and year).
 
-5. **Защита от дублиране и производителност:**
-   * Използване на уникални URL адреси като първични ключове в SQLite.
-   * Клиентско съхранение на данните, което прави отварянето на статистиката за фирмите абсолютно моментално без натоварване на базата данни.
+5. **Smart Filtering & Real-time Search:**
+   * Instant search by company, position, or technology stack.
+   * Filtering by source (`dev.bg` / `LinkedIn` / `jobs.bg`).
+   * Filtering by publication date (Today / Last 3 Days / Last 7 Days).
+   * Filtering by location (Remote / Hybrid / Sofia) and indicators (Only showing listings with salary / leave details).
+
+6. **Duplicate Prevention & Performance:**
+   * Unique URLs are used as primary keys in SQLite to prevent duplicate entries.
+   * Client-side data caching makes opening company statistics instant, with zero database load.
 
 ---
 
-## Структура на проекта
+## Project Structure
 
 ```text
 Observer/
 │
-├── run.bat                     # Стартов файл за Windows (инсталира библиотеки и стартира сървъра)
-├── app.py                      # Главен Flask сървър, API и уеб маршрути
-├── config.py                   # Конфигурационен файл (URL адреси, БД пътища, настройки)
-├── database.py                 # SQLite слой (схеми, миграции и CRUD операции)
-├── scraper.py                  # Всички скрапинг двигатели (urllib, Playwright LinkedIn/jobs.bg)
-├── parser.py                   # Regex и BeautifulSoup селектори за парсване на заплати, отпуск и дати
-├── linkedin_credentials.json   # Локални данни за достъп до LinkedIn (не се качват в GitHub)
-├── linkedin_session.json       # Запазена сесия за LinkedIn
-├── jobs.db                     # SQLite база данни (създава се автоматично при стартиране)
-├── app.log                     # Лог файл за следене на процесите (създава се автоматично)
+├── run.bat                     # Windows startup file (installs dependencies, starts server, opens Firefox)
+├── app.py                      # Main Flask server, API and web routes
+├── config.py                   # Configuration file (target URLs, DB paths, settings)
+├── database.py                 # SQLite database layer (schemas, migrations, and CRUD operations)
+├── scraper.py                  # Scraping engines (urllib, Playwright LinkedIn/jobs.bg)
+├── parser.py                   # Regex & BeautifulSoup selectors for parsing salaries, leave days, and dates
+├── linkedin_credentials.json   # Local credentials for LinkedIn access (not uploaded to GitHub)
+├── linkedin_session.json       # Preserved session state for LinkedIn
+├── jobs.db                     # SQLite database file (created automatically on startup)
+├── app.log                     # Application log file for process tracking (created automatically)
 │
 ├── static/
 │   └── css/
-│       └── styles.css          # Премиум лек интерфейс с Glassmorphism ефекти и карти за статистика
+│       └── styles.css          # Premium layout styling with Glassmorphism and responsive design
 │
 └── templates/
-    └── index.html              # Шаблон на таблото за управление (Dashboard) и статистика
+    └── index.html              # Main dashboard and stats dashboard template
 ```
 
 ---
 
-## Инструкции за стартиране
+## Execution Instructions
 
-### Автоматично стартиране (за Windows)
-Кликнете два пъти върху файла **`run.bat`** в главната директория на проекта. Скриптът автоматично ще конфигурира виртуалната среда, ще инсталира нужните пакети, ще свали нужния браузър за Playwright и ще стартира приложението.
+### Automatic Startup (Windows)
+Double-click the **`run.bat`** file in the root directory of the project. The script will automatically configure the virtual environment, install the required packages, download Chromium for Playwright, start the server, and open the app in **Firefox**.
 
-### Ръчно стартиране (всички системи)
+### Manual Startup (Cross-Platform)
 
-1. **Инсталиране на зависимостите и уеб браузъра:**
+1. **Install dependencies and the web browser:**
    ```bash
    pip install flask beautifulsoup4 lxml playwright
    playwright install chromium
    ```
 
-2. **Настройка на LinkedIn (опционално):**
-   Редактирайте локалния файл `linkedin_credentials.json`, за да добавите вашите данни:
+2. **LinkedIn Authentication Setup (Optional):**
+   Create or edit the local `linkedin_credentials.json` file in the root directory to supply your account details:
    ```json
    {
      "email": "your_email@example.com",
@@ -80,10 +85,10 @@ Observer/
    }
    ```
 
-3. **Стартиране на приложението:**
+3. **Start the application:**
    ```bash
    python app.py
    ```
 
-4. **Достъп през браузър:**
-   Отворете браузъра на: `http://127.0.0.1:5000`
+4. **Access the Web Dashboard:**
+   Open your browser and navigate to: `http://127.0.0.1:5000`

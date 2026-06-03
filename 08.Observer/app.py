@@ -57,8 +57,8 @@ def perform_refresh_cycle():
                             'date_published': job['date_published'],
                             'requirements': job['requirements'],
                             'leave_days': details['leave_days'],
-                            'salary_from': details['salary_from'],
-                            'salary_to': details['salary_to'],
+                            'salary_from': job.get('salary_from') if job.get('salary_from') is not None else details['salary_from'],
+                            'salary_to': job.get('salary_to') if job.get('salary_to') is not None else details['salary_to'],
                             'description': details['description'],
                             'source': 'dev.bg'
                         }
