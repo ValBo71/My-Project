@@ -10,7 +10,7 @@ The projects are logically organized by categories and technology stack:
 
 ### 🔍 1. Web Projects (`01. WEB project`)
 * **01. Telerik web project**: "Bug Hunters" Profile Portal — A responsive, multilingual static portal website featuring the profiles, personality index cards (with 3D card flip animations), about pages, and interactive hobby galleries for 6 team members. Developed using HTML5, Vanilla CSS, and JavaScript/jQuery.
-* **02. Personal site**: A personal website built using HTML, CSS, and JavaScript.
+* **02. Personal site**: Personal Portfolio Website — An interactive, responsive personal portal detailing professional experience, dynamic skill diagrams (radial and progress bars), filterable project cards, and an integrated BGN ⇄ EUR currency converter utility. Developed using HTML5, Bootstrap v3, and JavaScript/jQuery.
 
 ### 🖥️ 2. UI Automation (`02. UI Testing`)
 * **01. Cucumber**: Automated UI tests written using the Cucumber BDD framework.
@@ -259,6 +259,15 @@ A team portfolio web portal showcasing members of Buddy Group 1 ("Bug Hunters").
   * **Interactive Hobby Sections**: Custom individual galleries for cooking recipes (with interactive details), drone flying guides (with embedded video players), and travel/nature sections.
   * **Clean Syntax & Pathing**: Optimized link structuring, correct script routing, and zero dead links verified programmatically.
 * **Tech Stack**: HTML5, Vanilla CSS3 (3D transformations, flexbox, grid, media queries), JavaScript/jQuery.
+
+### 👤 Personal Portfolio Site & Currency Converter (`01. WEB project/02. Personal site`)
+An interactive personal portfolio website showcasing professional career details, dynamic skill indicators, and a standalone currency conversion card.
+* **Core Capabilities**:
+  * **Dynamic Skill Indicators**: Custom SVG radial percentage charts (depicting QA/QC/Programming ratios) coupled with Bootstrap progress bars tracking frameworks (Python, JS, Java, SQL, Selenium, Playwright).
+  * **Filterable Work Portfolio**: Integrates jQuery Isotope filtering allowing users to toggle visible projects by categories (Graduation QA Project, Web Design, JS Web Games).
+  * **BGN ⇄ EUR Currency Converter**: A dedicated sub-app with card layout, glassmorphic accents, and bi-directional calculation logic using the Bulgarian fixed rate of `1.95583`.
+  * **Contact & Resume Integration**: Validated email contact form powered by `jqBootstrapValidation` alongside downloadable PDF CV links.
+* **Tech Stack**: HTML5, CSS3 (Bootstrap v3 base), JavaScript/jQuery.
 
 ---
 
