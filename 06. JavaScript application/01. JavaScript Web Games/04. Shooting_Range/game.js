@@ -7,7 +7,7 @@ document.body.addEventListener('click', playShot);
 
 function playShot(e) {
  let el = e.target;
- if(el.classList.contains('beer')) {
+ if(el.classList.contains('beer') && !el.classList.contains('die')) {
   hit.stop();
   hit.play();
   counter++;

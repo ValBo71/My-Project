@@ -86,4 +86,4 @@ function draw() {
  requestAnimationFrame(draw);
 }
 
-pipeBottom.onload = draw;
+window.onload = draw;
