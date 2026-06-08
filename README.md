@@ -23,6 +23,7 @@ The projects are logically organized by categories and technology stack:
 Collections and projects for automated REST API testing:
 * **01. API testing with Postman**: Test collections and environments for automated testing in Postman:
   * **01. Approval Book iMX**: Postman regression testing collection verifying that XML inputs entered into the iMX system are correctly loaded and verified in REST API responses, using CSV dataloaders for collection variables.
+  * **03. WeareSocialNetwork**: Newman-runnable Postman API test collection (91 scripts) covering authentication, administrator actions, posts, and comments on the WEare social network. Includes custom environment settings and htmlextra reporting.
 * **02. API testing with RestAssured**: Test scenarios in Java using the REST Assured library:
   * **01. GoogleAPI**: Refactored Java Maven + TestNG API testing framework targeting JSONPlaceholder, SWAPI, and a complete CRUD integration lifecycle of a Place using the Google Places API sandbox. Features separated Request/Response specifications to isolate endpoint configurations.
   * **02. ProjectGoogleApi**: Refactored Model-Based Java Maven + TestNG API testing project targeting Google Places Find Place Search API. Implements Lombok builders, property-based credentials, and positive/negative test suites.
@@ -178,6 +179,19 @@ This section features automated API testing frameworks and scripts built to veri
 * **Quick Run**:
   * Import `EH AB - UK book- API testing.postman_collection.json` and `EH _environments_ODIN.postman_environment.json` into Postman.
   * Open **Collection Runner**, select the CSV data file `Variables for test.csv`, and run the suite.
+
+### 5. **Postman WEare Social Network API Test Suite** (`04. API Testing/01. API testing with Postman/03 WeareSocialNetwork`)
+* **Core Capabilities**:
+  * **Full Coverage Regression Testing**: Covers REST API endpoints for a social network platform (users, administrators, posts, comments, friends, categories, and skills).
+  * **Chai Assertion Syntax Cleanup**: Corrected silent passes by replacing invalid assertion getters (`.is.not.empty` and `.is.not.null`) with valid, strict Chai checks (`.to.not.be.empty` and `.to.not.be.null`).
+  * **Encoding Bug Resolution**: Resolved broken text characters in test case result descriptions.
+* **Quick CLI Run**:
+  * Double-click `Run_API_Tests.bat` or run:
+    ```bash
+    cd "04. API Testing/01. API testing with Postman/03 WeareSocialNetwork"
+    newman run WEareSocialNetwork.postman_collection.json -e PlutoFinalProject.postman_environment.json -r htmlextra
+    ```
+    View the generated report inside the `newman/` folder.
 
 ---
 
