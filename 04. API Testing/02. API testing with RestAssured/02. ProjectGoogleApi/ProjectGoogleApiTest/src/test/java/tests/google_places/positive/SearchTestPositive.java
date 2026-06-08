@@ -6,12 +6,12 @@ import io.restassured.http.Method;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-import static constants.Constans.API_TOKEN;
+import static constants.Constants.API_TOKEN;
 
 public class SearchTestPositive extends BaseTest {
 
     @Test(description = "Search some object", dataProvider = "searchText")
-    public void SearchPlaceModelWhitText(String key, String input, String inputtype){
+    public void SearchPlaceModelWithText(String key, String input, String inputtype){
         GooglePlacesModel.RequestModel requestModel = GooglePlacesModel.RequestModel.builder()
                 .key(key)
                 .input(input)
@@ -21,12 +21,9 @@ public class SearchTestPositive extends BaseTest {
     }
 
     @DataProvider
-    public Object[] [] searchText(){
-        return  new Object[][]{
-        {API_TOKEN, "New York", "textquery"}
+    public Object[][] searchText(){
+        return new Object[][]{
+            {API_TOKEN, "New York", "textquery"}
         };
-
-
     }
-
 }

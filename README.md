@@ -24,6 +24,7 @@ Collections and projects for automated REST API testing:
 * **01. API testing with Postman**: Test collections and environments for automated testing in Postman.
 * **02. API testing with RestAssured**: Test scenarios in Java using the REST Assured library:
   * **01. GoogleAPI**: Refactored Java Maven + TestNG API testing framework targeting JSONPlaceholder, SWAPI, and a complete CRUD integration lifecycle of a Place using the Google Places API sandbox. Features separated Request/Response specifications to isolate endpoint configurations.
+  * **02. ProjectGoogleApi**: Refactored Model-Based Java Maven + TestNG API testing project targeting Google Places Find Place Search API. Implements Lombok builders, property-based credentials, and positive/negative test suites.
 * **03. API testing with RestSharp**: API testing in C# using the RestSharp library:
   * **01. AutomationExercise.RestSharp.ApiTests**: Complete C# NUnit API Automation framework for `automationexercise.com` covering all 14 API scenarios from the official practice list. Features a clean client-based architecture, strongly-typed models, dynamic data generation, request/response logging, and Allure reporting.
 
@@ -135,7 +136,7 @@ This section features API performance and load testing projects built for the pr
 
 This section features automated API testing frameworks and scripts built to verify REST API endpoints using **RestAssured (Java)** and **RestSharp (C#)**.
 
-### 1. **RestAssured Java Project** (`04. API Testing/02. API testing with RestAssured/01. GoogleAPI/GoogleApi`)
+### 1. **RestAssured GoogleAPI Project** (`04. API Testing/02. API testing with RestAssured/01. GoogleAPI/GoogleApi`)
 * **Core Capabilities**:
   * **Multi-API Request Separation**: Implements isolated `RequestSpecification` contexts for SWAPI, JSONPlaceholder, httpbin, and Google Places. This prevents URL pollution and enables clean concurrent testing.
   * **Stateful CRUD Verification**: Automates the full lifecycle of a Place (Add, Get, Update, Get, Delete, Verify Deleted) using TestNG `dependsOnMethods` to chain state between tests.
@@ -146,7 +147,18 @@ This section features automated API testing frameworks and scripts built to veri
   mvn clean test
   ```
 
-### 2. **RestSharp C# Project** (`04. API Testing/03. API testing with RestSharp`)
+### 2. **RestAssured ProjectGoogleApi (Model-Based) Project** (`04. API Testing/02. API testing with RestAssured/02. ProjectGoogleApi/ProjectGoogleApiTest`)
+* **Core Capabilities**:
+  * **Model-Based HTTP Requests**: Encapsulates request parameters using a nested `RequestModel` with Lombok `@Builder` pattern for dynamic mapping.
+  * **Property-Based Credentials**: Reads security tokens securely from `userData.properties` in a configured classpath directory.
+  * **Positive & Negative Suites**: Validates location search success with DataProviders, and verifies error handling (status `REQUEST_DENIED` / `INVALID_REQUEST`) on invalid keys, missing parameters, and bad inputtypes.
+* **Quick CLI Start**:
+  ```bash
+  cd "04. API Testing/02. API testing with RestAssured/02. ProjectGoogleApi/ProjectGoogleApiTest"
+  mvn clean test
+  ```
+
+### 3. **RestSharp C# Project** (`04. API Testing/03. API testing with RestSharp`)
 * **Core Capabilities**:
   * **Strongly-Typed Payloads**: Built with C# and .NET 8 using strongly-typed models for requests and responses, utilizing `System.Text.Json` serialization.
   * **Allure Reports Integration**: Automatically logs request URLs, methods, headers, parameters, and response bodies to Allure report attachments for rich execution dashboards.
