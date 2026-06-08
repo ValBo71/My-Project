@@ -11,7 +11,7 @@ public class UtilsMethod {
     public static String getValue(String value){
         Properties properties = new Properties();
         try {
-            FileInputStream fileInputStream = new FileInputStream("src/main/test/resources/" + " userData.properties");
+            FileInputStream fileInputStream = new FileInputStream("src/test/resources/userData.properties");
             properties.load(fileInputStream);
         } catch (FileNotFoundException e) {
             e.printStackTrace();

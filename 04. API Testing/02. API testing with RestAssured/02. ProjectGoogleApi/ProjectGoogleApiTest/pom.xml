@@ -19,26 +19,12 @@
             <groupId>io.rest-assured</groupId>
             <artifactId>rest-assured</artifactId>
             <version>5.3.1</version>
-            <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
             <version>7.8.0</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.rest-assured</groupId>
-            <artifactId>rest-assured</artifactId>
-            <version>5.3.1</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.testng</groupId>
-            <artifactId>testng</artifactId>
-            <version>7.8.0</version>
-            <scope>compile</scope>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->
@@ -55,38 +41,6 @@
             <artifactId>json</artifactId>
             <version>20230227</version>
         </dependency>
-        <dependency>
-            <groupId>io.github.thecodinglog</groupId>
-            <artifactId>method-invoker</artifactId>
-            <version>0.3.0</version>
-        </dependency>
-        <dependency>
-            <groupId>io.github.thecodinglog</groupId>
-            <artifactId>Method-Invoker</artifactId>
-            <version>0.1.2</version>
-        </dependency>
-        <dependency>
-            <groupId>io.github.thecodinglog</groupId>
-            <artifactId>method-invoker</artifactId>
-            <version>0.3.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.lazydog.mbean</groupId>
-            <artifactId>method-statistics</artifactId>
-            <version>1.4</version>
-        </dependency>
-        <dependency>
-            <groupId>org.lazydog.mbean</groupId>
-            <artifactId>method-statistics</artifactId>
-            <version>1.4</version>
-        </dependency>
-        <dependency>
-            <groupId>io.magus.methodmap</groupId>
-            <artifactId>method-map</artifactId>
-            <version>1.0.2</version>
-        </dependency>
-
-
     </dependencies>
 
 
