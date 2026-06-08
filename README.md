@@ -17,6 +17,7 @@ The projects are logically organized by categories and technology stack:
 * **02. Selenium_PageObject**: Tests built with Selenium WebDriver implementing the **Page Object Model (POM)** design pattern:
   * **Java/01. Exam2_Selenium_PageObject**: Jira bug reporting UI automation framework utilizing Selenium Page Factory and JUnit 4. Automates project creation, issue reporting (description iframe rendering), and search queries.
   * **Java/02. WeareSocialNetwork**: Selenium PageObject UI test suite for the WEare social network. Automates registration, login, profile updates, posting, liking, friend requests, and admin actions in sequential order.
+  * **Java/03. PageObject_TestNG**: Selenium PageObject UI test suite built with TestNG and Java. Automates search functionality on the realt.by portal, featuring custom cookie consent handling, dynamic room filters, and automated ChromeDriver lifecycle management with TestNG suite hooks.
 
 ### 🖼️ 3. Sikuli GUI Automation (`03. Sikuli`)
 * **01. ValentinBogdanov.sikuli**: Desktop automation scripts based on image recognition using Sikuli.
@@ -160,6 +161,17 @@ This section features automated web UI test suites implementing the Page Object 
   ```bash
   cd "02. UI Testing/02. Selenium_PageObject/02. Java/02. WeareSocialNetwork"
   run.bat
+  ```
+
+### 3. **PageObject TestNG UI Automation** (`02. UI Testing/02. Selenium_PageObject/02. Java/03. PageObject_TestNG/PageObject_TestNG`)
+* **Core Capabilities**:
+  * **Page Object Design Pattern**: Encapsulates pages (`RealHomePage`, `RealListingPage`) and their interactions into dedicated modular Page Objects extending `BasePage`.
+  * **Robust Browser Control & Lifecycle Teardown**: Uses modern Selenium 4 native Selenium Manager for Chrome driver binaries, and wraps automated browser processes in TestNG `@BeforeSuite` and `@AfterSuite` hooks to cleanly quit ChromeDriver processes, avoiding resource leaks.
+  * **Cookie Banner & Dynamic Locators**: Automatically handles cookie consent banner dismissal and dynamic React dropdown select options for room counts to build resilient, flake-free UI tests.
+* **Quick CLI Start**:
+  ```bash
+  cd "02. UI Testing/02. Selenium_PageObject/02. Java/03. PageObject_TestNG/PageObject_TestNG"
+  & "C:\Program Files\JetBrains\IntelliJ IDEA Community Edition 2025.1.2\plugins\maven\lib\maven3\bin\mvn.cmd" test
   ```
 
 ---
