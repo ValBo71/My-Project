@@ -16,6 +16,7 @@ The projects are logically organized by categories and technology stack:
 * **01. Cucumber**: Automated UI tests written using the Cucumber BDD framework.
 * **02. Selenium_PageObject**: Tests built with Selenium WebDriver implementing the **Page Object Model (POM)** design pattern:
   * **Java/01. Exam2_Selenium_PageObject**: Jira bug reporting UI automation framework utilizing Selenium Page Factory and JUnit 4. Automates project creation, issue reporting (description iframe rendering), and search queries.
+  * **Java/02. WeareSocialNetwork**: Selenium PageObject UI test suite for the WEare social network. Automates registration, login, profile updates, posting, liking, friend requests, and admin actions in sequential order.
 
 ### 🖼️ 3. Sikuli GUI Automation (`03. Sikuli`)
 * **01. ValentinBogdanov.sikuli**: Desktop automation scripts based on image recognition using Sikuli.
@@ -148,6 +149,17 @@ This section features automated web UI test suites implementing the Page Object 
   ```bash
   cd "02. UI Testing/02. Selenium_PageObject/02. Java/01. Exam2_Selenium_PageObject"
   mvn clean test
+  ```
+
+### 2. **WEare Social Network UI Automation** (`02. UI Testing/02. Selenium_PageObject/02. Java/02. WeareSocialNetwork`)
+* **Core Capabilities**:
+  * **Method and Class-level Sequential Ordering**: Implements `@FixMethodOrder(MethodSorters.NAME_ASCENDING)` on all test classes and a JUnit `RunAllTests` Suite class to guarantee tests execute in a strict logical dependency flow.
+  * **Headless execution and modern Chrome support**: Refactored to utilize `webdrivermanager` 5.8.0 for compatibility with Chrome 148+ (CFT) while preserving the browser configuration settings.
+  * **Full Flow Coverage**: Automates registration of multiple users, profiles updates, creating posts, liking/disliking comments, sending/approving/disconnecting friend requests, and administrator enablement/disablement.
+* **Quick CLI Start**:
+  ```bash
+  cd "02. UI Testing/02. Selenium_PageObject/02. Java/02. WeareSocialNetwork"
+  run.bat
   ```
 
 ---
