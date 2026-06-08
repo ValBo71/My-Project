@@ -13,7 +13,7 @@ The projects are logically organized by categories and technology stack:
 * **02. Personal site**: Personal Portfolio Website — An interactive, responsive personal portal detailing professional experience, dynamic skill diagrams (radial and progress bars), filterable project cards, and an integrated BGN ⇄ EUR currency converter utility. Developed using HTML5, Bootstrap v3, and JavaScript/jQuery.
 
 ### 🖥️ 2. UI Automation (`02. UI Testing`)
-* **01. Cucumber**: Automated UI tests written using the Cucumber BDD framework.
+* **01. Cucumber**: BDD UI Test Automation framework utilizing JBehave and JUnit 4, featuring a custom Selenium WebDriver wrapper with dynamic element visibility waits and optimized configuration caching.
 * **02. Selenium_PageObject**: Tests built with Selenium WebDriver implementing the **Page Object Model (POM)** design pattern:
   * **Java/01. Exam2_Selenium_PageObject**: Jira bug reporting UI automation framework utilizing Selenium Page Factory and JUnit 4. Automates project creation, issue reporting (description iframe rendering), and search queries.
   * **Java/02. WeareSocialNetwork**: Selenium PageObject UI test suite for the WEare social network. Automates registration, login, profile updates, posting, liking, friend requests, and admin actions in sequential order.
