@@ -9,6 +9,7 @@
 # Binaries
 **/*.class
 **/out/
+**/target/
 
 ### AL ###
 #Template for AL projects for Dynamics 365 Business Central

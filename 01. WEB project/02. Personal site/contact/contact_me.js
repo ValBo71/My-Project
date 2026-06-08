@@ -22,35 +22,23 @@ $(function() {
         if (firstName.indexOf(' ') >= 0) {
 	   firstName = name.split(' ').slice(0, -1).join(' ');
          }        
-	 $.ajax({
-                url: "contact/contact_me.php",
-            	type: "POST",
-            	data: {name: name, email: email, message: message},
-            	cache: false,
-            	success: function() {  
-            	// Success message
-            	   $('#success').html("<div class='alert alert-success'>");
-            	   $('#success > .alert-success').html("<button type='button' class='close' data-dismiss='alert' aria-hidden='true'>&times;")
-            		.append( "</button>");
-            	  $('#success > .alert-success')
-            		.append("<strong>Your message has been sent. </strong>");
- 		  $('#success > .alert-success')
- 			.append('</div>');
- 						    
- 		  //clear all fields
- 		  $('#contactForm').trigger("reset");
- 	      },
- 	   error: function() {		
- 		// Fail message
- 		 $('#success').html("<div class='alert alert-danger'>");
-            	$('#success > .alert-danger').html("<button type='button' class='close' data-dismiss='alert' aria-hidden='true'>&times;")
-            	 .append( "</button>");
-            	$('#success > .alert-danger').append("<strong>Sorry "+firstName+" it seems that my mail server is not responding...</strong> Could you please email me directly to <a href='mailto:home@bogdanovi.com?Subject=Message_Me from ValBo Personal Site'>home@bogdanovi.com</a> ? Sorry for the inconvenience!");
- 	        $('#success > .alert-danger').append('</div>');
- 		//clear all fields
- 		$('#contactForm').trigger("reset");
- 	    },
-           })
+        var subject = "Message from " + name + " via Personal Site";
+        var body = "Hi Valentin,\n\n" + message + "\n\nRegards,\n" + name + "\nEmail: " + email;
+        var mailtoUrl = "mailto:home@bogdanovi.com?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(body);
+        
+        window.location.href = mailtoUrl;
+
+        // Success message for opening mail client
+        $('#success').html("<div class='alert alert-success'>");
+        $('#success > .alert-success').html("<button type='button' class='close' data-dismiss='alert' aria-hidden='true'>&times;")
+            .append("</button>");
+        $('#success > .alert-success')
+            .append("<strong>Opening your email client...</strong> If it doesn't open, you can email me directly at <a href='" + mailtoUrl + "'>home@bogdanovi.com</a>.");
+        $('#success > .alert-success')
+            .append('</div>');
+            
+        // clear all fields
+        $('#contactForm').trigger("reset");
          },
          filter: function() {
                    return $(this).is(":visible");
