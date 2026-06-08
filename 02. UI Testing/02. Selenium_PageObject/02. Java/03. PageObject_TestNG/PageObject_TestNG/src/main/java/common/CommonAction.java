@@ -19,8 +19,7 @@ public class CommonAction {
         if(driver == null){
             switch (PLATFORM_AND_BROWSERS) {
                 case "win_chrome":
-                    String setProperty = System.setProperty("webdriver.chrome.driver", "src/main/resources/chromedriver.exe");
-                    driver = (WebDriver) new ChromeDriver();
+                    driver = new ChromeDriver();
                     break;
                 default:
                    Assert.fail("Incorrect platform and browser: "  + PLATFORM_AND_BROWSERS);
@@ -33,7 +32,10 @@ public class CommonAction {
 
     }
 
-
-
-
+    public static void quitDriver() {
+        if (driver != null) {
+            driver.quit();
+            driver = null;
+        }
+    }
 }

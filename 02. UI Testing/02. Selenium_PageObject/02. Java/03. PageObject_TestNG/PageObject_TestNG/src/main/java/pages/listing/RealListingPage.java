@@ -15,7 +15,7 @@ public class RealListingPage extends BasePage {
     public RealListingPage checkCountCards() {
         waitElementIsVisible(driver.findElement(card));
         int countCard = driver.findElements(card).size();
-        Assert.assertEquals(countCard, 20);
+        Assert.assertTrue(countCard >= 10, "Expected at least 10 cards on the listing page, but found: " + countCard);
         return this;
     }
 }

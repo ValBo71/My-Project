@@ -10,15 +10,18 @@ public class RealHomePage extends BasePage {
         super(driver);
     }
 
-    By countRooms = By.xpath("//select[@id='rooms']");
-    By option2Rooms = By.xpath("//select[@id='rooms']/option[@value='2']");
-    By findBtn = By.xpath("//div[@id='residentialInputs']//a[@class='common-search-submit btn btn-primary'][contains(text(),'Найти')]");
+    By countRooms = By.xpath("//div[@role='button' and .//span[text()='Кол-во комнат']]");
+    By findBtn = By.xpath("//a[contains(., 'Найти') and contains(@class, 'bg-primary')]");
 
+    public RealHomePage selectRooms(String roomsOptionText) {
+        driver.findElement(countRooms).click();
+        By optionRooms = By.xpath("//div[@role='button' and text()='" + roomsOptionText + "']");
+        driver.findElement(optionRooms).click();
+        return this;
+    }
 
     public RealHomePage enterCountRooms() {
-        driver.findElement(countRooms).click();
-        driver.findElement(option2Rooms).click();
-        return this;
+        return selectRooms("2к квартира");
     }
 
     public RealHomePage clickBntFind() {
