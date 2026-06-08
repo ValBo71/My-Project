@@ -1,5 +1,7 @@
 # 🎯 Shooting Range Game
 
+![Game Screenshot](screenshot.png)
+
 An interactive, canvas-free clicker shooting game built with Vanilla HTML, CSS (flexbox and 3D transforms), and JavaScript. 
 
 ## 🎮 How to Play

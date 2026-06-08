@@ -1,5 +1,7 @@
 # 🐦 Flappy Bird Clone
 
+![Game Screenshot](img/screenshot.png)
+
 An interactive 2D side-scrolling web game inspired by Flappy Bird, developed in Vanilla JavaScript and rendered using HTML5 Canvas.
 
 ## 🎮 How to Play

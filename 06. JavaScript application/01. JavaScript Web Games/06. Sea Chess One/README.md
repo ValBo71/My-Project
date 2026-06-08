@@ -1,5 +1,7 @@
 # ❌ Sea Chess (Морски шах)
 
+![Game Screenshot](screenshot.png)
+
 An elegant web-based Tic-Tac-Toe (Морски шах) game built using HTML5, CSS (with premium dark gradients and glassmorphic designs), and Vanilla JavaScript. Features a smart computer AI opponent and score persistence across page reloads.
 
 ## 🎮 How to Play

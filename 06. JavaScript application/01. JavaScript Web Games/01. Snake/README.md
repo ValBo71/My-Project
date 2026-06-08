@@ -1,5 +1,7 @@
 # 🐍 Classic Snake Game
 
+![Game Screenshot](img/screenshot.png)
+
 A classic retro Snake Game built using Vanilla JavaScript and HTML5 Canvas. The game features grid-based movement, responsive keyboard controls, dynamic food spawning, and score tracking.
 
 ## 🎮 How to Play

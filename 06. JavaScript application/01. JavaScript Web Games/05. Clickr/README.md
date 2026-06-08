@@ -1,5 +1,7 @@
 # 🖱️ Clickr Game
 
+![Game Screenshot](screenshot.png)
+
 A fast-paced reflex web game where the objective is to click a button as many times as possible within a 5-second window. Developed using Vanilla HTML, CSS, and JavaScript.
 
 ## 🎮 How to Play
