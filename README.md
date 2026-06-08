@@ -21,7 +21,7 @@ The projects are logically organized by categories and technology stack:
   * **C#/1.httpsautomationexercise.com**: C# Selenium WebDriver & NUnit UI automation project covering 20 test cases from the official practice list. Features a clean Page Object Model with isolated locators, stale-proof wait utilities, automatic GDPR consent handling, dynamic Google Vignette ad bypass, and failure screenshot attachment.
 
 ### 🖼️ 3. Sikuli GUI Automation (`03. Sikuli`)
-* **01. ValentinBogdanov.sikuli**: Desktop automation scripts based on image recognition using Sikuli.
+* **01. ValentinBogdanov.sikuli**: End-to-end desktop and browser GUI automation script based on image recognition using SikuliX. Automates Jira sandbox registration via temp-mail, Kanban project setup, bug reporting, and visual assertion search.
 
 ### 🔌 4. API Testing (`04. API Testing`)
 Collections and projects for automated REST API testing:
@@ -196,6 +196,22 @@ This section features automated web UI test suites implementing the Page Object 
   cd "02. UI Testing/02. Selenium_PageObject/01. C#/1.httpsautomationexercise.com"
   dotnet test
   ```
+
+---
+
+## 🖼️ Sikuli GUI Automation Project (`03. Sikuli`)
+
+This section contains desktop GUI automation scripts utilizing image recognition libraries.
+
+### 1. **Jira End-to-End Flow Automation** (`03. Sikuli/01. ValentinBogdanov.sikuli`)
+* **Core Capabilities**:
+  * **Image-Recognition Automation**: Drives browser interactions, mouse clicks, and input forms using visual screen patterns and screenshots rather than DOM locators.
+  * **E2E Registration & Project Setup**: Automates generating a new temp email, registering in a Jira Sandbox sandbox environment, verifying email verification notifications, setting passwords, and logging in.
+  * **Dynamic Resource Creation**: Programmatically creates a Jira Kanban project (generating dynamic random numeric project keys) and logs a highly-detailed bug report in the description rich text editor.
+  * **Automated Success Validation**: Searches for the created bug report and verifies its presence via search results image matches, alerting the user with an interactive GUI popup upon success.
+* **Quick Start**:
+  * Download and install the [SikuliX IDE](http://sikulix.com/).
+  * Open the `03. Sikuli/01. ValentinBogdanov.sikuli` project folder within SikuliX IDE and click **Run** (`Ctrl + R`).
 
 ---
 

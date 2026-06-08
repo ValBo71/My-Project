@@ -1,4 +1,4 @@
-type(Key.CMD)
+type(Key.WIN)
 wait(5)
 type("firefox" + Key.ENTER)
 wait(5)
@@ -9,7 +9,7 @@ wait(20)
 click ("copy_emal_address.png")
 wait(10)
 cb = Env.getClipboard()
-type ("t", KEY_CTRL)
+type ("t", KeyModifier.CTRL)
 wait(10)
 type("https://sandbox.xpand-it.com/secure/Dashboard.jspa" + Key.ENTER)
 wait(5)
@@ -43,7 +43,7 @@ if exists("label_jira_email.png"):
 if exists("label_username.png"):
     doubleClick("label_user.png")
 
-type ("c", KEY_CTRL)  
+type ("c", KeyModifier.CTRL)  
 user = Env.getClipboard()
 
 
@@ -95,7 +95,7 @@ click("bug.png")
 type("Summary_Bug_Report.png", "When you change the language, the currencies used in the specific countries do not change automatically")
 wait(1)
 
-type("Description.png", "*Prerquites:*" + Key.ENTER + Key.ENTER)
+type("Description.png", "*Prerequisites:*" + Key.ENTER + Key.ENTER)
 type("Go to url: https://phptravels.net/" + Key.ENTER + Key.ENTER)
 type("*Steps to reproduce:*" + Key.ENTER + Key.ENTER)
 type("1. Click on the dropdown menu *English* on the top right corner of the page;" +Key.ENTER +Key.ENTER)
