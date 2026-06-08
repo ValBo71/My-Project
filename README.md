@@ -14,7 +14,8 @@ The projects are logically organized by categories and technology stack:
 
 ### 🖥️ 2. UI Automation (`02. UI Testing`)
 * **01. Cucumber**: Automated UI tests written using the Cucumber BDD framework.
-* **02. Selenium_PageObject**: Tests built with Selenium WebDriver implementing the **Page Object Model (POM)** design pattern for improved maintainability and code reusability.
+* **02. Selenium_PageObject**: Tests built with Selenium WebDriver implementing the **Page Object Model (POM)** design pattern:
+  * **Java/01. Exam2_Selenium_PageObject**: Jira bug reporting UI automation framework utilizing Selenium Page Factory and JUnit 4. Automates project creation, issue reporting (description iframe rendering), and search queries.
 
 ### 🖼️ 3. Sikuli GUI Automation (`03. Sikuli`)
 * **01. ValentinBogdanov.sikuli**: Desktop automation scripts based on image recognition using Sikuli.
@@ -130,6 +131,23 @@ This section features API performance and load testing projects built for the pr
 * **Quick CLI Start**:
   ```bash
   k6 run -e USERS=20 -e RAMPUP=60s -e DURATION=60s "05. Performance Tests/02. K6/k6_performance_test.js"
+  ```
+
+---
+
+## 🖥️ UI Automation Projects (`02. UI Testing`)
+
+This section features automated web UI test suites implementing the Page Object Model (POM) and Page Factory design patterns using **Selenium WebDriver (Java)**.
+
+### 1. **Jira Bug Reporting Automation** (`02. UI Testing/02. Selenium_PageObject/02. Java/01. Exam2_Selenium_PageObject`)
+* **Core Capabilities**:
+  * **Page Factory Design Pattern**: Encapsulates web elements and interactions into dedicated Page Objects (`LoginJira_Page_Factory`, `JiraBugReport_Page_Factory`, `SearchBugReportJira_Page_Factory`).
+  * **Project & Bug Lifecycle Automation**: Automates logging into Jira, creating a new Kanban project with random IDs, creating bug tickets (handling nested description rich-text editor iframes), and searching for tickets.
+  * **Resource Management**: Extends `BaseTest` to automatically clean up WebDriver and browser processes (`quit()`) after each run, preventing system memory leaks.
+* **Quick CLI Start**:
+  ```bash
+  cd "02. UI Testing/02. Selenium_PageObject/02. Java/01. Exam2_Selenium_PageObject"
+  mvn clean test
   ```
 
 ---

@@ -24,15 +24,23 @@ public class LoginJira_Page_Factory {
     @FindBy(id="login")
     public WebElement logInButton;
 
-    public void enterEmail(){
-        emailField.sendKeys("user11");
+    public void enterEmail(String email) {
+        emailField.sendKeys(email);
     }
 
-    public void enterPassword(){
-        passwordField.sendKeys("Penka");
+    public void enterEmail() {
+        enterEmail("user11");
     }
 
-    public void clickLogInButton(){
+    public void enterPassword(String password) {
+        passwordField.sendKeys(password);
+    }
+
+    public void enterPassword() {
+        enterPassword("Penka");
+    }
+
+    public void clickLogInButton() {
         logInButton.click();
     }
 }

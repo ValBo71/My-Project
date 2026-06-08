@@ -1,9 +1,7 @@
 package test.cases;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
-import io.opentelemetry.internal.Utils;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.openqa.selenium.WebDriver;
@@ -27,12 +25,12 @@ public class BaseTest {
 //        options.setHeadless(true);
         webdriver = new ChromeDriver(options);
         webdriver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
-
     }
 
-//    @After
-//    public void tearDown(){
-//        webdriver.quit();
-//    }
-
+    @After
+    public void tearDown(){
+        if (webdriver != null) {
+            webdriver.quit();
+        }
+    }
 }

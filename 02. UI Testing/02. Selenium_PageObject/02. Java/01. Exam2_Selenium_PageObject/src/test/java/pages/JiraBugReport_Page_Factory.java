@@ -103,15 +103,23 @@ public class JiraBugReport_Page_Factory {
         newIssueButton.click();
     }
 
-    public void enterSummary(){
+    public void enterSummary(String summary){
         wait.until(ExpectedConditions.visibilityOf(summaryField));
-        summaryField.sendKeys("When you change the language, the currencies used in the specific countries do not change automatically");
+        summaryField.sendKeys(summary);
+    }
+
+    public void enterSummary(){
+        enterSummary("When you change the language, the currencies used in the specific countries do not change automatically");
+    }
+
+    public void enterContent(String content){
+        wait.until(ExpectedConditions.visibilityOf(descriptionField));
+        descriptionField.click();
+        descriptionField.sendKeys(content);
     }
 
     public void enterContent(){
-        wait.until(ExpectedConditions.visibilityOf(descriptionField));
-        descriptionField.click();
-        descriptionField.sendKeys("*Summary:*\n\n" +
+        enterContent("*Summary:*\n\n" +
                 "When you change the language, the currencies used in the specific countries do not change automatically\n\n" +
                 "*Prerequisites:*\n\n" +
                 "Go to url: https://phptravels.net\n\n" +
