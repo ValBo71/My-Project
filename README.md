@@ -42,7 +42,14 @@ Collections and projects for automated REST API testing:
   * **01. AutomationExercise**: Replicated API performance testing project for `automationexercise.com` simulating 20 and 40 virtual users using ramping-vus, custom scenarios (main load vs account lifecycle), check assertions, and SLA thresholds.
 
 ### 🎮 6. JavaScript Applications (`06. JavaScript application`)
-* **01. JavaScript Web Games**: Interactive web games and applications built with pure JavaScript (Vanilla JS).
+* **01. JavaScript Web Games**: A premium collection of 7 classic interactive web games developed from scratch using HTML5, Vanilla CSS (with responsive layouts and glassmorphic designs), and pure JavaScript (Vanilla JS):
+  * [01. Snake](file:///e:/Programing/My_project/GitHub/MyProject/06.%20JavaScript%20application/01.%20JavaScript%20Web%20Games/01.%20Snake/README.md): Classic retro game featuring canvas rendering, grid movement, apple consumption mechanics, tail collision detection, and screen-rendered boundary checks.
+  * [02. Dino](file:///e:/Programing/My_project/GitHub/MyProject/06.%20JavaScript%20application/01.%20JavaScript%20Web%20Games/02.%20Dino/README.md): Fast-paced endless runner game featuring custom CSS keyframe animations, jump collision detection, and clean state reset scripts to avoid alert interrupts.
+  * [03. Bird](file:///e:/Programing/My_project/GitHub/MyProject/06.%20JavaScript%20application/01.%20JavaScript%20Web%20Games/03.%20Bird/README.md): Side-scrolling 2D Flappy Bird clone featuring gravity physics, dynamic obstacle spawning, audio triggers, and safe asset loading.
+  * [04. Shooting_Range](file:///e:/Programing/My_project/GitHub/MyProject/06.%20JavaScript%20application/01.%20JavaScript%20Web%20Games/04.%20Shooting_Range/README.md): Interactive crosshair clicker game featuring custom target-seeking controls, 3D rotating targets, audio triggers, and duplicate hit filtering.
+  * [05. Clickr](file:///e:/Programing/My_project/GitHub/MyProject/06.%20JavaScript%20application/01.%20JavaScript%20Web%20Games/05.%20Clickr/README.md): Rapid-clicking reflex game with custom retro design styling, high-precision millisecond timing, and score-state tracking.
+  * [06. Sea Chess One](file:///e:/Programing/My_project/GitHub/MyProject/06.%20JavaScript%20application/01.%20JavaScript%20Web%20Games/06.%20Sea%20Chess%20One/README.md): Advanced Tic-Tac-Toe game featuring a dual-difficulty defensive/offensive computer AI, session score history tracking, and board-level event delegation.
+  * [07. Retro Fighting Game](file:///e:/Programing/My_project/GitHub/MyProject/06.%20JavaScript%20application/01.%20JavaScript%20Web%20Games/07.%20Retro%20Fighting%20Game/README.md): 2D arcade cyber-themed fighter game built with OOP classes, physics gravity, computer AI combat behaviors, visual hit flash notifications, and clean UI health metrics.
 
 ### 🎭 7. Playwright Automation (`07.Playwright`)
 Projects using Playwright — a modern tool for UI and API automation:

@@ -9,18 +9,24 @@ const counter = document.querySelector('#counter');
 button.onclick = start;
 
 function start() {
+  clicks = 0;
+  counter.textContent = clicks;
   const startTime = Date.now();
 
   display.textContent = formatTime(TIMEOUT);
-  button.onclick = () => counter.textContent = clicks++;
+  button.onclick = () => {
+    clicks++;
+    counter.textContent = clicks;
+  };
 
   const interval = setInterval(() => {
     const delta = Date.now() - startTime;
-    display.textContent = formatTime(TIMEOUT) - delta;
+    const remaining = TIMEOUT - delta;
+    display.textContent = formatTime(remaining > 0 ? remaining : 0);
   }, 100);
 
-  setTimeout(() => {
-    button.onclick = null;
+  const timeout = setTimeout(() => {
+    button.onclick = start;
     display.textContent = 'Game Over';
 
     clearInterval(interval);
@@ -30,24 +36,4 @@ function start() {
 
 function formatTime(ms) {
   return Number.parseFloat(ms / 1000).toFixed(2);
-}
-
-function start() {
-  const startTime = Date.now();
-
-  display.textContent = formatTime(TIMEOUT);
-  button.onclick = () => counter.textContent = clicks++;
-
-  const interval = setInterval(() => {
-    const delta = Date.now() - startTime;
-    display.textContent = formatTime(TIMEOUT - delta);
-  }, 100);
-
-  const timeout = setTimeout(() => {
-    button.onclick = null;
-    display.textContent = 'Game Over';
-
-    clearInterval(interval);
-    clearTimeout(timeout);
-  }, TIMEOUT);
 }

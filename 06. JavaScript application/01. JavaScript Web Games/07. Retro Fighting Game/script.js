@@ -149,7 +149,7 @@ class Fighter {
         if (this.health < 0) this.health = 0;
         
         // Update Health UI
-        const healthPercentage = `calc(${this.health}% - 6px)`;
+        const healthPercentage = this.health > 0 ? `calc(${this.health}% - 6px)` : '0%';
         if (this.isEnemy) {
             enemyHealthBar.style.width = healthPercentage;
             if (this.health < 30) enemyHealthBar.style.background = '#ff0000';

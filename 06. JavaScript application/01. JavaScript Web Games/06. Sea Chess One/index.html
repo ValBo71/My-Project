@@ -343,10 +343,10 @@ var botZero = function(){
 	}
 }
 
-addEventListener("click", function(event){
+document.querySelector(".board").addEventListener("click", function(event){
 	if (stop === true){return}
 	
-	if (event.target.className === "cell" && event.target.textContent === ""){
+	if (event.target.classList.contains("cell") && event.target.textContent === ""){
 		event.target.style.color = "#00d2d3" // Cyan for human
 		event.target.style.textShadow = "0 0 10px rgba(0, 210, 211, 0.5)"
 		event.target.innerHTML = "x"
