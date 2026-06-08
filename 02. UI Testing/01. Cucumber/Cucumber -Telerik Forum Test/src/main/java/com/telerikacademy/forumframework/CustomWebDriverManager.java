@@ -14,8 +14,8 @@ public class CustomWebDriverManager {
 			WebDriverManager.chromedriver().setup();
 			WebDriver chromeDriver = new ChromeDriver();
 			chromeDriver.manage().window().maximize();
-			driver = chromeDriver;
-			return chromeDriver;
+			driver = new Driver(chromeDriver);
+			return driver;
 		}
 
 		public void quitDriver() {

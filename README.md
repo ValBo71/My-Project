@@ -140,9 +140,20 @@ This section features API performance and load testing projects built for the pr
 
 ## 🖥️ UI Automation Projects (`02. UI Testing`)
 
-This section features automated web UI test suites implementing the Page Object Model (POM) and Page Factory design patterns using **Selenium WebDriver (Java)**.
+This section features automated web UI test suites implementing the Page Object Model (POM), Page Factory, and BDD design patterns using **Selenium WebDriver (Java & C#)**.
 
-### 1. **Jira Bug Reporting Automation** (`02. UI Testing/02. Selenium_PageObject/02. Java/01. Exam2_Selenium_PageObject`)
+### 1. **BDD UI Automation (JBehave & Selenium)** (`02. UI Testing/01. Cucumber/Cucumber -Telerik Forum Test`)
+* **Core Capabilities**:
+  * **BDD Story Integration**: Orchestrates Gherkin-like `.story` files containing test scenarios (valid topic posts, error pop-up verifications) mapped directly to JUnit step definitions.
+  * **Custom WebDriver Wrapper**: Features a custom `Driver` class that logs element locators and enforces dynamic visibility wait hooks (`ExpectedConditions.visibilityOfElementLocated`) during lookups to eliminate page loading flakes.
+  * **Externalized Mappings & Cached Mappings**: Moves XPath locators out of Java classes into separate properties mappings and optimizes `PropertiesManager` using cached configurations to avoid repetitive disk loads.
+* **Quick CLI Start**:
+  ```bash
+  cd "02. UI Testing/01. Cucumber/Cucumber -Telerik Forum Test"
+  mvn clean test
+  ```
+
+### 2. **Jira Bug Reporting Automation** (`02. UI Testing/02. Selenium_PageObject/02. Java/01. Exam2_Selenium_PageObject`)
 * **Core Capabilities**:
   * **Page Factory Design Pattern**: Encapsulates web elements and interactions into dedicated Page Objects (`LoginJira_Page_Factory`, `JiraBugReport_Page_Factory`, `SearchBugReportJira_Page_Factory`).
   * **Project & Bug Lifecycle Automation**: Automates logging into Jira, creating a new Kanban project with random IDs, creating bug tickets (handling nested description rich-text editor iframes), and searching for tickets.
@@ -153,7 +164,7 @@ This section features automated web UI test suites implementing the Page Object 
   mvn clean test
   ```
 
-### 2. **WEare Social Network UI Automation** (`02. UI Testing/02. Selenium_PageObject/02. Java/02. WeareSocialNetwork`)
+### 3. **WEare Social Network UI Automation** (`02. UI Testing/02. Selenium_PageObject/02. Java/02. WeareSocialNetwork`)
 * **Core Capabilities**:
   * **Method and Class-level Sequential Ordering**: Implements `@FixMethodOrder(MethodSorters.NAME_ASCENDING)` on all test classes and a JUnit `RunAllTests` Suite class to guarantee tests execute in a strict logical dependency flow.
   * **Headless execution and modern Chrome support**: Refactored to utilize `webdrivermanager` 5.8.0 for compatibility with Chrome 148+ (CFT) while preserving the browser configuration settings.
@@ -164,7 +175,7 @@ This section features automated web UI test suites implementing the Page Object 
   run.bat
   ```
 
-### 3. **PageObject TestNG UI Automation** (`02. UI Testing/02. Selenium_PageObject/02. Java/03. PageObject_TestNG/PageObject_TestNG`)
+### 4. **PageObject TestNG UI Automation** (`02. UI Testing/02. Selenium_PageObject/02. Java/03. PageObject_TestNG/PageObject_TestNG`)
 * **Core Capabilities**:
   * **Page Object Design Pattern**: Encapsulates pages (`RealHomePage`, `RealListingPage`) and their interactions into dedicated modular Page Objects extending `BasePage`.
   * **Robust Browser Control & Lifecycle Teardown**: Uses modern Selenium 4 native Selenium Manager for Chrome driver binaries, and wraps automated browser processes in TestNG `@BeforeSuite` and `@AfterSuite` hooks to cleanly quit ChromeDriver processes, avoiding resource leaks.
@@ -175,7 +186,7 @@ This section features automated web UI test suites implementing the Page Object 
   & "C:\Program Files\JetBrains\IntelliJ IDEA Community Edition 2025.1.2\plugins\maven\lib\maven3\bin\mvn.cmd" test
   ```
 
-### 4. **C# Selenium UI Automation** (`02. UI Testing/02. Selenium_PageObject/01. C#/1.httpsautomationexercise.com`)
+### 5. **C# Selenium UI Automation** (`02. UI Testing/02. Selenium_PageObject/01. C#/1.httpsautomationexercise.com`)
 * **Core Capabilities**:
   * **Page Object Design Pattern**: Encapsulates pages and their actions into modular Page Objects. Follows a strict separation of concerns where elements/locators are isolated into dedicated static `Selectors` classes.
   * **Automatic GDPR & Ad Bypass**: Automatically handles and dismisses GDPR cookie consent popup overlays, and dynamically bypasses interstitial Google Vignette ads (re-navigating to the clean URL on click interception), building extremely stable, flake-free tests.

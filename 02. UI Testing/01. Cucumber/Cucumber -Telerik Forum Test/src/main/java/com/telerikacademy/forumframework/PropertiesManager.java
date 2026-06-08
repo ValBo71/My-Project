@@ -24,11 +24,17 @@ public class PropertiesManager {
 		}
 
 		public Properties getConfigProperties() {
-			return configProperties = loadProperties(CONFIG_PROPERTIES);
+			if (configProperties == null) {
+				configProperties = loadProperties(CONFIG_PROPERTIES);
+			}
+			return configProperties;
 		}
 
 		public Properties getUiMappings() {
-			return uiMappings = loadProperties(UI_MAP);
+			if (uiMappings == null) {
+				uiMappings = loadProperties(UI_MAP);
+			}
+			return uiMappings;
 		}
 	}
 }

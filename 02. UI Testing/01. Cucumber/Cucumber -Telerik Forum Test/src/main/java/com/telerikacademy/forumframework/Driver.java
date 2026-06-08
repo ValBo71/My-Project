@@ -44,15 +44,14 @@ public class Driver implements WebDriver {
 
     @Override
     public List<WebElement> findElements(By by) {
-        Utils.LOG.info("Finding element with locator: " + by.toString());
+        Utils.LOG.info("Finding all elements with locator: " + by.toString());
         return webDriver.findElements(by);
     }
 
     @Override
     public WebElement findElement(By by) {
-        Utils.LOG.info("Finding all elements with locator: " + by.toString());
-        WebElement elementFound = webDriver.findElement(by);
-        return webDriverWait.until(ExpectedConditions.visibilityOf(elementFound));
+        Utils.LOG.info("Finding element with locator: " + by.toString());
+        return webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(by));
     }
 
     @Override
