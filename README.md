@@ -22,7 +22,8 @@ The projects are logically organized by categories and technology stack:
 ### 🔌 4. API Testing (`04. API Testing`)
 Collections and projects for automated REST API testing:
 * **01. API testing with Postman**: Test collections and environments for automated testing in Postman.
-* **02. API testing with RestAssured**: Test scenarios in Java using the REST Assured library.
+* **02. API testing with RestAssured**: Test scenarios in Java using the REST Assured library:
+  * **01. GoogleAPI**: Refactored Java Maven + TestNG API testing framework targeting JSONPlaceholder, SWAPI, and a complete CRUD integration lifecycle of a Place using the Google Places API sandbox. Features separated Request/Response specifications to isolate endpoint configurations.
 * **03. API testing with RestSharp**: API testing in C# using the RestSharp library:
   * **01. AutomationExercise.RestSharp.ApiTests**: Complete C# NUnit API Automation framework for `automationexercise.com` covering all 14 API scenarios from the official practice list. Features a clean client-based architecture, strongly-typed models, dynamic data generation, request/response logging, and Allure reporting.
 
