@@ -38,7 +38,7 @@ public class JiraBugReportTest extends BaseTest {
     }
 
     @Test
-    public void creteNewProject() throws InterruptedException {
+    public void createNewProject() throws InterruptedException {
         LoginJira_Page_Factory loginPage = new LoginJira_Page_Factory(webdriver);
         JiraBugReport_Page_Factory createProject = new JiraBugReport_Page_Factory(webdriver);
         JiraBugReport_Page_Factory createIssue = new JiraBugReport_Page_Factory(webdriver);
@@ -68,7 +68,7 @@ public class JiraBugReportTest extends BaseTest {
 
     }
     @Test
-    public void creteNewProject_withNewIssue() throws InterruptedException {
+    public void createNewProject_withNewIssue() throws InterruptedException {
 
         LoginJira_Page_Factory loginPage = new LoginJira_Page_Factory(webdriver);
         JiraBugReport_Page_Factory createProject = new JiraBugReport_Page_Factory(webdriver);
@@ -110,7 +110,7 @@ public class JiraBugReportTest extends BaseTest {
 
     }
     @Test
-    public void creteNewProject_withNewIssue_AndSearch() throws InterruptedException {
+    public void createNewProject_withNewIssue_AndSearch() throws InterruptedException {
         LoginJira_Page_Factory loginPage = new LoginJira_Page_Factory(webdriver);
         JiraBugReport_Page_Factory createProject = new JiraBugReport_Page_Factory(webdriver);
         JiraBugReport_Page_Factory createIssue = new JiraBugReport_Page_Factory(webdriver);
@@ -126,7 +126,7 @@ public class JiraBugReportTest extends BaseTest {
 
 
         Thread.sleep (2000);
-        searchIssue.clickNewSearchMenue();
+        searchIssue.clickNewSearchMenu();
         Thread.sleep (2000);
         searchIssue.clickSearchMenue();
         Thread.sleep (2000);

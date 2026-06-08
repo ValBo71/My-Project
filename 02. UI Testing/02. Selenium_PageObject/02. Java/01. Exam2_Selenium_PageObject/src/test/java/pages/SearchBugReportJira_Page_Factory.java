@@ -21,7 +21,7 @@ public class SearchBugReportJira_Page_Factory {
     }
 
     @FindBy(id="find_link")
-    public WebElement NewSearchIssueMenue;
+    public WebElement NewSearchIssueMenu;
 
     @FindBy(id="issues_new_search_link_lnk")
     public WebElement NewSearchIssue;
@@ -35,19 +35,25 @@ public class SearchBugReportJira_Page_Factory {
     @FindBy(xpath="//button[@class='aui-button aui-button-primary search-button']")
     public WebElement searchFieldButton;
 
-    public void clickNewSearchMenue(){
-        wait.until(ExpectedConditions.visibilityOf(NewSearchIssueMenue));
-        NewSearchIssueMenue.click();
+    public void clickNewSearchMenu(){
+        wait.until(ExpectedConditions.visibilityOf(NewSearchIssueMenu));
+        NewSearchIssueMenu.click();
     }
 
     public void clickSearchMenue(){
         wait.until(ExpectedConditions.visibilityOf(NewSearchIssue));
         NewSearchIssue.click();
     }
-    public void enterSearchField(){
+    
+    public void enterSearchField(String query){
         wait.until(ExpectedConditions.visibilityOf(searchField));
-        searchField.sendKeys("When you change the language");
+        searchField.sendKeys(query);
     }
+    
+    public void enterSearchField(){
+        enterSearchField("When you change the language");
+    }
+    
     public void clickSearchButton(){
         searchFieldButton.click();
     }
