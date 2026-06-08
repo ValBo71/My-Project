@@ -1,19 +1,14 @@
+# IDEs and Editors
+.idea/
+.vs/
+**/.idea/
+**/.vs/
+.vscode/
+**/.vscode/
+
 # Binaries
 **/*.class
 **/out/
-.vscode
-
-# User-specific stuff
-**/.idea/**/workspace.xml
-**/.idea/**/tasks.xml
-**/.idea/**/checkstyle-idea.xml
-**/*.iml
-**/*.ipr
-**/.idea/**/*.iml
-**/.idea/**/modules
-**/.idea/**/modules.xml
-**/.vscode
-.vscode
 
 ### AL ###
 #Template for AL projects for Dynamics 365 Business Central
