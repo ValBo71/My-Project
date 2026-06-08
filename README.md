@@ -21,7 +21,8 @@ The projects are logically organized by categories and technology stack:
 
 ### 🔌 4. API Testing (`04. API Testing`)
 Collections and projects for automated REST API testing:
-* **01. API testing with Postman**: Test collections and environments for automated testing in Postman.
+* **01. API testing with Postman**: Test collections and environments for automated testing in Postman:
+  * **01. Approval Book iMX**: Postman regression testing collection verifying that XML inputs entered into the iMX system are correctly loaded and verified in REST API responses, using CSV dataloaders for collection variables.
 * **02. API testing with RestAssured**: Test scenarios in Java using the REST Assured library:
   * **01. GoogleAPI**: Refactored Java Maven + TestNG API testing framework targeting JSONPlaceholder, SWAPI, and a complete CRUD integration lifecycle of a Place using the Google Places API sandbox. Features separated Request/Response specifications to isolate endpoint configurations.
   * **02. ProjectGoogleApi**: Refactored Model-Based Java Maven + TestNG API testing project targeting Google Places Find Place Search API. Implements Lombok builders, property-based credentials, and positive/negative test suites.
@@ -168,6 +169,15 @@ This section features automated API testing frameworks and scripts built to veri
   cd "04. API Testing/03. API testing with RestSharp/AutomationExercise.RestSharp.ApiTests"
   dotnet test
   ```
+
+### 4. **Postman Approval Book iMX Project** (`04. API Testing/01. API testing with Postman/01. Approval Book iMX`)
+* **Core Capabilities**:
+  * **Regression Testing**: Validates that case data created in the iMX backend via XML schemas maps correctly to REST API response structures.
+  * **Dynamic Variable Injection**: Loads testing credentials and Case/Reference/BU/Debtor IDs from an external `Variables for test.csv` file into Postman collection variables via Runner iterations.
+  * **JavaScript Assertions**: Refactored to utilize safe array lookup find-match logic (avoiding loop closure bugs) and compliant Chai assertion patterns (`to.not.be.empty`, `to.not.be.null`).
+* **Quick Run**:
+  * Import `EH AB - UK book- API testing.postman_collection.json` and `EH _environments_ODIN.postman_environment.json` into Postman.
+  * Open **Collection Runner**, select the CSV data file `Variables for test.csv`, and run the suite.
 
 ---
 
