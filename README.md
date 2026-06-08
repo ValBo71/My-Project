@@ -29,7 +29,8 @@ Collections and projects for automated REST API testing:
 * **01. JMeter**: Test plans (JMX) for performance and load testing with Apache JMeter:
   * **01. WEare**: Load and stress tests with 30 and 60 users.
   * **02. AutomationExercise**: Parameterized API performance testing project for `automationexercise.com` simulating 20 and 40 virtual users, featuring response/JSON assertions, random timers, CSV config, and automated HTML report generation.
-* **02. K6**: Modern JavaScript-based load testing scripts executed with Grafana k6.
+* **02. K6**: Modern JavaScript-based load testing scripts executed with Grafana k6:
+  * **01. AutomationExercise**: Replicated API performance testing project for `automationexercise.com` simulating 20 and 40 virtual users using ramping-vus, custom scenarios (main load vs account lifecycle), check assertions, and SLA thresholds.
 
 ### 🎮 6. JavaScript Applications (`06. JavaScript application`)
 * **01. JavaScript Web Games**: Interactive web games and applications built with pure JavaScript (Vanilla JS).
