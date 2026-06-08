@@ -9,7 +9,7 @@ Welcome to my portfolio! Here you will find various projects, tasks, and practic
 The projects are logically organized by categories and technology stack:
 
 ### 🔍 1. Web Projects (`01. WEB project`)
-* **01. Telerik web project**: Web projects developed as part of my training at Telerik.
+* **01. Telerik web project**: "Bug Hunters" Profile Portal — A responsive, multilingual static portal website featuring the profiles, personality index cards (with 3D card flip animations), about pages, and interactive hobby galleries for 6 team members. Developed using HTML5, Vanilla CSS, and JavaScript/jQuery.
 * **02. Personal site**: A personal website built using HTML, CSS, and JavaScript.
 
 ### 🖥️ 2. UI Automation (`02. UI Testing`)
@@ -246,6 +246,19 @@ This section features automated API testing frameworks and scripts built to veri
     newman run WEareSocialNetwork.postman_collection.json -e PlutoFinalProject.postman_environment.json -r htmlextra
     ```
     View the generated report inside the `newman/` folder.
+
+---
+
+## 🌐 Web Projects (`01. WEB project`)
+
+### 🕷️ Bug Hunters Portal (`01. WEB project/01. Telerik web project/01. WebPage`)
+A team portfolio web portal showcasing members of Buddy Group 1 ("Bug Hunters").
+* **Core Capabilities**:
+  * **3D Card Flip Animation**: Hover or click on any member's card to flip it and view their personality traits (Predictive Index).
+  * **Full Multilingual Support**: Complete localized versions in English (`index.html`) and Bulgarian (`indexBG.html`), with fully-integrated language switching.
+  * **Interactive Hobby Sections**: Custom individual galleries for cooking recipes (with interactive details), drone flying guides (with embedded video players), and travel/nature sections.
+  * **Clean Syntax & Pathing**: Optimized link structuring, correct script routing, and zero dead links verified programmatically.
+* **Tech Stack**: HTML5, Vanilla CSS3 (3D transformations, flexbox, grid, media queries), JavaScript/jQuery.
 
 ---
 
