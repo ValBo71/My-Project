@@ -102,5 +102,32 @@ Projects using Playwright — a modern tool for UI and API automation:
 
 ---
 
+## ⚡ Performance Testing Projects (`05. Performance Tests`)
+
+This section features API performance and load testing projects built for the practice platform [Automation Exercise](https://automationexercise.com) using two different industry-standard tools: **Apache JMeter** and **Grafana k6**.
+
+### 1. **Apache JMeter Project** (`05. Performance Tests/01. JMeter/02.AutomationExercise`)
+* **Core Capabilities**:
+  * **Dynamic Parameterization**: Configured with JMeter Properties for threads (`users`), ramp-up, and duration.
+  * **Dual Thread Groups**: A main load group for GET/POST API endpoints and a low-load account lifecycle group (using unique emails) to test account creation, details, updates, and deletion.
+  * **SLA Threshold Verification**: Duration assertions enforce a response time threshold under `2000 ms`.
+  * **Local Reporting**: Features automated HTML report generation during non-GUI CLI execution.
+* **Quick CLI Start**:
+  ```bash
+  jmeter -n -t "05. Performance Tests/01. JMeter/02.AutomationExercise/AutomationExercise_Performance_Test.jmx" -Jusers=20 -Jrampup=60 -Jduration=60 -l results_20_users.jtl -e -o report_20_users
+  ```
+
+### 2. **Grafana k6 Project** (`05. Performance Tests/02. K6`)
+* **Core Capabilities**:
+  * **Code-as-Test Scenarios**: Written in JavaScript utilizing custom multi-scenario configurations (`main_load` and `account_lifecycle`).
+  * **Strict Threshold Checks (SLAs)**: Automatically enforces error rate `< 5%` and response times: average `< 2000ms`, 95th percentile `< 3000ms`, and 99th percentile `< 5000ms`.
+  * **CLI Parameterization**: Custom variables passed through environment flags (`-e USERS=20`).
+* **Quick CLI Start**:
+  ```bash
+  k6 run -e USERS=20 -e RAMPUP=60s -e DURATION=60s "05. Performance Tests/02. K6/k6_performance_test.js"
+  ```
+
+---
+
 ✉️ **Contacts**:
 If you have any questions about the projects or would like to get in touch, feel free to visit my GitHub profile [ValBo71](https://github.com/ValBo71).
