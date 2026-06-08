@@ -26,7 +26,9 @@ Collections and projects for automated REST API testing:
 * **03. API testing with RestSharp**: API testing in C# using the RestSharp library.
 
 ### ⚡ 5. Performance & Load Testing (`05. Performance Tests`)
-* **01. JMeter**: Test plans (JMX) for performance and load testing with Apache JMeter.
+* **01. JMeter**: Test plans (JMX) for performance and load testing with Apache JMeter:
+  * **01. WEare**: Load and stress tests with 30 and 60 users.
+  * **02. AutomationExercise**: Parameterized API performance testing project for `automationexercise.com` simulating 20 and 40 virtual users, featuring response/JSON assertions, random timers, CSV config, and automated HTML report generation.
 * **02. K6**: Modern JavaScript-based load testing scripts executed with Grafana k6.
 
 ### 🎮 6. JavaScript Applications (`06. JavaScript application`)
