@@ -18,6 +18,7 @@ The projects are logically organized by categories and technology stack:
   * **Java/01. Exam2_Selenium_PageObject**: Jira bug reporting UI automation framework utilizing Selenium Page Factory and JUnit 4. Automates project creation, issue reporting (description iframe rendering), and search queries.
   * **Java/02. WeareSocialNetwork**: Selenium PageObject UI test suite for the WEare social network. Automates registration, login, profile updates, posting, liking, friend requests, and admin actions in sequential order.
   * **Java/03. PageObject_TestNG**: Selenium PageObject UI test suite built with TestNG and Java. Automates search functionality on the realt.by portal, featuring custom cookie consent handling, dynamic room filters, and automated ChromeDriver lifecycle management with TestNG suite hooks.
+  * **C#/1.httpsautomationexercise.com**: C# Selenium WebDriver & NUnit UI automation project covering 20 test cases from the official practice list. Features a clean Page Object Model with isolated locators, stale-proof wait utilities, automatic GDPR consent handling, dynamic Google Vignette ad bypass, and failure screenshot attachment.
 
 ### 🖼️ 3. Sikuli GUI Automation (`03. Sikuli`)
 * **01. ValentinBogdanov.sikuli**: Desktop automation scripts based on image recognition using Sikuli.
@@ -172,6 +173,17 @@ This section features automated web UI test suites implementing the Page Object 
   ```bash
   cd "02. UI Testing/02. Selenium_PageObject/02. Java/03. PageObject_TestNG/PageObject_TestNG"
   & "C:\Program Files\JetBrains\IntelliJ IDEA Community Edition 2025.1.2\plugins\maven\lib\maven3\bin\mvn.cmd" test
+  ```
+
+### 4. **C# Selenium UI Automation** (`02. UI Testing/02. Selenium_PageObject/01. C#/1.httpsautomationexercise.com`)
+* **Core Capabilities**:
+  * **Page Object Design Pattern**: Encapsulates pages and their actions into modular Page Objects. Follows a strict separation of concerns where elements/locators are isolated into dedicated static `Selectors` classes.
+  * **Automatic GDPR & Ad Bypass**: Automatically handles and dismisses GDPR cookie consent popup overlays, and dynamically bypasses interstitial Google Vignette ads (re-navigating to the clean URL on click interception), building extremely stable, flake-free tests.
+  * **Stale-Proof Execution & Wait Hooks**: Features robust wait utility wrappers (stale-element retries on click/enter actions) and a configuration system (`appsettings.json`) to control headless execution, browser selection, and timeouts.
+* **Quick CLI Start**:
+  ```bash
+  cd "02. UI Testing/02. Selenium_PageObject/01. C#/1.httpsautomationexercise.com"
+  dotnet test
   ```
 
 ---
