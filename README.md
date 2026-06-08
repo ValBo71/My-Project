@@ -131,5 +131,33 @@ This section features API performance and load testing projects built for the pr
 
 ---
 
+## 🔌 API Testing Projects (`04. API Testing`)
+
+This section features automated API testing frameworks and scripts built to verify REST API endpoints using **RestAssured (Java)** and **RestSharp (C#)**.
+
+### 1. **RestAssured Java Project** (`04. API Testing/02. API testing with RestAssured/01. GoogleAPI/GoogleApi`)
+* **Core Capabilities**:
+  * **Multi-API Request Separation**: Implements isolated `RequestSpecification` contexts for SWAPI, JSONPlaceholder, httpbin, and Google Places. This prevents URL pollution and enables clean concurrent testing.
+  * **Stateful CRUD Verification**: Automates the full lifecycle of a Place (Add, Get, Update, Get, Delete, Verify Deleted) using TestNG `dependsOnMethods` to chain state between tests.
+  * **Dynamic Payload Validation**: Extracts JSON responses using `JsonPath` and asserts response properties via Hamcrest matchers.
+* **Quick CLI Start**:
+  ```bash
+  cd "04. API Testing/02. API testing with RestAssured/01. GoogleAPI/GoogleApi"
+  mvn clean test
+  ```
+
+### 2. **RestSharp C# Project** (`04. API Testing/03. API testing with RestSharp`)
+* **Core Capabilities**:
+  * **Strongly-Typed Payloads**: Built with C# and .NET 8 using strongly-typed models for requests and responses, utilizing `System.Text.Json` serialization.
+  * **Allure Reports Integration**: Automatically logs request URLs, methods, headers, parameters, and response bodies to Allure report attachments for rich execution dashboards.
+  * **Complete Business Scenarios**: Fully automates all 14 official test cases from `automationexercise.com` (user lifecycle, products, brands, login verification).
+* **Quick CLI Start**:
+  ```bash
+  cd "04. API Testing/03. API testing with RestSharp/AutomationExercise.RestSharp.ApiTests"
+  dotnet test
+  ```
+
+---
+
 ✉️ **Contacts**:
 If you have any questions about the projects or would like to get in touch, feel free to visit my GitHub profile [ValBo71](https://github.com/ValBo71).
