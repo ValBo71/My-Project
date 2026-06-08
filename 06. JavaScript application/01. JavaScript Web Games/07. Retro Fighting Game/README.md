@@ -1,5 +1,7 @@
 # 🥊 Retro Fighting Game (Retro Kombat)
 
+![Game Screenshot](screenshot.png)
+
 A 2D arcade-style fighting game built from scratch using HTML5 Canvas, Vanilla JavaScript classes, and retro cyber-themed CSS styling. Features a playable character fighting against an automated computer AI.
 
 ## 🎮 How to Play

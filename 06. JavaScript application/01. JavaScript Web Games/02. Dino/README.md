@@ -1,5 +1,7 @@
 # 🦖 Dino Jump Game
 
+![Game Screenshot](img/screenshot.png)
+
 A lightweight, endless runner web game inspired by the famous Google Chrome offline dinosaur game, built with Vanilla HTML, CSS, and JavaScript.
 
 ## 🎮 How to Play
