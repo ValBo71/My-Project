@@ -42,7 +42,7 @@ body {
 }
 
 .container {
-    max-width: 1650px;
+    max-width: 1780px;
     width: 100%;
     margin: 0 auto;
     padding: 2rem 1.5rem;
@@ -821,3 +821,153 @@ tr:hover td {
     font-size: 0.7rem;
     white-space: nowrap;
 }
+
+/* Flag styling */
+.col-flag {
+    width: 50px;
+    text-align: center;
+    position: relative;
+}
+
+.flag-dropdown-container {
+    position: relative;
+    display: inline-block;
+}
+
+.flag-trigger-btn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px;
+    border-radius: 50%;
+    transition: background-color var(--transition-speed);
+}
+
+.flag-trigger-btn:hover {
+    background-color: #e2e8f0;
+}
+
+.flag-dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    display: inline-block;
+    transition: transform 0.2s ease;
+}
+
+.flag-trigger-btn:hover .flag-dot {
+    transform: scale(1.2);
+}
+
+.flag-dot.green {
+    background-color: #10b981;
+    box-shadow: 0 0 6px rgba(16, 185, 129, 0.4);
+}
+
+.flag-dot.yellow {
+    background-color: #f59e0b;
+    box-shadow: 0 0 6px rgba(245, 158, 11, 0.4);
+}
+
+.flag-dot.red {
+    background-color: #ef4444;
+    box-shadow: 0 0 6px rgba(239, 68, 68, 0.4);
+}
+
+.flag-dot.empty {
+    border: 2px dashed #94a3b8;
+    background-color: transparent;
+}
+
+.flag-trigger-btn:hover .flag-dot.empty {
+    border-style: solid;
+    border-color: var(--text-secondary);
+}
+
+/* Flag Dropdown Menu */
+.flag-dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 100;
+    display: none;
+    min-width: 150px;
+    background-color: #ffffff;
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    padding: 4px 0;
+    margin-top: 6px;
+}
+
+.flag-dropdown-menu.show {
+    display: block;
+}
+
+.flag-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    font-size: 0.85rem;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: background-color var(--transition-speed);
+    text-align: left;
+}
+
+.flag-option:hover {
+    background-color: #f1f5f9;
+}
+
+.flag-option.clear {
+    border-top: 1px solid #e2e8f0;
+    color: var(--text-secondary);
+}
+
+/* Sidebar Preview Dots */
+.flag-dot-preview {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-right: 6px;
+}
+.flag-dot-preview.green {
+    background-color: #10b981;
+}
+.flag-dot-preview.yellow {
+    background-color: #f59e0b;
+}
+.flag-dot-preview.red {
+    background-color: #ef4444;
+}
+
+/* Row Highlights - Premium Subtle Pastel Colors */
+.job-row.flag-green td {
+    background-color: #f0fdf4 !important; /* Soft premium green */
+    border-bottom-color: #bbf7d0;
+}
+.job-row.flag-green:hover td {
+    background-color: #dcfce7 !important; /* Slightly darker on hover */
+}
+
+.job-row.flag-yellow td {
+    background-color: #fffbeb !important; /* Soft premium yellow */
+    border-bottom-color: #fef08a;
+}
+.job-row.flag-yellow:hover td {
+    background-color: #fef9c3 !important; /* Slightly darker on hover */
+}
+
+.job-row.flag-red td {
+    background-color: #fdf2f2 !important; /* Soft premium red */
+    border-bottom-color: #fecaca;
+}
+.job-row.flag-red:hover td {
+    background-color: #fee2e2 !important; /* Slightly darker on hover */
+}
+

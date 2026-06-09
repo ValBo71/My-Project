@@ -30,10 +30,16 @@ This is a web application developed in **Python (Flask)** and **SQLite** that au
    * Filtering by source (`dev.bg` / `LinkedIn` / `jobs.bg`).
    * Filtering by publication date (Today / Last 3 Days / Last 7 Days).
    * Filtering by location (Remote / Hybrid / Sofia) and indicators (Only showing listings with salary / leave details).
+   * Filtering by color/flag status (All / No Flag / Green / Yellow / Red).
 
 6. **Duplicate Prevention & Performance:**
    * Unique URLs are used as primary keys in SQLite to prevent duplicate entries.
    * Client-side data caching makes opening company statistics instant, with zero database load.
+
+7. **Job Categorization Flags & Subtle Highlighting:**
+   * Interactive flag selection (green for suitable, yellow for interesting, red for unsuitable, or clear) available directly on each row via a dropdown menu.
+   * Persistence of flags in SQLite database.
+   * Row backgrounds highlighted dynamically using premium, subtle pastel tints to preserve design aesthetics and hover feedback, avoiding bright "screaming" colors.
 
 ---
 
