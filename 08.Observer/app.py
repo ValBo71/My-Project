@@ -7,7 +7,7 @@ import sys
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
 from config import DEV_BG_URL, PORT, FLASK_DEBUG
-from database import init_db, save_job, get_all_jobs, update_job_flag
+from database import init_db, save_job, get_all_jobs, update_job_flag, get_all_companies, update_company
 from scraper import fetch_html, fetch_job_details, scrape_linkedin_jobs, scrape_jobs_bg_jobs
 from parser import parse_job_listings, parse_job_detail_page
 
@@ -107,10 +107,12 @@ def index():
     
     # 2. Retrieve all jobs from the database (both old and newly scraped)
     jobs = get_all_jobs()
+    companies = get_all_companies()
     
     return render_template(
         'index.html',
         jobs=jobs,
+        companies=companies,
         refresh_success=success,
         refresh_error=error_msg,
         new_jobs_count=new_count
@@ -130,7 +132,8 @@ def api_refresh():
         'error': error_msg,
         'new_jobs_count': new_count,
         'total_jobs_count': len(jobs),
-        'jobs': jobs
+        'jobs': jobs,
+        'companies': get_all_companies()
     })
 
 @app.route('/api/job/flag', methods=['POST'])
@@ -159,6 +162,49 @@ def api_update_flag():
         return jsonify({'success': True})
     else:
         return jsonify({'success': False, 'error': 'Failed to update flag in database.'})
+
+@app.route('/api/company/update', methods=['POST'])
+def api_update_company():
+    """
+    API endpoint to update a company's details.
+    Expects JSON: { "id": int, "flag": string|null, "label": string|null, 
+                    "parent_company_id": int|null, "display_name": string|null }
+    """
+    data = request.get_json()
+    if not data or 'id' not in data:
+        return jsonify({'success': False, 'error': 'Липсва ID на фирмата.'}), 400
+        
+    company_id = data['id']
+    
+    # Extract optional fields
+    update_fields = {}
+    for field in ['flag', 'label', 'parent_company_id', 'display_name']:
+        if field in data:
+            val = data[field]
+            if val == '':
+                val = None
+            if field == 'parent_company_id' and val is not None:
+                try:
+                    val = int(val)
+                except ValueError:
+                    val = None
+            update_fields[field] = val
+            
+    if not update_fields:
+        return jsonify({'success': False, 'error': 'Няма посочени полета за актуализация.'}), 400
+        
+    success = update_company(company_id, **update_fields)
+    if success:
+        return jsonify({
+            'success': True,
+            'companies': get_all_companies(),
+            'jobs': get_all_jobs()
+        })
+    else:
+        return jsonify({
+            'success': False, 
+            'error': 'Грешка при записване или невалидна връзка (цикличност/двустепенна йерархия).'
+        })
 
 if __name__ == '__main__':
     logger.info(f"Starting Flask server on port {PORT}...")
