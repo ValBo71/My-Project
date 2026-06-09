@@ -86,6 +86,31 @@
                     </select>
                 </div>
 
+                <!-- Flag Selector -->
+                <div class="filter-group">
+                    <label>Флаг</label>
+                    <div class="checkbox-group">
+                        <label class="checkbox-label">
+                            <input type="radio" name="flagFilter" value="all" checked> Всички
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="radio" name="flagFilter" value="none"> Без флаг
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="radio" name="flagFilter" value="green">
+                            <span class="flag-dot-preview green"></span> Зелен
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="radio" name="flagFilter" value="yellow">
+                            <span class="flag-dot-preview yellow"></span> Жълт
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="radio" name="flagFilter" value="red">
+                            <span class="flag-dot-preview red"></span> Червен
+                        </label>
+                    </div>
+                </div>
+
                 <!-- Location Selector -->
                 <div class="filter-group">
                     <label>Локация</label>
@@ -190,6 +215,7 @@
                         <table id="jobsTable">
                             <thead>
                                 <tr>
+                                    <th>Флаг</th>
                                     <th>Източник</th>
                                     <th>Компания</th>
                                     <th>Позиция</th>
@@ -204,7 +230,7 @@
                             <tbody id="jobsTableBody">
                                 {% if jobs %}
                                     {% for job in jobs %}
-                                    <tr class="job-row" 
+                                    <tr class="job-row{% if job.flag %} flag-{{ job.flag }}{% endif %}" 
                                         data-company="{{ job.company|lower }}" 
                                         data-title="{{ job.title|lower }}" 
                                         data-reqs="{{ job.requirements|lower }}" 
@@ -213,8 +239,38 @@
                                         data-has-leave="{% if job.leave_days %}true{% else %}false{% endif %}"
                                         data-source="{{ job.source|lower if job.source else 'dev.bg' }}"
                                         data-url="{{ job.url }}"
+                                        data-flag="{{ job.flag if job.flag else 'none' }}"
                                         data-date-timestamp="{{ job.published_at if job.published_at else job.scraped_at }}">
                                         
+                                        <td class="col-flag">
+                                            <div class="flag-dropdown-container">
+                                                <button class="flag-trigger-btn" onclick="toggleFlagDropdown(event)" title="Задай флаг">
+                                                    {% if job.flag == 'green' %}
+                                                        <span class="flag-dot green"></span>
+                                                    {% elif job.flag == 'yellow' %}
+                                                        <span class="flag-dot yellow"></span>
+                                                    {% elif job.flag == 'red' %}
+                                                        <span class="flag-dot red"></span>
+                                                    {% else %}
+                                                        <span class="flag-dot empty"></span>
+                                                    {% endif %}
+                                                </button>
+                                                <div class="flag-dropdown-menu">
+                                                    <div class="flag-option" onclick="setJobFlag(event, 'green')">
+                                                        <span class="flag-dot green"></span> Зелен
+                                                    </div>
+                                                    <div class="flag-option" onclick="setJobFlag(event, 'yellow')">
+                                                        <span class="flag-dot yellow"></span> Жълт
+                                                    </div>
+                                                    <div class="flag-option" onclick="setJobFlag(event, 'red')">
+                                                        <span class="flag-dot red"></span> Червен
+                                                    </div>
+                                                    <div class="flag-option clear" onclick="setJobFlag(event, null)">
+                                                        <span class="flag-dot empty"></span> Без флаг
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
                                         <td class="col-source">
                                             <span class="badge-source {{ 'linkedin' if job.source and job.source|lower == 'linkedin' else ('jobsbg' if job.source and job.source|lower == 'jobs.bg' else 'devbg') }}">
                                                 {{ job.source if job.source else 'dev.bg' }}
@@ -276,7 +332,7 @@
                                     {% endfor %}
                                 {% else %}
                                     <tr id="noJobsRow">
-                                        <td colspan="9">
+                                        <td colspan="10">
                                             <div class="empty-state">
                                                 <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                                                     <circle cx="12" cy="12" r="10"></circle>
@@ -540,6 +596,12 @@
             if (event.target === statsModal) {
                 closeCompanyStatsModal();
             }
+            // Close all flag dropdowns when clicking outside
+            if (!event.target.closest('.flag-dropdown-container')) {
+                document.querySelectorAll('.flag-dropdown-menu.show').forEach(menu => {
+                    menu.classList.remove('show');
+                });
+            }
         }
         
         // Close modal on ESC key
@@ -556,6 +618,7 @@
         const locationFilters = document.getElementsByName('locationFilter');
         const sourceFilters = document.getElementsByName('sourceFilter');
         const dateFilters = document.getElementsByName('dateFilter');
+        const flagFilters = document.getElementsByName('flagFilter');
         const salaryFilter = document.getElementById('salaryFilter');
         const leaveFilter = document.getElementById('leaveFilter');
         
@@ -567,6 +630,14 @@
             for (const radio of locationFilters) {
                 if (radio.checked) {
                     selectedLocation = radio.value;
+                    break;
+                }
+            }
+            
+            let selectedFlag = 'all';
+            for (const radio of flagFilters) {
+                if (radio.checked) {
+                    selectedFlag = radio.value;
                     break;
                 }
             }
@@ -647,7 +718,10 @@
                     }
                 }
                 
-                if (matchesText && matchesLocation && matchesCompany && matchesSalary && matchesLeave && matchesSource && matchesDate) {
+                const flag = row.getAttribute('data-flag') || 'none';
+                const matchesFlag = selectedFlag === 'all' || flag === selectedFlag;
+                
+                if (matchesText && matchesLocation && matchesCompany && matchesSalary && matchesLeave && matchesSource && matchesDate && matchesFlag) {
                     row.style.display = '';
                     visibleCount++;
                 } else {
@@ -664,6 +738,7 @@
         locationFilters.forEach(radio => radio.addEventListener('change', applyFilters));
         sourceFilters.forEach(radio => radio.addEventListener('change', applyFilters));
         dateFilters.forEach(radio => radio.addEventListener('change', applyFilters));
+        flagFilters.forEach(radio => radio.addEventListener('change', applyFilters));
         salaryFilter.addEventListener('change', applyFilters);
         leaveFilter.addEventListener('change', applyFilters);
 
@@ -767,7 +842,7 @@
             if (!jobs || jobs.length === 0) {
                 tbody.innerHTML = `
                     <tr id="noJobsRow">
-                        <td colspan="9">
+                        <td colspan="10">
                             <div class="empty-state">
                                 <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                                     <circle cx="12" cy="12" r="10"></circle>
@@ -786,6 +861,9 @@
             jobs.forEach(job => {
                 const tr = document.createElement('tr');
                 tr.className = 'job-row';
+                if (job.flag) {
+                    tr.classList.add(`flag-${job.flag}`);
+                }
                 
                 // Set data attributes
                 const titleLower = job.title.toLowerCase();
@@ -809,6 +887,7 @@
                 tr.setAttribute('data-has-salary', job.salary_from ? 'true' : 'false');
                 tr.setAttribute('data-has-leave', job.leave_days ? 'true' : 'false');
                 tr.setAttribute('data-url', job.url);
+                tr.setAttribute('data-flag', job.flag || 'none');
                 tr.setAttribute('data-date-timestamp', job.published_at || job.scraped_at);
                 
                 // Build Tech tags
@@ -842,7 +921,35 @@
                 
                 const companyEscaped = JSON.stringify(job.company).replace(/"/g, '&quot;');
                 
+                let flagDotClass = 'flag-dot empty';
+                if (job.flag === 'green') flagDotClass = 'flag-dot green';
+                else if (job.flag === 'yellow') flagDotClass = 'flag-dot yellow';
+                else if (job.flag === 'red') flagDotClass = 'flag-dot red';
+                
+                const flagHtml = `
+                    <div class="flag-dropdown-container">
+                        <button class="flag-trigger-btn" onclick="toggleFlagDropdown(event)" title="Задай флаг">
+                            <span class="${flagDotClass}"></span>
+                        </button>
+                        <div class="flag-dropdown-menu">
+                            <div class="flag-option" onclick="setJobFlag(event, 'green')">
+                                <span class="flag-dot green"></span> Зелен
+                            </div>
+                            <div class="flag-option" onclick="setJobFlag(event, 'yellow')">
+                                <span class="flag-dot yellow"></span> Жълт
+                            </div>
+                            <div class="flag-option" onclick="setJobFlag(event, 'red')">
+                                <span class="flag-dot red"></span> Червен
+                            </div>
+                            <div class="flag-option clear" onclick="setJobFlag(event, null)">
+                                <span class="flag-dot empty"></span> Без флаг
+                            </div>
+                        </div>
+                    </div>
+                `;
+
                 tr.innerHTML = `
+                    <td class="col-flag">${flagHtml}</td>
                     <td class="col-source">${sourceBadgeHtml}</td>
                     <td class="col-company" onclick="openCompanyStats(${companyEscaped})" title="Виж статистика за фирмата">${job.company}</td>
                     <td class="col-position">${job.title}</td>
@@ -900,6 +1007,75 @@
                 select.value = currentValue;
             } else {
                 select.value = 'all';
+            }
+        }
+
+        function toggleFlagDropdown(event) {
+            event.stopPropagation();
+            
+            // Close any other open dropdowns first
+            document.querySelectorAll('.flag-dropdown-menu.show').forEach(menu => {
+                if (menu !== event.currentTarget.nextElementSibling) {
+                    menu.classList.remove('show');
+                }
+            });
+            
+            const menu = event.currentTarget.nextElementSibling;
+            menu.classList.toggle('show');
+        }
+
+        async function setJobFlag(event, flagValue) {
+            event.stopPropagation();
+            
+            const optionEl = event.currentTarget;
+            const menuEl = optionEl.parentElement;
+            menuEl.classList.remove('show');
+            
+            const rowEl = optionEl.closest('.job-row');
+            const url = rowEl.getAttribute('data-url');
+            
+            const container = optionEl.closest('.flag-dropdown-container');
+            const triggerBtn = container.querySelector('.flag-trigger-btn');
+            
+            try {
+                const response = await fetch('/api/job/flag', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ url: url, flag: flagValue })
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    let dotClass = 'flag-dot empty';
+                    if (flagValue === 'green') dotClass = 'flag-dot green';
+                    else if (flagValue === 'yellow') dotClass = 'flag-dot yellow';
+                    else if (flagValue === 'red') dotClass = 'flag-dot red';
+                    
+                    triggerBtn.innerHTML = `<span class="${dotClass}"></span>`;
+                    
+                    rowEl.setAttribute('data-flag', flagValue || 'none');
+                    
+                    // Update highlighting
+                    rowEl.classList.remove('flag-green', 'flag-yellow', 'flag-red');
+                    if (flagValue) {
+                        rowEl.classList.add(`flag-${flagValue}`);
+                    }
+                    
+                    // Update local cache
+                    const jobIndex = jobsData.findIndex(j => j.url === url);
+                    if (jobIndex !== -1) {
+                        jobsData[jobIndex].flag = flagValue;
+                    }
+                    
+                    applyFilters();
+                } else {
+                    alert('Грешка при записване на флага: ' + data.error);
+                }
+            } catch (error) {
+                console.error('Error setting flag:', error);
+                alert('Възникна мрежова грешка при опит за промяна на флага.');
             }
         }
     </script>

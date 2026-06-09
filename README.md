@@ -72,10 +72,12 @@ Projects using Playwright — a modern tool for UI and API automation:
   * Automatically extracts salary details, annual paid leave days, and required technologies (Tech Stack).
   * Supports dual detail formats for jobs.bg (custom HTML in a sandboxed iframe and standard templates).
 * **Database**: Saves listings to a SQLite database with automatic validation to prevent duplicate entries.
+* **Job Flags & Color Coding**: Categorize listings with custom flags (green for suitable, yellow for interesting, red for unsuitable, or clear) which are saved persistently in SQLite. Row backgrounds are dynamically highlighted in premium, soft pastel colors and can be filtered in real-time.
 * **Real-Time Frontend Filtering & Search**:
   * Free-text search (technology, company, job title).
   * Filter by company and location (Remote / Hybrid / Sofia).
   * Filter by source (`dev.bg`, `LinkedIn`, `jobs.bg`).
+  * Filter by flag/color status (All / No Flag / Green / Yellow / Red).
   * Filter by disclosed metrics (only with salary, only with specified paid leave).
   * **Date Filtering**: Preset filters for "Today only", "Last 3 days", or "Last 7 days" (based on calendar date calculations).
 * **Sorting**: All listings are automatically sorted chronologically with the newest postings at the top.

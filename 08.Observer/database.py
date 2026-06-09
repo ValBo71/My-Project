@@ -42,6 +42,9 @@ def init_db():
             if 'published_at' not in columns:
                 logger.info("Migrating database: adding 'published_at' column to jobs table.")
                 conn.execute("ALTER TABLE jobs ADD COLUMN published_at TEXT")
+            if 'flag' not in columns:
+                logger.info("Migrating database: adding 'flag' column to jobs table.")
+                conn.execute("ALTER TABLE jobs ADD COLUMN flag TEXT DEFAULT NULL")
                 
             # Backfill published_at for existing records where it is NULL
             cursor.execute("SELECT url, date_published FROM jobs WHERE published_at IS NULL")
@@ -211,6 +214,19 @@ def job_exists(url):
         return cursor.fetchone() is not None
     except Exception as e:
         logger.error(f"Error checking job existence for URL {url}: {e}")
+        return False
+    finally:
+        conn.close()
+
+def update_job_flag(url, flag):
+    """Updates the flag/color indicator of a job listing."""
+    conn = get_db_connection()
+    try:
+        with conn:
+            cursor = conn.execute("UPDATE jobs SET flag = ? WHERE url = ?", (flag, url))
+            return cursor.rowcount > 0
+    except Exception as e:
+        logger.error(f"Error updating flag for job {url}: {e}")
         return False
     finally:
         conn.close()

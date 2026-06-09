@@ -7,7 +7,7 @@ import sys
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
 from config import DEV_BG_URL, PORT, FLASK_DEBUG
-from database import init_db, save_job, get_all_jobs
+from database import init_db, save_job, get_all_jobs, update_job_flag
 from scraper import fetch_html, fetch_job_details, scrape_linkedin_jobs, scrape_jobs_bg_jobs
 from parser import parse_job_listings, parse_job_detail_page
 
@@ -132,6 +132,33 @@ def api_refresh():
         'total_jobs_count': len(jobs),
         'jobs': jobs
     })
+
+@app.route('/api/job/flag', methods=['POST'])
+def api_update_flag():
+    """
+    API endpoint to update the flag of a job listing.
+    Expects JSON: { "url": "...", "flag": "red"|"green"|"yellow"|null }
+    """
+    data = request.get_json()
+    if not data or 'url' not in data or 'flag' not in data:
+        return jsonify({'success': False, 'error': 'Invalid request data.'}), 400
+        
+    url = data['url']
+    flag = data['flag']
+    
+    # Validate flag value
+    if flag not in [None, 'red', 'green', 'yellow', '']:
+        return jsonify({'success': False, 'error': 'Invalid flag value.'}), 400
+        
+    # Standardize empty string/None representation
+    if flag == '':
+        flag = None
+        
+    success = update_job_flag(url, flag)
+    if success:
+        return jsonify({'success': True})
+    else:
+        return jsonify({'success': False, 'error': 'Failed to update flag in database.'})
 
 if __name__ == '__main__':
     logger.info(f"Starting Flask server on port {PORT}...")
