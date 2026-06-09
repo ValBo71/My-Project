@@ -53,38 +53,44 @@
                     <polyline points="22 4 12 14.01 9 11.01"></polyline>
                 </svg>
                 <span>Намерени и добавени <strong>{{ new_jobs_count }}</strong> нови обяви!</span>
-            </div>
-            <button class="notification-close" onclick="document.getElementById('statusBanner').remove()">×</button>
+               {% endif %}
+
+        <!-- Tab Navigation -->
+        <div class="tabs-navigation">
+            <button class="tab-btn active" data-tab="jobs-tab">Обяви</button>
+            <button class="tab-btn" data-tab="companies-tab">Фирми</button>
         </div>
-        {% endif %}
 
-        <div class="dashboard-grid">
-            <!-- Sidebar: Filters -->
-            <aside class="filters-card">
-                <h2>Филтриране</h2>
-                
-                <!-- Search Input -->
-                <div class="filter-group">
-                    <label for="searchInput">Търсене в обявите</label>
-                    <input type="text" id="searchInput" class="input-control" placeholder="Фирма, заглавие, технология...">
-                </div>
+        <!-- Tab Panes -->
+        <div id="jobs-tab" class="tab-content-pane active">
+            <div class="dashboard-grid">
+                <!-- Sidebar: Filters -->
+                <aside class="filters-card">
+                    <h2>Филтриране</h2>
+                    
+                    <!-- Search Input -->
+                    <div class="filter-group">
+                        <label for="searchInput">Търсене в обявите</label>
+                        <input type="text" id="searchInput" class="input-control" placeholder="Фирма, заглавие, технология...">
+                    </div>
 
-                <!-- Company Selector -->
-                <div class="filter-group">
-                    <label for="companySelect">Филтър по фирма</label>
-                    <select id="companySelect" class="input-control">
-                        <option value="all">Всички фирми</option>
-                        {% set unique_companies = [] %}
-                        {% for job in jobs %}
-                            {% if job.company not in unique_companies %}
-                                {% if unique_companies.append(job.company) %}{% endif %}
-                            {% endif %}
-                        {% endfor %}
-                        {% for comp in unique_companies|sort %}
-                            <option value="{{ comp|lower }}">{{ comp }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
+                    <!-- Company Selector -->
+                    <div class="filter-group">
+                        <label for="companySelect">Филтър по фирма</label>
+                        <select id="companySelect" class="input-control">
+                            <option value="all">Всички фирми</option>
+                            {% set unique_companies = [] %}
+                            {% for job in jobs %}
+                                {% set comp_name = job.resolved_company if job.resolved_company else job.company %}
+                                {% if comp_name not in unique_companies %}
+                                    {% if unique_companies.append(comp_name) %}{% endif %}
+                                {% endif %}
+                            {% endfor %}
+                            {% for comp in unique_companies|sort %}
+                                <option value="{{ comp|lower }}">{{ comp }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
 
                 <!-- Flag Selector -->
                 <div class="filter-group">
@@ -276,7 +282,15 @@
                                                 {{ job.source if job.source else 'dev.bg' }}
                                             </span>
                                         </td>
-                                        <td class="col-company" onclick="openCompanyStats({{ job.company|tojson|forceescape }})" title="Виж статистика за фирмата">{{ job.company }}</td>
+                                        <td class="col-company" onclick="openCompanyStats({{ (job.resolved_company if job.resolved_company else job.company)|tojson|forceescape }})" title="Виж статистика за фирмата">
+                                            {{ job.resolved_company if job.resolved_company else job.company }}
+                                            {% if job.company_flag %}
+                                                <span class="flag-dot {{ job.company_flag }}" style="width: 8px; height: 8px; display: inline-block; margin-left: 6px; vertical-align: middle;" title="Флаг на фирмата: {{ job.company_flag }}"></span>
+                                            {% endif %}
+                                            {% if job.company_label %}
+                                                <span class="tech-tag" style="background-color: #f8fafc; border-color: #cbd5e1; font-size: 0.7rem; margin-left: 6px; padding: 0.1rem 0.3rem;" title="Етикет на фирмата">{{ job.company_label }}</span>
+                                            {% endif %}
+                                        </td>
                                         <td class="col-position">{{ job.title }}</td>
                                         <td class="col-date">{{ job.date_published }}</td>
                                         <td>
@@ -349,6 +363,95 @@
                     </div>
                 </section>
             </main>
+        </div>
+        </div> <!-- End of jobs-tab -->
+
+        <!-- Companies Tab Pane -->
+        <div id="companies-tab" class="tab-content-pane">
+            <div class="dashboard-grid">
+                <!-- Sidebar: Company Filters -->
+                <aside class="filters-card">
+                    <h2>Филтриране на фирми</h2>
+                    
+                    <!-- Search Input -->
+                    <div class="filter-group">
+                        <label for="companySearchInput">Търсене на фирма</label>
+                        <input type="text" id="companySearchInput" class="input-control" placeholder="Име или етикет на фирма...">
+                    </div>
+
+                    <!-- Flag Selector -->
+                    <div class="filter-group">
+                        <label>Флаг на фирмата</label>
+                        <div class="checkbox-group">
+                            <label class="checkbox-label">
+                                <input type="radio" name="companyFlagFilter" value="all" checked> Всички
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="radio" name="companyFlagFilter" value="none"> Без флаг
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="radio" name="companyFlagFilter" value="green">
+                                <span class="flag-dot-preview green"></span> Зелен
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="radio" name="companyFlagFilter" value="yellow">
+                                <span class="flag-dot-preview yellow"></span> Жълт
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="radio" name="companyFlagFilter" value="red">
+                                <span class="flag-dot-preview red"></span> Червен
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Type Selector -->
+                    <div class="filter-group">
+                        <label>Тип</label>
+                        <div class="checkbox-group">
+                            <label class="checkbox-label">
+                                <input type="radio" name="companyTypeFilter" value="all" checked> Всички
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="radio" name="companyTypeFilter" value="primary"> Само основни фирми
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="radio" name="companyTypeFilter" value="alias"> Само свързани (синоними)
+                            </label>
+                        </div>
+                    </div>
+                </aside>
+
+                <!-- Vertical Divider -->
+                <div class="vertical-divider"></div>
+
+                <!-- Main area: Companies Table Card -->
+                <main>
+                    <section class="listings-card">
+                        <div class="card-header">
+                            <h2>Регистър на фирмите</h2>
+                            <span id="companiesCountText" style="font-size: 0.85rem; color: var(--text-secondary);">Показани: <strong id="visibleCompaniesCount">0</strong> от <strong id="totalCompaniesCount">0</strong></span>
+                        </div>
+
+                        <div class="table-wrapper">
+                            <table id="companiesTable">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 80px;">Флаг</th>
+                                        <th>Оригинално име</th>
+                                        <th>Етикет (Label)</th>
+                                        <th>Свържи с (Основна фирма)</th>
+                                        <th>Показвано име (Main Page)</th>
+                                        <th style="text-align: right; width: 100px;">Обяви</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="companiesTableBody">
+                                    <!-- Populated dynamically via JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+                </main>
+            </div>
         </div>
     </div>
 
@@ -467,8 +570,9 @@
 
     <!-- Client-side logic for Refresh & Filtering -->
     <script>
-        // Store all jobs in JavaScript array for dynamic updates
+        // Store all jobs and companies in JavaScript array for dynamic updates
         let jobsData = {{ jobs|tojson|safe }};
+        let companiesData = {{ companies|tojson|safe }};
         
         // Modal functions
         function openJobDetails(job) {
@@ -518,8 +622,10 @@
             const limitMonth = new Date(now.getTime() - 30 * oneDay);
             const limitYear = new Date(now.getTime() - 365 * oneDay);
             
-            // Filter all jobs for this company
-            const companyJobs = jobsData.filter(job => job.company.toLowerCase() === companyName.toLowerCase());
+            // Filter all jobs for this company group (using resolved_company or company)
+            const companyJobs = jobsData.filter(job => 
+                (job.resolved_company || job.company).toLowerCase() === companyName.toLowerCase()
+            );
             
             // Initialize structures
             const periods = [
@@ -768,9 +874,16 @@
                 if (data.success) {
                     // Update local cache
                     jobsData = data.jobs;
+                    companiesData = data.companies;
                     
                     // Update table HTML dynamically
                     updateTable(data.jobs);
+                    
+                    // Render companies if tab is open
+                    const activeTab = document.querySelector('.tab-btn.active') ? document.querySelector('.tab-btn.active').getAttribute('data-tab') : 'jobs-tab';
+                    if (activeTab === 'companies-tab') {
+                        renderCompaniesTable();
+                    }
                     
                     // Update metrics
                     document.getElementById('totalJobsMetric').innerText = data.total_jobs_count;
@@ -867,7 +980,8 @@
                 
                 // Set data attributes
                 const titleLower = job.title.toLowerCase();
-                const companyLower = job.company.toLowerCase();
+                const resolvedCompany = job.resolved_company || job.company;
+                const companyLower = resolvedCompany.toLowerCase();
                 const reqsLower = (job.requirements || '').toLowerCase();
                 const source = (job.source || 'dev.bg').toLowerCase();
                 
@@ -918,8 +1032,7 @@
                 
                 // Escape job object data to safely pass to openJobDetails in onclick
                 const jobEscaped = JSON.stringify(job).replace(/"/g, '&quot;');
-                
-                const companyEscaped = JSON.stringify(job.company).replace(/"/g, '&quot;');
+                const companyEscaped = JSON.stringify(resolvedCompany).replace(/"/g, '&quot;');
                 
                 let flagDotClass = 'flag-dot empty';
                 if (job.flag === 'green') flagDotClass = 'flag-dot green';
@@ -951,7 +1064,11 @@
                 tr.innerHTML = `
                     <td class="col-flag">${flagHtml}</td>
                     <td class="col-source">${sourceBadgeHtml}</td>
-                    <td class="col-company" onclick="openCompanyStats(${companyEscaped})" title="Виж статистика за фирмата">${job.company}</td>
+                    <td class="col-company" onclick="openCompanyStats(${companyEscaped})" title="Виж статистика за фирмата">
+                        ${resolvedCompany}
+                        ${job.company_flag ? `<span class="flag-dot ${job.company_flag}" style="width: 8px; height: 8px; display: inline-block; margin-left: 6px; vertical-align: middle;" title="Флаг на фирмата"></span>` : ''}
+                        ${job.company_label ? `<span class="tech-tag" style="background-color: #f8fafc; border-color: #cbd5e1; font-size: 0.7rem; margin-left: 6px; padding: 0.1rem 0.3rem;" title="Етикет на фирмата">${job.company_label}</span>` : ''}
+                    </td>
                     <td class="col-position">${job.title}</td>
                     <td class="col-date">${job.date_published || 'N/A'}</td>
                     <td>${techHtml}</td>
@@ -994,7 +1111,7 @@
             select.innerHTML = '<option value="all">Всички фирми</option>';
             
             // Extract unique companies
-            const companies = [...new Set(jobs.map(j => j.company))].sort();
+            const companies = [...new Set(jobs.map(j => j.resolved_company || j.company))].sort();
             companies.forEach(comp => {
                 const opt = document.createElement('option');
                 opt.value = comp.toLowerCase();
@@ -1009,6 +1126,219 @@
                 select.value = 'all';
             }
         }
+
+        // Tab switching logic
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        const tabPanes = document.querySelectorAll('.tab-content-pane');
+        
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const targetTab = btn.getAttribute('data-tab');
+                
+                tabBtns.forEach(b => b.classList.remove('active'));
+                tabPanes.forEach(p => p.classList.remove('active'));
+                
+                btn.classList.add('active');
+                document.getElementById(targetTab).classList.add('active');
+                
+                if (targetTab === 'companies-tab') {
+                    renderCompaniesTable();
+                }
+            });
+        });
+
+        // Companies List Controllers
+        const companySearchInput = document.getElementById('companySearchInput');
+        const companyFlagFilters = document.getElementsByName('companyFlagFilter');
+        const companyTypeFilters = document.getElementsByName('companyTypeFilter');
+        
+        function getCompanyFlagFilter() {
+            for (const r of companyFlagFilters) {
+                if (r.checked) return r.value;
+            }
+            return 'all';
+        }
+        
+        function getCompanyTypeFilter() {
+            for (const r of companyTypeFilters) {
+                if (r.checked) return r.value;
+            }
+            return 'all';
+        }
+        
+        function renderCompaniesTable() {
+            const query = companySearchInput.value.toLowerCase().trim();
+            const flagFilter = getCompanyFlagFilter();
+            const typeFilter = getCompanyTypeFilter();
+            
+            const tbody = document.getElementById('companiesTableBody');
+            tbody.innerHTML = '';
+            
+            // Filter companies
+            const filtered = companiesData.filter(c => {
+                const matchesSearch = c.name.toLowerCase().includes(query) || (c.label && c.label.toLowerCase().includes(query));
+                
+                let matchesFlag = true;
+                if (flagFilter === 'none') {
+                    matchesFlag = !c.flag;
+                } else if (flagFilter !== 'all') {
+                    matchesFlag = c.flag === flagFilter;
+                }
+                
+                let matchesType = true;
+                if (typeFilter === 'primary') {
+                    matchesType = c.parent_company_id === null;
+                } else if (typeFilter === 'alias') {
+                    matchesType = c.parent_company_id !== null;
+                }
+                
+                return matchesSearch && matchesFlag && matchesType;
+            });
+            
+            document.getElementById('visibleCompaniesCount').innerText = filtered.length;
+            document.getElementById('totalCompaniesCount').innerText = companiesData.length;
+            
+            if (filtered.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 2.5rem;">
+                            Няма намерени фирми по тези критерии.
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            // List of primary companies for parent select (only those with parent_company_id === null)
+            const primaryCompanies = companiesData.filter(c => c.parent_company_id === null);
+            
+            filtered.forEach(company => {
+                const tr = document.createElement('tr');
+                
+                // Flag cell
+                let flagDotClass = 'flag-dot empty';
+                if (company.flag === 'green') flagDotClass = 'flag-dot green';
+                else if (company.flag === 'yellow') flagDotClass = 'flag-dot yellow';
+                else if (company.flag === 'red') flagDotClass = 'flag-dot red';
+                
+                const flagHtml = `
+                    <div class="flag-dropdown-container">
+                        <button class="flag-trigger-btn" onclick="toggleFlagDropdown(event)" title="Задай флаг">
+                            <span class="${flagDotClass}"></span>
+                        </button>
+                        <div class="flag-dropdown-menu">
+                            <div class="flag-option" onclick="setCompanyField(${company.id}, 'flag', 'green')">
+                                <span class="flag-dot green"></span> Зелен
+                            </div>
+                            <div class="flag-option" onclick="setCompanyField(${company.id}, 'flag', 'yellow')">
+                                <span class="flag-dot yellow"></span> Жълт
+                            </div>
+                            <div class="flag-option" onclick="setCompanyField(${company.id}, 'flag', 'red')">
+                                <span class="flag-dot red"></span> Червен
+                            </div>
+                            <div class="flag-option clear" onclick="setCompanyField(${company.id}, 'flag', null)">
+                                <span class="flag-dot empty"></span> Без флаг
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                // Label input
+                const labelHtml = `
+                    <input type="text" class="company-label-input" 
+                        value="${company.label || ''}" 
+                        placeholder="Добави етикет..." 
+                        onblur="setCompanyField(${company.id}, 'label', this.value)"
+                        onkeydown="if(event.key === 'Enter') { this.blur(); }">
+                `;
+                
+                // Parent Select Dropdown
+                let parentOptions = `<option value="">-- Не е свързана (основна) --</option>`;
+                primaryCompanies.forEach(p => {
+                    if (p.id !== company.id) {
+                        const isSelected = company.parent_company_id === p.id ? 'selected' : '';
+                        parentOptions += `<option value="${p.id}" ${isSelected}>${p.name}</option>`;
+                    }
+                });
+                const parentHtml = `
+                    <select class="company-select-parent" onchange="setCompanyField(${company.id}, 'parent_company_id', this.value)">
+                        ${parentOptions}
+                    </select>
+                `;
+                
+                // Display name input
+                const isAlias = company.parent_company_id !== null;
+                const displayNameVal = isAlias ? (company.resolved_name || company.name) : (company.display_name || '');
+                const displayHtml = `
+                    <input type="text" class="company-display-name-input" 
+                        value="${displayNameVal}" 
+                        placeholder="${company.name}" 
+                        ${isAlias ? 'disabled' : ''}
+                        onblur="setCompanyField(${company.id}, 'display_name', this.value)"
+                        onkeydown="if(event.key === 'Enter') { this.blur(); }">
+                `;
+                
+                tr.innerHTML = `
+                    <td class="col-flag">${flagHtml}</td>
+                    <td style="font-weight: 600; color: var(--text-primary);">${company.name}</td>
+                    <td>${labelHtml}</td>
+                    <td>${parentHtml}</td>
+                    <td>${displayHtml}</td>
+                    <td style="text-align: right;"><span class="badge-count">${company.job_count}</span></td>
+                `;
+                
+                tbody.appendChild(tr);
+            });
+        }
+
+        async function setCompanyField(companyId, fieldName, value) {
+            // Close dropdowns if flag was modified
+            if (fieldName === 'flag') {
+                document.querySelectorAll('.flag-dropdown-menu.show').forEach(m => m.classList.remove('show'));
+            }
+            
+            try {
+                const payload = { id: companyId };
+                payload[fieldName] = value;
+                
+                const response = await fetch('/api/company/update', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    // Update local cache
+                    companiesData = data.companies;
+                    jobsData = data.jobs;
+                    
+                    // Re-render both views
+                    updateTable(jobsData);
+                    renderCompaniesTable();
+                    
+                    // Update metrics
+                    document.getElementById('totalJobsMetric').innerText = jobsData.length;
+                    document.getElementById('salaryJobsMetric').innerText = jobsData.filter(j => j.salary_from !== null).length;
+                    document.getElementById('leaveJobsMetric').innerText = jobsData.filter(j => j.leave_days !== null).length;
+                    document.getElementById('totalCount').innerText = jobsData.length;
+                } else {
+                    alert('Грешка: ' + data.error);
+                    renderCompaniesTable(); // Re-render to revert
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Мрежова грешка при актуализиране на фирмата.');
+                renderCompaniesTable(); // Re-render to revert
+            }
+        }
+        
+        // Handle filter inputs for companies
+        companySearchInput.addEventListener('input', renderCompaniesTable);
+        companyFlagFilters.forEach(r => r.addEventListener('change', renderCompaniesTable));
+        companyTypeFilters.forEach(r => r.addEventListener('change', renderCompaniesTable));
 
         function toggleFlagDropdown(event) {
             event.stopPropagation();

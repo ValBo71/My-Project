@@ -73,6 +73,9 @@ Projects using Playwright — a modern tool for UI and API automation:
   * Supports dual detail formats for jobs.bg (custom HTML in a sandboxed iframe and standard templates).
 * **Database**: Saves listings to a SQLite database with automatic validation to prevent duplicate entries.
 * **Job Flags & Color Coding**: Categorize listings with custom flags (green for suitable, yellow for interesting, red for unsuitable, or clear) which are saved persistently in SQLite. Row backgrounds are dynamically highlighted in premium, soft pastel colors and can be filtered in real-time.
+* **Companies Tab & Alias Grouping**: Toggle to a dedicated "Фирми" (Companies) tab to manage company records. Link spelling variations of the same company (e.g. "DraftKings Bulgaria" and "Draft Kings" under "DraftKings") so they are grouped under a single resolved name on the main dashboard. Enforces a flat hierarchy to prevent circular dependencies.
+* **Company Tagging & Flag Inheritance**: Set color flags (Green, Yellow, Red) and custom text labels directly on companies. Jobs automatically inherit the flag status of their company (or its parent) in real-time, highlighting all associated rows. Company flags and text labels are rendered next to the company name in the jobs list.
+* **Grouped Statistics**: The company statistics modal aggregates and displays job listings and repetitions across all linked alias variations for the company group.
 * **Real-Time Frontend Filtering & Search**:
   * Free-text search (technology, company, job title).
   * Filter by company and location (Remote / Hybrid / Sofia).

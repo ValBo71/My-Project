@@ -41,6 +41,14 @@ This is a web application developed in **Python (Flask)** and **SQLite** that au
    * Persistence of flags in SQLite database.
    * Row backgrounds highlighted dynamically using premium, subtle pastel tints to preserve design aesthetics and hover feedback, avoiding bright "screaming" colors.
 
+8. **Companies Tab, Alias Grouping & Flag Inheritance:**
+   * **Dedicated Tab**: Switch to the "Фирми" (Companies) tab to manage all registered companies in a single place.
+   * **Spelling Aliases & Connections**: Link spelling variations of the same company (e.g. "DraftKings Bulgaria" and "Draft Kings" under "DraftKings") to group them under a single resolved name on the main dashboard. Enforces a flat hierarchy to prevent circular dependencies.
+   * **Custom Display Names**: Assign a custom display name override (e.g. "DraftKings Inc.") for primary companies.
+   * **Company Flags & Labels**: Set color flags (Green, Yellow, Red) and custom text labels directly on companies. These markers are displayed next to the company name on the main jobs page.
+   * **Automatic Flag Inheritance**: Jobs automatically inherit the flag status of their company (or its parent company if it is an alias) in real-time, coloring all job rows from that company.
+   * **Grouped Statistics**: The company statistics modal automatically groups and aggregates job counts and repetitions across all spelling variations in a connected company group.
+
 ---
 
 ## Project Structure
