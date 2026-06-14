@@ -59,67 +59,31 @@ Projects using Playwright — a modern tool for UI and API automation:
 * **4. Automation at automationexercise.com**: Complete automated C# Playwright & NUnit test suite (26/26 test cases) featuring the Page Object Model (POM) design pattern, automated overload-resilience checks, custom SlowMo debugging, and Allure reporting.
 * **5. API Testing on automationexercise.com**: Complete automated C# Playwright & NUnit API test framework covering all 14 API scenarios from the official practice list. Features a clean client-based architecture, request/response payload capture, Allure attachments, and full state integration tests for account lifecycle orchestration.
 
----
-
-## 🚀 Main Project: **Observer (Automation QA Jobs Tracker)** (`08.Observer`)
-
-`Observer` is a full-featured web application (Dashboard) designed to automatically track new **Automation QA** job listings in Bulgaria.
-
-### 💡 Core Features:
-* **Multi-Platform Scraping**:
-  * Scrapes job listings from **dev.bg**, **LinkedIn** (using Playwright with session/cookie persistence), and **jobs.bg** (using Playwright with DataDome bot-protection evasion).
-* **Smart Detail Parsing**:
-  * Automatically extracts salary details, annual paid leave days, and required technologies (Tech Stack).
-  * Supports dual detail formats for jobs.bg (custom HTML in a sandboxed iframe and standard templates).
-* **Database**: Saves listings to a SQLite database with automatic validation to prevent duplicate entries.
-* **Job Flags & Color Coding**: Categorize listings with custom flags (green for suitable, yellow for interesting, red for unsuitable, or clear) which are saved persistently in SQLite. Row backgrounds are dynamically highlighted in premium, soft pastel colors and can be filtered in real-time.
-* **Companies Tab & Alias Grouping**: Toggle to a dedicated "Фирми" (Companies) tab to manage company records. Link spelling variations of the same company (e.g. "DraftKings Bulgaria" and "Draft Kings" under "DraftKings") so they are grouped under a single resolved name on the main dashboard. Enforces a flat hierarchy to prevent circular dependencies.
-* **Company Tagging & Flag Inheritance**: Set color flags (Green, Yellow, Red) and custom text labels directly on companies. Jobs automatically inherit the flag status of their company (or its parent) in real-time, highlighting all associated rows. Company flags and text labels are rendered next to the company name in the jobs list.
-* **Grouped Statistics**: The company statistics modal aggregates and displays job listings and repetitions across all linked alias variations for the company group.
-* **Real-Time Frontend Filtering & Search**:
-  * Free-text search (technology, company, job title).
-  * Filter by company and location (Remote / Hybrid / Sofia).
-  * Filter by source (`dev.bg`, `LinkedIn`, `jobs.bg`).
-  * Filter by flag/color status (All / No Flag / Green / Yellow / Red).
-  * Filter by disclosed metrics (only with salary, only with specified paid leave).
-  * **Date Filtering**: Preset filters for "Today only", "Last 3 days", or "Last 7 days" (based on calendar date calculations).
-* **Sorting**: All listings are automatically sorted chronologically with the newest postings at the top.
-
-### 🛠️ Tech Stack:
-* **Backend**: Python, Flask, Playwright, SQLite, BeautifulSoup (lxml).
-* **Frontend**: HTML5, Vanilla CSS (Premium Light Theme, Glassmorphic effects), JavaScript (AJAX).
+### 🚀 8. Jobs Tracker / Observer (`08.Observer` & `11.Observer v2`)
+* **08.Observer**: Main Project (Automation QA Jobs Tracker) — A full-featured Python Flask and SQLite dashboard scraping job listings from dev.bg, LinkedIn, and jobs.bg, standardizing dates, filtering results, and inheritance of company flags.
+* **11.Observer v2**: Jobs Tracker v2 — Upgraded version of the job tracker introducing dynamic scraping URLs configuration directly in the UI settings panel, selective/optional scraping support, database resetting, and running on port 5001.
 
 ---
 
-## 🛠️ How to Run the `Observer` Project Locally:
+## 🚀 Main Projects: **Observer (Jobs Tracker) - Versions 1 & 2**
 
-1. **Clone the repository**:
-   ```bash
-   git clone https://github.com/ValBo71/My-Project.git
-   cd My-Project/08.Observer
-   ```
+### 1. **Observer v1** (`08.Observer`)
+`Observer` is a full-featured web application (Dashboard) designed to automatically track new **Automation QA** job listings in Bulgaria. Runs on port **`5000`**.
 
-2. **Install the required dependencies**:
-   ```bash
-   pip install -r requirements.txt
-   playwright install chromium
-   ```
+* **Multi-Platform Scraping**: Scrapes job listings from **dev.bg**, **LinkedIn** (using Playwright with session/cookie persistence), and **jobs.bg** (using Playwright with DataDome bot-protection evasion).
+* **Smart Detail Parsing**: Automatically extracts salary details, annual paid leave days, and required technologies (Tech Stack).
+* **Database & Flags**: Saves listings to SQLite, provides interactive row coloring flags, and groups spelling variations of companies under unified parent aliases.
+* **How to Run**: Run `run.bat` inside `08.Observer/` or execute `python app.py` (access at `http://127.0.0.1:5000`).
+*(See details in [08.Observer/README.md](file:///E:/Programing/My_project/GitHub/MyProject/08.Observer/README.md)).*
 
-3. **Configure LinkedIn Credentials**:
-   Create a `linkedin_credentials.json` file inside the `08.Observer/` directory with your email and password:
-   ```json
-   {
-     "email": "your_email@example.com",
-     "password": "your_password"
-   }
-   ```
-
-4. **Start the application**:
-   Run the `run.bat` file or start directly with:
-   ```bash
-   python app.py
-   ```
-   Open your browser and navigate to [http://127.0.0.1:5000](http://127.0.0.1:5000).
+### 2. **Observer v2** (`11.Observer v2`)
+An upgraded version of the job tracker featuring:
+* **Custom Scraping URLs**: Configure and manage scraping search links for all platforms directly from the new **"Настройки" (Settings)** tab in the UI.
+* **Optional / Selective Scanning**: URL fields are optional. Leave fields blank to automatically skip platforms during the refresh cycle.
+* **Database Reset capability**: Instantly clear jobs and companies data directly from the settings panel.
+* **Port Isolation**: Configured to run on port **`5001`** to prevent port conflicts with version 1.
+* **How to Run**: Run `run.bat` inside `11.Observer v2/` or execute `python app.py` (access at `http://127.0.0.1:5001`).
+*(See details in [11.Observer v2/README.md](file:///E:/Programing/My_project/GitHub/MyProject/11.Observer%20v2/README.md)).*
 
 ---
 
