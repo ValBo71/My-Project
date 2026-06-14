@@ -62,6 +62,7 @@ This version (**Observer v2**) is an upgraded version of the original observer p
 ├── linkedin_credentials.json   # Local credentials for LinkedIn access
 ├── linkedin_session.json       # Saved session cookies for LinkedIn
 ├── jobs.db                     # SQLite database file (created and migrated automatically)
+├── manual.md                   # Short guide for setup and running the application (Bulgarian)
 ├── app.log                     # Log output tracking scraping and server events
 │
 ├── static/
