@@ -82,7 +82,7 @@ An upgraded version of the job tracker featuring:
 * **Optional / Selective Scanning**: URL fields are optional. Leave fields blank to automatically skip platforms during the refresh cycle.
 * **Database Reset capability**: Instantly clear jobs and companies data directly from the settings panel.
 * **Port Isolation**: Configured to run on port **`5001`** to prevent port conflicts with version 1.
-* **How to Run**: Run `run.bat` inside `11.Observer v2/` or execute `python app.py` (access at `http://127.0.0.1:5001`).
+* **How to Run**: Run `run.bat` inside `11.Observer v2/` or execute `python app.py` (access at `http://127.0.0.1:5001`). See the dedicated [manual.md](file:///E:/Programing/My_project/GitHub/MyProject/11.Observer%20v2/manual.md) for detailed instructions.
 *(See details in [11.Observer v2/README.md](file:///E:/Programing/My_project/GitHub/MyProject/11.Observer%20v2/README.md)).*
 
 ---

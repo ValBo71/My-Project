@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Automation QA Jobs Tracker - dev.bg</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
-    <link rel="icon" type="image/png" href="https://dev.bg/wp-content/themes/jobsdevbg/images/favicon.png">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon.png') }}">
 </head>
 <body>
     <div class="container">
@@ -81,7 +81,7 @@
                             <option value="all">Всички фирми</option>
                             {% set unique_companies = [] %}
                             {% for job in jobs %}
-                                {% set comp_name = job.resolved_company if job.resolved_company else job.company %}
+                                {% set comp_name = job.company %}
                                 {% if comp_name not in unique_companies %}
                                     {% if unique_companies.append(comp_name) %}{% endif %}
                                 {% endif %}
@@ -282,15 +282,18 @@
                                                 {{ job.source if job.source else 'dev.bg' }}
                                             </span>
                                         </td>
-                                        <td class="col-company" onclick="openCompanyStats({{ (job.resolved_company if job.resolved_company else job.company)|tojson|forceescape }})" title="Виж статистика за фирмата">
-                                            {{ job.resolved_company if job.resolved_company else job.company }}
-                                            {% if job.company_flag %}
-                                                <span class="flag-dot {{ job.company_flag }}" style="width: 8px; height: 8px; display: inline-block; margin-left: 6px; vertical-align: middle;" title="Флаг на фирмата: {{ job.company_flag }}"></span>
-                                            {% endif %}
-                                            {% if job.company_label %}
-                                                <span class="tech-tag" style="background-color: #f8fafc; border-color: #cbd5e1; font-size: 0.7rem; margin-left: 6px; padding: 0.1rem 0.3rem;" title="Етикет на фирмата">{{ job.company_label }}</span>
-                                            {% endif %}
-                                        </td>
+                                        <td class="col-company" onclick="openCompanyStats({{ (job.company)|tojson|forceescape }})" title="Виж статистика за фирмата">
+                                             {{ job.company }}
+                                             {% if job.resolved_company and job.resolved_company.lower() != job.company.lower() %}
+                                                 <span class="company-alias-hint" style="font-size: 0.75rem; color: var(--text-muted); display: block; font-weight: normal; margin-top: 2px;">({{ job.resolved_company }})</span>
+                                             {% endif %}
+                                             {% if job.company_flag %}
+                                                 <span class="flag-dot {{ job.company_flag }}" style="width: 8px; height: 8px; display: inline-block; margin-left: 6px; vertical-align: middle;" title="Флаг на фирмата: {{ job.company_flag }}"></span>
+                                             {% endif %}
+                                             {% if job.company_label %}
+                                                 <span class="tech-tag" style="background-color: #f8fafc; border-color: #cbd5e1; font-size: 0.7rem; margin-left: 6px; padding: 0.1rem 0.3rem;" title="Етикет на фирмата">{{ job.company_label }}</span>
+                                             {% endif %}
+                                         </td>
                                         <td class="col-position">{{ job.title }}</td>
                                         <td class="col-date">{{ job.date_published }}</td>
                                         <td>
@@ -622,10 +625,20 @@
             const limitMonth = new Date(now.getTime() - 30 * oneDay);
             const limitYear = new Date(now.getTime() - 365 * oneDay);
             
-            // Filter all jobs for this company group (using resolved_company or company)
-            const companyJobs = jobsData.filter(job => 
-                (job.resolved_company || job.company).toLowerCase() === companyName.toLowerCase()
-            );
+            // Find the company in companiesData to get its root
+            const clickedComp = companiesData.find(c => c.name.toLowerCase() === companyName.toLowerCase());
+            const rootId = clickedComp ? (clickedComp.parent_company_id !== null ? clickedComp.parent_company_id : clickedComp.id) : null;
+            
+            const companyJobs = jobsData.filter(job => {
+                if (rootId !== null) {
+                    const comp = companiesData.find(c => c.id === job.company_id || (c.name && job.company && c.name.toLowerCase() === job.company.toLowerCase()));
+                    if (comp) {
+                        const cRootId = comp.parent_company_id !== null ? comp.parent_company_id : comp.id;
+                        return cRootId === rootId;
+                    }
+                }
+                return (job.resolved_company || job.company).toLowerCase() === companyName.toLowerCase();
+            });
             
             // Initialize structures
             const periods = [
@@ -728,6 +741,32 @@
         const salaryFilter = document.getElementById('salaryFilter');
         const leaveFilter = document.getElementById('leaveFilter');
         
+        function getAssociatedCompanyNamesForJob(job) {
+            if (!job) return [];
+            const names = new Set();
+            
+            if (job.company) names.add(job.company.toLowerCase());
+            if (job.resolved_company) names.add(job.resolved_company.toLowerCase());
+            
+            const comp = companiesData.find(c => {
+                if (c.id === job.company_id) return true;
+                if (c.name && job.company && c.name.toLowerCase() === job.company.toLowerCase()) return true;
+                return false;
+            });
+            if (comp) {
+                const rootId = comp.parent_company_id !== null ? comp.parent_company_id : comp.id;
+                companiesData.forEach(c => {
+                    const cRootId = c.parent_company_id !== null ? c.parent_company_id : c.id;
+                    if (cRootId === rootId) {
+                        if (c.name) names.add(c.name.toLowerCase());
+                        if (c.display_name) names.add(c.display_name.toLowerCase());
+                        if (c.resolved_name) names.add(c.resolved_name.toLowerCase());
+                    }
+                });
+            }
+            return Array.from(names);
+        }
+
         function applyFilters() {
             const query = searchInput.value.toLowerCase().trim();
             const selectedCompany = companySelect.value;
@@ -771,17 +810,22 @@
             let visibleCount = 0;
             
             rows.forEach(row => {
-                const title = row.getAttribute('data-title');
-                const company = row.getAttribute('data-company');
-                const reqs = row.getAttribute('data-reqs');
+                const url = row.getAttribute('data-url');
+                const job = jobsData.find(j => j.url === url);
+
+                const title = job ? job.title.toLowerCase() : row.getAttribute('data-title');
+                const reqs = job ? (job.requirements || '').toLowerCase() : row.getAttribute('data-reqs');
                 const location = row.getAttribute('data-location'); // 'remote', 'hybrid', 'sofia'
-                const source = row.getAttribute('data-source') || 'dev.bg';
-                const hasSalary = row.getAttribute('data-has-salary') === 'true';
-                const hasLeave = row.getAttribute('data-has-leave') === 'true';
-                const timestampStr = row.getAttribute('data-date-timestamp');
+                const source = job ? (job.source || 'dev.bg').toLowerCase() : row.getAttribute('data-source');
+                const hasSalary = job ? (job.salary_from !== null) : (row.getAttribute('data-has-salary') === 'true');
+                const hasLeave = job ? (job.leave_days !== null) : (row.getAttribute('data-has-leave') === 'true');
+                const timestampStr = job ? (job.published_at || job.scraped_at) : row.getAttribute('data-date-timestamp');
                 
+                // Associated company names (lower case)
+                const assocNames = getAssociatedCompanyNamesForJob(job || { company: row.getAttribute('data-company') });
+
                 // Text search match
-                const matchesText = title.includes(query) || company.includes(query) || reqs.includes(query);
+                const matchesText = title.includes(query) || reqs.includes(query) || assocNames.some(name => name.includes(query));
                 
                 // Location match
                 let matchesLocation = true;
@@ -795,7 +839,7 @@
                 const matchesSource = selectedSource === 'all' || source === selectedSource;
                 
                 // Company match
-                const matchesCompany = selectedCompany === 'all' || company === selectedCompany;
+                const matchesCompany = selectedCompany === 'all' || assocNames.includes(selectedCompany);
                 
                 // Salary & Leave match
                 const matchesSalary = !onlySalary || hasSalary;
@@ -1032,7 +1076,7 @@
                 
                 // Escape job object data to safely pass to openJobDetails in onclick
                 const jobEscaped = JSON.stringify(job).replace(/"/g, '&quot;');
-                const companyEscaped = JSON.stringify(resolvedCompany).replace(/"/g, '&quot;');
+                const companyEscaped = JSON.stringify(job.company).replace(/"/g, '&quot;');
                 
                 let flagDotClass = 'flag-dot empty';
                 if (job.flag === 'green') flagDotClass = 'flag-dot green';
@@ -1065,7 +1109,8 @@
                     <td class="col-flag">${flagHtml}</td>
                     <td class="col-source">${sourceBadgeHtml}</td>
                     <td class="col-company" onclick="openCompanyStats(${companyEscaped})" title="Виж статистика за фирмата">
-                        ${resolvedCompany}
+                        ${job.company}
+                        ${job.resolved_company && job.resolved_company.toLowerCase() !== job.company.toLowerCase() ? `<span class="company-alias-hint" style="font-size: 0.75rem; color: var(--text-muted); display: block; font-weight: normal; margin-top: 2px;">(${job.resolved_company})</span>` : ''}
                         ${job.company_flag ? `<span class="flag-dot ${job.company_flag}" style="width: 8px; height: 8px; display: inline-block; margin-left: 6px; vertical-align: middle;" title="Флаг на фирмата"></span>` : ''}
                         ${job.company_label ? `<span class="tech-tag" style="background-color: #f8fafc; border-color: #cbd5e1; font-size: 0.7rem; margin-left: 6px; padding: 0.1rem 0.3rem;" title="Етикет на фирмата">${job.company_label}</span>` : ''}
                     </td>
@@ -1111,7 +1156,7 @@
             select.innerHTML = '<option value="all">Всички фирми</option>';
             
             // Extract unique companies
-            const companies = [...new Set(jobs.map(j => j.resolved_company || j.company))].sort();
+            const companies = [...new Set(jobs.map(j => j.company))].sort();
             companies.forEach(comp => {
                 const opt = document.createElement('option');
                 opt.value = comp.toLowerCase();
@@ -1174,9 +1219,25 @@
             const tbody = document.getElementById('companiesTableBody');
             tbody.innerHTML = '';
             
+            // Precalculate matching root IDs if there is a query
+            const matchingRootIds = new Set();
+            if (query) {
+                companiesData.forEach(comp => {
+                    const matchesDirectly = comp.name.toLowerCase().includes(query) || (comp.label && comp.label.toLowerCase().includes(query));
+                    if (matchesDirectly) {
+                        const rootId = comp.parent_company_id !== null ? comp.parent_company_id : comp.id;
+                        matchingRootIds.add(rootId);
+                    }
+                });
+            }
+            
             // Filter companies
             const filtered = companiesData.filter(c => {
-                const matchesSearch = c.name.toLowerCase().includes(query) || (c.label && c.label.toLowerCase().includes(query));
+                let matchesSearch = true;
+                if (query) {
+                    const currentRootId = c.parent_company_id !== null ? c.parent_company_id : c.id;
+                    matchesSearch = matchingRootIds.has(currentRootId);
+                }
                 
                 let matchesFlag = true;
                 if (flagFilter === 'none') {
