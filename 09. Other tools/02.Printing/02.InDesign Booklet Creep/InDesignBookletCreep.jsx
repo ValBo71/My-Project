@@ -101,77 +101,8 @@
         return;
     }
 
-    // 2. Сканиране за заключени обекти или заключени слоеве на таргетираните страници
-    var lockedItemsByPage = {};
-    var hasLockedItems = false;
-
-    for (var i = startIndex; i < doc.pages.length; i++) {
-        var page = doc.pages[i];
-        var items = page.pageItems;
-        
-        for (var j = 0; j < items.length; j++) {
-            var item = items[j];
-            var isTopLevel = (item.parent instanceof Page || item.parent.constructor.name === "Page" || 
-                              item.parent instanceof Spread || item.parent.constructor.name === "Spread");
-            
-            // Обектът се счита за заключен, ако самият той е заключен или неговият слой е заключен
-            var isLocked = item.locked || item.itemLayer.locked;
-            
-            if (isTopLevel && isLocked) {
-                var pName = page.name;
-                if (!lockedItemsByPage[pName]) {
-                    lockedItemsByPage[pName] = 0;
-                }
-                lockedItemsByPage[pName]++;
-                hasLockedItems = true;
-            }
-        }
-    }
-
-    var lockedAction = "skip"; // По подразбиране пропуска заключените
-
-    // Ако има заключени обекти/слоеве, показваме диалогов прозорец за избор на действие
-    if (hasLockedItems) {
-        var lockedMsg = "Внимание: Намерени бяха заключени обекти или слоеве на следните страници:\n\n";
-        for (var pName in lockedItemsByPage) {
-            lockedMsg += "- Страница " + pName + " (" + lockedItemsByPage[pName] + " заключени елемента)\n";
-        }
-        lockedMsg += "\nИзберете как скриптът да се справи с тях:";
-
-        var lockedDialog = new Window("dialog", "Заключени елементи в документа");
-        lockedDialog.alignChildren = "fill";
-        lockedDialog.spacing = 15;
-
-        var textLabel = lockedDialog.add("statictext", undefined, lockedMsg, {multiline: true});
-        textLabel.preferredSize.width = 420;
-
-        var actionGroup = lockedDialog.add("group");
-        actionGroup.alignment = "center";
-        actionGroup.spacing = 10;
-        
-        var unlockBtn = actionGroup.add("button", undefined, "Отключи и премести");
-        var skipBtn = actionGroup.add("button", undefined, "Пропусни ги");
-        var abortBtn = actionGroup.add("button", undefined, "Откажи операцията");
-
-        unlockBtn.onClick = function() {
-            lockedAction = "unlock";
-            lockedDialog.close(1);
-        };
-
-        skipBtn.onClick = function() {
-            lockedAction = "skip";
-            lockedDialog.close(1);
-        };
-
-        abortBtn.onClick = function() {
-            lockedAction = "cancel";
-            lockedDialog.close(0);
-        };
-
-        if (lockedDialog.show() !== 1 || lockedAction === "cancel") {
-            return; // Отмяна на операцията
-        }
-    }
+    // Автоматично отключваме заключените обекти/слоеве, скалираме ги и ги заключваме обратно.
+    var lockedAction = "unlock";
 
     // 3. Основна функция за скалиране
     function runCreepScaling() {
@@ -185,6 +116,23 @@
         try {
             for (var i = startIndex; i < doc.pages.length; i++) {
                 var page = doc.pages[i];
+                
+                // Преодоляване (override) на обектите от мастер страницата (parent page), за да могат да се скалират
+                if (page.appliedMaster !== null) {
+                    try {
+                        var masterItems = page.appliedMaster.pageItems.everyItem().getElements();
+                        for (var m = 0; m < masterItems.length; m++) {
+                            try {
+                                masterItems[m].override(page);
+                            } catch (errOverride) {
+                                // Вече презаписан или непреодолим
+                            }
+                        }
+                    } catch (errMaster) {
+                        // Защитна проверка при липса на достъп до мастер страницата
+                    }
+                }
+                
                 var relIndex = i - startIndex;
                 
                 // Позиция на страницата в текущата кола (1-индексирана от 1 до signatureSize)
