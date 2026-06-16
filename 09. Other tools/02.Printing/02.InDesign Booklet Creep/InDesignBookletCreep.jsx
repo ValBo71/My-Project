@@ -31,10 +31,14 @@
     var paperInput = paperGroup.add("edittext", undefined, "0.155");
     paperInput.characters = 10;
 
-    // Падащо меню за размер на колата
+    // Падащо меню за размер на колата (генерираме всички възможни делими на 4 размера до 128)
     var sigGroup = infoPanel.add("group");
     sigGroup.add("statictext", undefined, "Размер на колата (страници):");
-    var sigDropdown = sigGroup.add("dropdownlist", undefined, ["4", "8", "12", "16", "24", "32", "64"]);
+    var sigSizes = [];
+    for (var s = 4; s <= 128; s += 4) {
+        sigSizes.push(s.toString());
+    }
+    var sigDropdown = sigGroup.add("dropdownlist", undefined, sigSizes);
     sigDropdown.selection = 3; // 16 страници по подразбиране
 
     // Поле за начална страница във файла
