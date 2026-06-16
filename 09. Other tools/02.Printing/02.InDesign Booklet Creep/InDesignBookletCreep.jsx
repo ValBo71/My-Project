@@ -111,7 +111,8 @@
         
         for (var j = 0; j < items.length; j++) {
             var item = items[j];
-            var isTopLevel = (item.parent instanceof Page || item.parent.constructor.name === "Page");
+            var isTopLevel = (item.parent instanceof Page || item.parent.constructor.name === "Page" || 
+                              item.parent instanceof Spread || item.parent.constructor.name === "Spread");
             
             // Обектът се счита за заключен, ако самият той е заключен или неговият слой е заключен
             var isLocked = item.locked || item.itemLayer.locked;
@@ -227,7 +228,8 @@
                 
                 for (var j = 0; j < items.length; j++) {
                     var item = items[j];
-                    var isTopLevel = (item.parent instanceof Page || item.parent.constructor.name === "Page");
+                    var isTopLevel = (item.parent instanceof Page || item.parent.constructor.name === "Page" || 
+                                      item.parent instanceof Spread || item.parent.constructor.name === "Spread");
                     if (isTopLevel) {
                         pageItemsToProcess.push(item);
                     }
