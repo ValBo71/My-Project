@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Калкулатор за Гръбче и Избутване | Book Spine & Creep Calculator</title>
+    <meta name="description" content="Професионален уеб калкулатор за пресмятане на дебелина на гръбче и избутване (creep) на книги с мека и твърда корица.">
+    <meta name="author" content="ValBo">
+    <!-- Google Fonts for premium typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Custom Style Sheet -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="background-decor bg-glow-1"></div>
+    <div class="background-decor bg-glow-2"></div>
+
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="logo-area">
+                <svg class="book-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M4 19.5C4 18.837 4.26339 18.2011 4.73223 17.7322C5.20107 17.2634 5.83696 17 6.5 17H20" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M6.5 2H20V22H6.5C5.83696 22 5.20107 21.7366 4.73223 21.2678C4.26339 20.7989 4 20.163 4 19.5V4.5C4 3.83696 4.26339 3.20107 4.73223 2.73223C5.20107 2.26339 5.83696 2 6.5 2Z" stroke="currentColor" stroke-linejoin="round"/>
+                    <path d="M8 6H16M8 10H16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                <div class="brand-text">
+                    <h1>ГРЪБЧЕ И ИЗБУТВАНЕ</h1>
+                    <span class="subtitle">Издателски калкулатор за печат</span>
+                </div>
+            </div>
+            <div class="author-tag">
+                <span>by ValBo</span>
+            </div>
+        </header>
+
+        <!-- Main Workspace -->
+        <main class="workspace-grid">
+            
+            <!-- Controls Card -->
+            <section class="card controls-card">
+                <div class="card-header">
+                    <h2>Параметри на книгата</h2>
+                    <p>Конфигурирайте характеристиките за точно изчисление</p>
+                </div>
+                
+                <form id="calculator-form" onsubmit="return false;">
+                    
+                    <!-- Cover Type Toggle -->
+                    <div class="form-group">
+                        <label>Тип подвързване (корица)</label>
+                        <div class="segmented-control">
+                            <input type="radio" id="cover-soft" name="cover_type" value="soft" checked>
+                            <label for="cover-soft">Мека корица</label>
+                            
+                            <input type="radio" id="cover-hard" name="cover_type" value="hard">
+                            <label for="cover-hard">Твърда корица</label>
+                        </div>
+                    </div>
+
+                    <!-- Pages Input -->
+                    <div class="form-group">
+                        <label for="pages" id="label-pages">
+                            Брой страници
+                            <span class="info-bubble" title="Броят на страниците в книжното тяло">?</span>
+                        </label>
+                        <div class="input-with-controls">
+                            <button type="button" class="btn-step" onclick="adjustPages(-4)" aria-label="Намали с 4 страници">-4</button>
+                            <input type="number" id="pages" name="pages" min="4" max="2000" step="2" value="200" required>
+                            <button type="button" class="btn-step" onclick="adjustPages(4)" aria-label="Увеличи с 4 страници">+4</button>
+                        </div>
+                        <input type="range" id="pages-range" min="4" max="1000" step="2" value="200" aria-labelledby="label-pages">
+                    </div>
+
+                    <!-- Paper Select -->
+                    <div class="form-group">
+                        <label for="paper">
+                            Вид хартия за тялото
+                            <span class="info-bubble" title="Видът и грамажът определят дебелината на един лист">?</span>
+                        </label>
+                        <div class="select-wrapper">
+                            <select id="paper" name="paper" required>
+                                <optgroup label="Офсетови хартии">
+                                    <option value="0.085">70 г Офсет (0.085 мм)</option>
+                                    <option value="0.095" selected>80 г Офсет (0.095 мм)</option>
+                                    <option value="0.105">90 г Офсет (0.105 мм)</option>
+                                    <option value="0.12">100 г Офсет (0.120 мм)</option>
+                                    <option value="0.132">120 г Офсет (0.132 мм)</option>
+                                    <option value="0.145">140 г Офсет (0.145 мм)</option>
+                                </optgroup>
+                                <optgroup label="Хромови хартии (Гланц)">
+                                    <option value="0.06">80 г Хром Гланц (0.060 мм)</option>
+                                    <option value="0.065">90 г Хром Гланц (0.065 мм)</option>
+                                    <option value="0.071">100 г Хром Гланц (0.071 мм)</option>
+                                    <option value="0.085">115 г Хром Гланц (0.085 мм)</option>
+                                    <option value="0.1">130 г Хром Гланц (0.100 мм)</option>
+                                    <option value="0.12">150 г Хром Гланц (0.120 мм)</option>
+                                    <option value="0.13">170 г Хром Гланц (0.130 мм)</option>
+                                    <option value="0.145">200 г Хром Гланц (0.145 мм)</option>
+                                </optgroup>
+                                <optgroup label="Хромови хартии (Мат)">
+                                    <option value="0.065">80 г Хром Мат (0.065 мм)</option>
+                                    <option value="0.072">90 г Хром Мат (0.072 мм)</option>
+                                    <option value="0.08">100 г Хром Мат (0.080 мм)</option>
+                                    <option value="0.1">115 г Хром Мат (0.100 мм)</option>
+                                    <option value="0.112">130 г Хром Мат (0.112 мм)</option>
+                                    <option value="0.125">150 г Хром Мат (0.125 мм)</option>
+                                    <option value="0.15">170 г Хром Мат (0.150 мм)</option>
+                                    <option value="0.18">200 г Хром Мат (0.180 мм)</option>
+                                </optgroup>
+                                <optgroup label="Обемни хартии">
+                                    <option value="0.095">55 г Обемна хартия (0.095 мм)</option>
+                                    <option value="0.135">70 г Обемна хартия (0.135 мм)</option>
+                                    <option value="0.155">80 г Обемна хартия (0.155 мм)</option>
+                                </optgroup>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Softcover Options Group -->
+                    <div id="softcover-options" class="conditional-options transition-group">
+                        <div class="form-group">
+                            <label for="cover-paper">Дебелина на корицата (грамаж)</label>
+                            <div class="select-wrapper">
+                                <select id="cover-paper" name="cover_paper">
+                                    <option value="0.25">250 г/м² (~0.25 мм)</option>
+                                    <option value="0.32" selected>300 г/м² (~0.32 мм)</option>
+                                    <option value="0.38">350 г/м² (~0.38 мм)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="glue-type">Тип лепило</label>
+                            <div class="select-wrapper">
+                                <select id="glue-type" name="glue_type">
+                                    <option value="0.50" selected>EVA термолепило (+0.50 мм)</option>
+                                    <option value="0.25">PUR лепило (+0.25 мм)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Hardcover Options Group -->
+                    <div id="hardcover-options" class="conditional-options transition-group hidden">
+                        <div class="form-group">
+                            <label for="board-thickness">Дебелина на мукавата</label>
+                            <div class="select-wrapper">
+                                <select id="board-thickness" name="board_thickness">
+                                    <option value="1.5">1.5 мм</option>
+                                    <option value="2.0" selected>2.0 мм (стандартна)</option>
+                                    <option value="2.5">2.5 мм</option>
+                                    <option value="3.0">3.0 мм</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="spine-shape">Форма на гръбчето</label>
+                            <div class="select-wrapper">
+                                <select id="spine-shape" name="spine_shape">
+                                    <option value="flat" selected>Прав гръб (Flat)</option>
+                                    <option value="rounded">Закръглен гръб (+15%)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sewing Toggle -->
+                    <div class="form-group style-toggle">
+                        <label class="checkbox-container">
+                            <input type="checkbox" id="sewing-checkbox" name="sewing_checkbox">
+                            <span class="checkbox-checkmark"></span>
+                            Шита с конци (+8% набухване на тялото)
+                        </label>
+                    </div>
+
+                </form>
+            </section>
+
+            <!-- Results & Preview Card -->
+            <section class="card preview-card">
+                <!-- Result Outputs -->
+                <div class="results-grid">
+                    <div class="result-tile accent-gold">
+                        <div class="tile-label">ГРЪБЧЕ</div>
+                        <div class="tile-value-container">
+                            <span class="tile-value" id="result-spine">16.64</span>
+                            <span class="tile-unit">мм</span>
+                        </div>
+                        <div class="tile-subtext">Обща ширина на гърба</div>
+                    </div>
+                    <div class="result-tile accent-teal">
+                        <div class="tile-label">ИЗБУТВАНЕ (CREEP)</div>
+                        <div class="tile-value-container">
+                            <span class="tile-value" id="result-creep">7.75</span>
+                            <span class="tile-unit">мм</span>
+                        </div>
+                        <div class="tile-subtext">Общо изместване на колите</div>
+                    </div>
+                </div>
+
+                <!-- Live Visual Preview -->
+                <div class="visualizer-container">
+                    <h3 class="visualizer-title">Динамичен Изглед</h3>
+                    <div class="book-scene">
+                        <div class="book-wrapper" id="book-model">
+                            <!-- Book spine (Center) -->
+                            <div class="book-spine" id="preview-spine-element">
+                                <span class="spine-text" id="preview-spine-text">СПИНА • 200 СТР.</span>
+                            </div>
+                            <!-- Book Front cover -->
+                            <div class="book-cover front" id="preview-front-cover"></div>
+                            <!-- Book Back cover -->
+                            <div class="book-cover back" id="preview-back-cover"></div>
+                            <!-- Book Pages Edge -->
+                            <div class="book-pages" id="preview-pages-element"></div>
+                        </div>
+                    </div>
+                    <div class="visualizer-legend">
+                        <span class="legend-item"><span class="legend-dot color-spine"></span>Гръбче: <strong id="legend-spine">16.64 мм</strong></span>
+                        <span class="legend-item"><span class="legend-dot color-creep"></span>Избутване: <strong id="legend-creep">7.75 мм</strong></span>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Formulas & Info Section -->
+        <footer class="app-footer">
+            <div class="info-section">
+                <h3>Как се изчисляват новите стойности?</h3>
+                <div class="formulas-grid">
+                    <div class="formula-card">
+                        <h4>Мека корица (Paperback)</h4>
+                        <div class="math-expr">
+                            Гръбче = Тяло + (2 × Картон корица) + Лепило
+                        </div>
+                        <p><strong>Тяло:</strong> страниците × дебелината / 2. При шиене с конци добавяме 8% набухване на книгата. <strong>Лепило:</strong> EVA термолепило (+0.5 мм) или PUR лепило (+0.25 мм).</p>
+                    </div>
+                    <div class="formula-card">
+                        <h4>Твърда корица (Hardcover)</h4>
+                        <div class="math-expr">
+                            Гръбче (Прав) = Тяло + (2 × Мукава) + 1.5 мм
+                        </div>
+                        <div class="math-expr">
+                            Гръбче (Закръглен) = (Тяло × 1.15) + (2 × Мукава) + 1.5 мм
+                        </div>
+                        <p>Добавя се толеранс от 1.5 мм за прегъване на облицовката и лепилото. Мукавата е с дебелина от 1.5 до 3.0 мм.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="bottom-bar">
+                <p>&copy; 2026 Калкулатор за Гръбче и Избутване. Създадено за бързи и точни предпечатни изчисления.</p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Script File -->
+    <script src="script.js"></script>
+</body>
+</html>
