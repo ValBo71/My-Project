@@ -1,8 +1,8 @@
 /**
- * @title InDesign Booklet Creep Script
- * @description Скрипт за автоматично избутване на обекти в коли за шиене (Booklet Creep).
+ * @title InDesign Booklet Creep Script (Scale-based)
+ * @description Скрипт за автоматично хоризонтално скалиране (свиване) на обекти в коли за шиене (Booklet Creep).
  * @author ValBo
- * @version 1.0
+ * @version 2.0
  */
 
 (function() {
@@ -15,7 +15,7 @@
     var doc = app.activeDocument;
 
     // 1. Създаване на основния потребителски интерфейс
-    var dialog = new Window("dialog", "Калкулатор за Избутване в Коли (Booklet Creep)");
+    var dialog = new Window("dialog", "Калкулатор за Избутване в Коли (Скалиране)");
     dialog.alignChildren = "fill";
     dialog.spacing = 15;
 
@@ -43,9 +43,9 @@
     var startPageInput = startPageGroup.add("edittext", undefined, "1");
     startPageInput.characters = 10;
 
-    // Описание на логиката за избутване
+    // Описание на логиката за скалиране
     var descGroup = infoPanel.add("group");
-    var descText = descGroup.add("statictext", undefined, "Скриптът премества обектите към гръбчето на книгата според вложеността на листите в колата за шиене.", {multiline: true});
+    var descText = descGroup.add("statictext", undefined, "Скриптът скалира хоризонтално обектите спрямо гръбчето (spine), за да се запази еднакъв размерът на външните полета (фаши) в крайното обрязано изделие.", {multiline: true});
     descText.preferredSize.width = 320;
 
     // Група за бутони
@@ -90,7 +90,6 @@
     // Намиране на началната страница в колекцията на InDesign (0-индексирана)
     var startIndex = -1;
     for (var p = 0; p < doc.pages.length; p++) {
-        // Сравняваме името (номерацията) на страницата
         if (doc.pages[p].name == startPageNumber.toString()) {
             startIndex = p;
             break;
@@ -102,7 +101,7 @@
         return;
     }
 
-    // 2. Сканиране за заключени обекти на таргетираните страници
+    // 2. Сканиране за заключени обекти или заключени слоеве на таргетираните страници
     var lockedItemsByPage = {};
     var hasLockedItems = false;
 
@@ -112,10 +111,12 @@
         
         for (var j = 0; j < items.length; j++) {
             var item = items[j];
-            // Проверяваме дали е обект на най-горно ниво на страницата (не в група)
             var isTopLevel = (item.parent instanceof Page || item.parent.constructor.name === "Page");
             
-            if (isTopLevel && item.locked) {
+            // Обектът се счита за заключен, ако самият той е заключен или неговият слой е заключен
+            var isLocked = item.locked || item.itemLayer.locked;
+            
+            if (isTopLevel && isLocked) {
                 var pName = page.name;
                 if (!lockedItemsByPage[pName]) {
                     lockedItemsByPage[pName] = 0;
@@ -128,15 +129,15 @@
 
     var lockedAction = "skip"; // По подразбиране пропуска заключените
 
-    // Ако има заключени обекти, показваме диалогов прозорец за избор на действие
+    // Ако има заключени обекти/слоеве, показваме диалогов прозорец за избор на действие
     if (hasLockedItems) {
-        var lockedMsg = "Внимание: Намерени бяха заключени обекти на следните страници:\n\n";
+        var lockedMsg = "Внимание: Намерени бяха заключени обекти или слоеве на следните страници:\n\n";
         for (var pName in lockedItemsByPage) {
-            lockedMsg += "- Страница " + pName + " (" + lockedItemsByPage[pName] + " заключени обекта)\n";
+            lockedMsg += "- Страница " + pName + " (" + lockedItemsByPage[pName] + " заключени елемента)\n";
         }
         lockedMsg += "\nИзберете как скриптът да се справи с тях:";
 
-        var lockedDialog = new Window("dialog", "Заключени обекти в документа");
+        var lockedDialog = new Window("dialog", "Заключени елементи в документа");
         lockedDialog.alignChildren = "fill";
         lockedDialog.spacing = 15;
 
@@ -171,13 +172,13 @@
         }
     }
 
-    // 3. Основна функция за преместване
-    function runCreepCalculation() {
+    // 3. Основна функция за скалиране
+    function runCreepScaling() {
         var originalXUnits = doc.viewPreferences.horizontalMeasurementUnits;
-        // Задаваме мерните единици временно на милиметри за прецизно местене
+        // Задаваме мерните единици временно на милиметри за прецизно измерване
         doc.viewPreferences.horizontalMeasurementUnits = MeasurementUnits.MILLIMETERS;
 
-        var shiftedCount = 0;
+        var scaledCount = 0;
         var skippedCount = 0;
 
         try {
@@ -185,10 +186,10 @@
                 var page = doc.pages[i];
                 var relIndex = i - startIndex;
                 
-                // Намиране на позицията на страницата в текущата кола (1-индексирана от 1 до signatureSize)
+                // Позиция на страницата в текущата кола (1-индексирана от 1 до signatureSize)
                 var pageInSig = (relIndex % signatureSize) + 1;
                 
-                // Пресмятане на индекса на листа в колата (0-индексиран отвън навътре)
+                // Индекс на листа в колата (0-индексиран отвън навътре)
                 var sheetIdx = 0;
                 var halfSig = signatureSize / 2;
                 if (pageInSig <= halfSig) {
@@ -197,59 +198,127 @@
                     sheetIdx = Math.floor((signatureSize - pageInSig) / 2);
                 }
 
-                // Преместване (избутване) = индекс на листа * дебелина на хартията
+                // Пресмятане на дебелината на избутване (D = sheetIdx * paperThickness)
                 var displacement = sheetIdx * paperThickness;
                 if (displacement === 0) {
-                    continue; // Най-външният лист не се измества
+                    continue; // Най-външният лист не се променя
                 }
 
-                // Посока на изместване към гръбчето (spine):
-                // Лява страница (LEFT_HAND) -> измества се надясно (+dX)
-                // Дясна страница (RIGHT_HAND) -> измества се наляво (-dX)
-                var dX = 0;
+                // Определяне на точка на закотвяне (Anchor) спрямо гръбчето (spine):
+                // Лява страница (LEFT_HAND) -> Гръбчето е отдясно -> Закотвяме отдясно (RIGHT_CENTER)
+                // Дясна страница (RIGHT_HAND) -> Гръбчето е отляво -> Закотвяме отляво (LEFT_CENTER)
+                var anchor = AnchorPoint.LEFT_CENTER;
                 if (page.side === PageSideOptions.LEFT_HAND) {
-                    dX = displacement;
+                    anchor = AnchorPoint.RIGHT_CENTER;
                 } else if (page.side === PageSideOptions.RIGHT_HAND) {
-                    dX = -displacement;
+                    anchor = AnchorPoint.LEFT_CENTER;
                 } else {
-                    // Ако документът не е на разтвори (facing pages), определяме спрямо четност на страницата в колата
+                    // Ако не е в режим разтвори (facing pages)
                     if (pageInSig % 2 === 0) {
-                        dX = displacement; // Лява
+                        anchor = AnchorPoint.RIGHT_CENTER; // Лява
                     } else {
-                        dX = -displacement; // Дясна
+                        anchor = AnchorPoint.LEFT_CENTER; // Дясна
                     }
                 }
 
-                // Преместване на обектите
+                // Събиране на обектите на страницата
                 var items = page.pageItems;
+                var pageItemsToProcess = [];
+                
                 for (var j = 0; j < items.length; j++) {
                     var item = items[j];
                     var isTopLevel = (item.parent instanceof Page || item.parent.constructor.name === "Page");
-
                     if (isTopLevel) {
-                        if (item.locked) {
-                            if (lockedAction === "unlock") {
-                                item.locked = false;
-                                item.move(undefined, [dX, 0]);
-                                item.locked = true; // Заключва се обратно
-                                shiftedCount++;
-                            } else {
-                                skippedCount++;
-                            }
-                        } else {
-                            item.move(undefined, [dX, 0]);
-                            shiftedCount++;
-                        }
+                        pageItemsToProcess.push(item);
                     }
+                }
+
+                if (pageItemsToProcess.length === 0) {
+                    continue;
+                }
+
+                // Обработка на заключени слоеве и обекти
+                var itemsToScale = [];
+                var layersToRelock = [];
+                var itemsToRelock = [];
+
+                for (var k = 0; k < pageItemsToProcess.length; k++) {
+                    var item = pageItemsToProcess[k];
+                    var isItemLocked = item.locked;
+                    var isLayerLocked = item.itemLayer.locked;
+
+                    if (isItemLocked || isLayerLocked) {
+                        if (lockedAction === "unlock") {
+                            if (isLayerLocked) {
+                                item.itemLayer.locked = false;
+                                layersToRelock.push(item.itemLayer);
+                            }
+                            if (isItemLocked) {
+                                item.locked = false;
+                                itemsToRelock.push(item);
+                            }
+                            itemsToScale.push(item);
+                        } else {
+                            skippedCount++;
+                        }
+                    } else {
+                        itemsToScale.push(item);
+                    }
+                }
+
+                if (itemsToScale.length === 0) {
+                    continue;
+                }
+
+                // Дефиниране на обекта за скалиране (групираме, ако са повече от 1)
+                var target = null;
+                var wasGrouped = false;
+
+                if (itemsToScale.length > 1) {
+                    target = page.groups.add(itemsToScale);
+                    wasGrouped = true;
+                } else {
+                    target = itemsToScale[0];
+                }
+
+                // Взимаме геометрията на обекта в милиметри [y1, x1, y2, x2]
+                var bounds = target.geometricBounds;
+                var width = bounds[3] - bounds[1];
+
+                if (width > 0) {
+                    // Коефициент на хоризонтално свиване (scaleX)
+                    var scaleX = (width - displacement) / width;
+                    if (scaleX > 0) {
+                        target.resize(
+                            CoordinateSpaces.INNER_COORDINATES,
+                            anchor,
+                            ResizeMethods.MULTIPLYING_CURRENT_DIMENSIONS_BY,
+                            [scaleX, 1.0]
+                        );
+                        scaledCount += itemsToScale.length;
+                    }
+                }
+
+                // Разгрупиране на временната група
+                if (wasGrouped) {
+                    target.ungroup();
+                }
+
+                // Възстановяване на заключенията
+                for (var r = 0; r < itemsToRelock.length; r++) {
+                    itemsToRelock[r].locked = true;
+                }
+                for (var l = 0; l < layersToRelock.length; l++) {
+                    layersToRelock[l].locked = true;
                 }
             }
 
             // Връщане на оригиналните мерни единици
             doc.viewPreferences.horizontalMeasurementUnits = originalXUnits;
 
-            // Извеждане на съобщение за край
-            var msg = "Успешно приключване на избутването!\n\n" +
-                      "- Преместени обекти: " + shiftedCount + "\n";
+            // Съобщение за край
+            var msg = "Успешно приключване на хоризонталното скалиране!\n\n" +
+                      "- Скалирани обекти: " + scaledCount + "\n";
             if (skippedCount > 0) {
                 msg += "- Пропуснати заключени обекти: " + skippedCount + "\n";
             }
@@ -258,11 +327,11 @@
         } catch (err) {
             // Връщане на оригиналните мерни единици при грешка
             doc.viewPreferences.horizontalMeasurementUnits = originalXUnits;
-            alert("Грешка при преместването: " + err.message, "Грешка");
+            alert("Грешка при скалирането: " + err.message, "Грешка");
         }
     }
 
     // 4. Изпълнение на кода в Undo транзакция за лесно отменяне (Ctrl+Z)
-    app.doScript(runCreepCalculation, ScriptLanguage.JAVASCRIPT, undefined, UndoModes.ENTIRE_SCRIPT, "Booklet Creep Shifting");
+    app.doScript(runCreepScaling, ScriptLanguage.JAVASCRIPT, undefined, UndoModes.ENTIRE_SCRIPT, "Booklet Creep Scaling");
 
 })();
