@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const pagesInput = document.getElementById('pages');
     const pagesRange = document.getElementById('pages-range');
     const paperSelect = document.getElementById('paper');
+    const signatureSizeSelect = document.getElementById('signature-size');
     
     // Softcover options
     const softcoverOptions = document.getElementById('softcover-options');
@@ -81,6 +82,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // General listener for all recalculation events
     const recalculateElements = [
         paperSelect,
+        signatureSizeSelect,
         coverPaperSelect,
         glueTypeSelect,
         boardThicknessSelect,
@@ -96,6 +98,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function calculate() {
         const pages = parseInt(pagesInput.value) || 0;
         const paperThickness = parseFloat(paperSelect.value) || 0;
+        const signatureSize = parseInt(signatureSizeSelect.value) || 16;
         const isSewn = sewingCheckbox.checked;
         const isHardcover = coverHardRadio.checked;
 
@@ -105,13 +108,29 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // 1. Calculate Book Block Thickness
-        let blockThickness = paperThickness * (pages / 2);
-        
-        // Apply 8% thread swelling if sewn
+        // 1. Calculate Spine Thread Swelling based on Signature Size
+        // Smaller signatures accumulate more thread layers at the fold
+        let swellingFactor = 1.0;
         if (isSewn) {
-            blockThickness *= 1.08;
+            switch (signatureSize) {
+                case 4:
+                    swellingFactor = 1.12; // +12%
+                    break;
+                case 8:
+                    swellingFactor = 1.10; // +10%
+                    break;
+                case 16:
+                    swellingFactor = 1.08; // +8%
+                    break;
+                case 32:
+                    swellingFactor = 1.05; // +5%
+                    break;
+                default:
+                    swellingFactor = 1.08;
+            }
         }
+
+        let blockThickness = paperThickness * (pages / 2) * swellingFactor;
 
         let spineWidth = 0;
 
@@ -139,8 +158,9 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        // 2. Creep Calculation
-        const creepValue = (pages / 4) * paperThickness;
+        // 2. Creep Calculation based on Signature Size (nested sheets)
+        // Creep = (Signature Size / 4 - 1) * Paper Thickness
+        const creepValue = Math.max(0, (signatureSize / 4 - 1) * paperThickness);
 
         // Rounding results to 2 decimal places
         const spineFormatted = spineWidth.toFixed(2);
