@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QA & SDET Portfolio | Инженер по качеството</title>
+    <meta name="description" content="Лично портфолио на QA Automation Engineer & SDET. Демонстрация на автоматизирано тестване, тестови планове и предпремиерни проекти.">
+    <!-- Google Fonts for Outfit and Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Header Navigation -->
+    <header class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <span class="logo-icon">&lt;QA/&gt;</span>
+                <span class="logo-text">ALEX_PETROV</span>
+            </div>
+            <nav class="nav-menu">
+                <a href="#simulator" class="nav-link">Симулатор</a>
+                <a href="#stack" class="nav-link">Стек</a>
+                <a href="#projects" class="nav-link">Проекти</a>
+                <a href="#artifacts" class="nav-link">Артефакти</a>
+                <a href="#about" class="nav-link">За мен</a>
+                <a href="#contact" class="nav-link btn-nav">Контакт</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero-section" id="simulator">
+        <div class="hero-container">
+            <div class="hero-content">
+                <div class="badge-sdet">SDET & QA AUTOMATION</div>
+                <h1>Пиша код, който тества вашия код</h1>
+                <p class="hero-desc">Аз съм инженер по осигуряване на качеството. Специализирам в изграждането на автоматизирани фреймуорци за тестване на уеб приложения, API и мобилни платформи. Помагам на екипите да доставят софтуер без бъгове при всяко внедряване.</p>
+                <div class="hero-actions">
+                    <a href="#projects" class="btn btn-primary">Преглед на проекти</a>
+                    <a href="#artifacts" class="btn btn-secondary">Тестови артефакти</a>
+                </div>
+            </div>
+            
+            <!-- Terminal Simulator -->
+            <div class="terminal-card">
+                <div class="terminal-header">
+                    <div class="terminal-dots">
+                        <span class="dot red"></span>
+                        <span class="dot yellow"></span>
+                        <span class="dot green"></span>
+                    </div>
+                    <span class="terminal-title">playwright-runner --project=chromium</span>
+                </div>
+                <div class="terminal-body" id="terminal-screen">
+                    <div class="line prompt">Ready to run test suite. Click below to execute automated tests.</div>
+                    <div class="line output static">$ npm run test:e2e</div>
+                </div>
+                <div class="terminal-controls">
+                    <button class="btn-run" id="btn-run-tests">Стартирай Тестове</button>
+                    <span class="test-status-pill idle" id="test-status">IDLE</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Metrics Dashboard -->
+    <section class="metrics-section">
+        <div class="section-container">
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-value" id="val-cicd">+40%</div>
+                    <div class="metric-label">По-бързо CI/CD внедряване</div>
+                    <p class="metric-sub">Оптимизиране и паралелизиране на Playwright тестови пакети в GitHub Actions.</p>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value" id="val-coverage">92%</div>
+                    <div class="metric-label">Тестово покритие на критични модули</div>
+                    <p class="metric-sub">Автоматизация на критичните пътища: потребителска количка, разплащания и аутентикация.</p>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value" id="val-bugs">500+</div>
+                    <div class="metric-label">Открити и документирани регресии</div>
+                    <p class="metric-sub">Умение за прецизна локализация на дефекти с подробни логове, мрежови хронологии и стъпки.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tech Stack Section -->
+    <section class="stack-section" id="stack">
+        <div class="section-container">
+            <div class="section-header">
+                <h2>Технологичен стек</h2>
+                <p>Фреймуорци, езици и инструменти, с които работя ежедневно</p>
+            </div>
+            
+            <div class="stack-filters">
+                <button class="filter-btn active" data-filter="all">Всички</button>
+                <button class="filter-btn" data-filter="languages">Езици</button>
+                <button class="filter-btn" data-filter="automation">Автоматизация</button>
+                <button class="filter-btn" data-filter="devops">DevOps / CI-CD</button>
+                <button class="filter-btn" data-filter="tools">Други инструменти</button>
+            </div>
+
+            <div class="stack-grid" id="stack-grid">
+                <!-- JavaScript -->
+                <div class="stack-item" data-category="languages">
+                    <div class="stack-icon">JS</div>
+                    <h4>JavaScript</h4>
+                    <span class="stack-badge">Напреднал</span>
+                </div>
+                <!-- TypeScript -->
+                <div class="stack-item" data-category="languages">
+                    <div class="stack-icon">TS</div>
+                    <h4>TypeScript</h4>
+                    <span class="stack-badge">Напреднал</span>
+                </div>
+                <!-- Python -->
+                <div class="stack-item" data-category="languages">
+                    <div class="stack-icon">PY</div>
+                    <h4>Python</h4>
+                    <span class="stack-badge">Средно</span>
+                </div>
+                <!-- Playwright -->
+                <div class="stack-item" data-category="automation">
+                    <div class="stack-icon">PW</div>
+                    <h4>Playwright</h4>
+                    <span class="stack-badge">Основен инструмент</span>
+                </div>
+                <!-- Cypress -->
+                <div class="stack-item" data-category="automation">
+                    <div class="stack-icon">CY</div>
+                    <h4>Cypress</h4>
+                    <span class="stack-badge">Тестване</span>
+                </div>
+                <!-- Postman -->
+                <div class="stack-item" data-category="automation">
+                    <div class="stack-icon">PM</div>
+                    <h4>Postman (API)</h4>
+                    <span class="stack-badge">REST / GraphQL</span>
+                </div>
+                <!-- GitHub Actions -->
+                <div class="stack-item" data-category="devops">
+                    <div class="stack-icon">GH</div>
+                    <h4>GitHub Actions</h4>
+                    <span class="stack-badge">CI / CD</span>
+                </div>
+                <!-- Docker -->
+                <div class="stack-item" data-category="devops">
+                    <div class="stack-icon">DK</div>
+                    <h4>Docker</h4>
+                    <span class="stack-badge">Контейнеризация</span>
+                </div>
+                <!-- Git -->
+                <div class="stack-item" data-category="devops">
+                    <div class="stack-icon">GT</div>
+                    <h4>Git</h4>
+                    <span class="stack-badge">Контрол на версии</span>
+                </div>
+                <!-- Jira -->
+                <div class="stack-item" data-category="tools">
+                    <div class="stack-icon">JR</div>
+                    <h4>Jira & Xray</h4>
+                    <span class="stack-badge">Тест мениджмънт</span>
+                </div>
+                <!-- Grafana -->
+                <div class="stack-item" data-category="tools">
+                    <div class="stack-icon">GF</div>
+                    <h4>Grafana / Loki</h4>
+                    <span class="stack-badge">Мониторинг</span>
+                </div>
+                <!-- K6 -->
+                <div class="stack-item" data-category="tools">
+                    <div class="stack-icon">K6</div>
+                    <h4>k6 (Performance)</h4>
+                    <span class="stack-badge">Натоварване</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Projects Section -->
+    <section class="projects-section" id="projects">
+        <div class="section-container">
+            <div class="section-header">
+                <h2>Практически проекти & Казуси</h2>
+                <p>Реални проблеми и инженерните решения зад осигуряването на качеството</p>
+            </div>
+
+            <div class="projects-list">
+                <!-- Project 1 -->
+                <article class="project-card">
+                    <div class="project-header">
+                        <span class="project-tag">E-Commerce Automation</span>
+                        <h3>Архитектура за паралелно E2E тестване на електронен магазин</h3>
+                        <p class="project-desc">Разработка на мащабируем автоматизиран тестов пакет за уеб платформа с над 10 000 артикула, използващ Playwright и TypeScript.</p>
+                        <div class="project-meta">
+                            <span><strong>Технологии:</strong> Playwright, TypeScript, GitHub Actions, Docker</span>
+                        </div>
+                    </div>
+                    
+                    <div class="case-study-details">
+                        <div class="case-grid">
+                            <div class="case-col">
+                                <h5>Контекст & Предизвикателство</h5>
+                                <p>Бавно изпълнение на регресионните тестове (над 45 минути) и висок брой фалшиви негативни резултати (flaky tests) поради динамично зареждащи се елементи в количката за пазаруване.</p>
+                            </div>
+                            <div class="case-col">
+                                <h5>Решение & Стратегия</h5>
+                                <p>Имплементиране на Page Object Model (POM), изолация на тестовите състояния чрез API сесии и преструктуриране за паралелно изпълнение в 4 Docker контейнера в CI/CD тръбопровода.</p>
+                            </div>
+                        </div>
+                        <div class="case-metrics">
+                            <div class="metric-small">
+                                <span class="metric-num">6 мин</span>
+                                <span class="metric-lbl">Време за тест пакет (намалено от 45)</span>
+                            </div>
+                            <div class="metric-small">
+                                <span class="metric-num">&lt;1%</span>
+                                <span class="metric-lbl">Фалшиви аларми (Flakiness rate)</span>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Project 2 -->
+                <article class="project-card">
+                    <div class="project-header">
+                        <span class="project-tag">API & Load Testing</span>
+                        <h3>Тестване на сигурността и производителността на Финтех API</h3>
+                        <p class="project-desc">Имплементиране на непрекъснато тестване за RESTful API услуги на банкови транзакции.</p>
+                        <div class="project-meta">
+                            <span><strong>Технологии:</strong> Postman, k6, Newman, Node.js, GitLab CI</span>
+                        </div>
+                    </div>
+                    
+                    <div class="case-study-details">
+                        <div class="case-grid">
+                            <div class="case-col">
+                                <h5>Контекст & Предизвикателство</h5>
+                                <p>Необходимост от гаранция за нулева загуба на пакети и време за реакция под 200ms при симулиране на натоварване от 2000 едновременни потребители на критични банкови транзакционни точки.</p>
+                            </div>
+                            <div class="case-col">
+                                <h5>Решение & Стратегия</h5>
+                                <p>Разработка на параметризирани k6 JS скриптове за натоварване, валидиране на JWT токени и автоматично стартиране на натоварващи тестове при всяко пускане на нова версия в GitLab CI.</p>
+                            </div>
+                        </div>
+                        <div class="case-metrics">
+                            <div class="metric-small">
+                                <span class="metric-num">180ms</span>
+                                <span class="metric-lbl">Средно време за отговор под товар</span>
+                            </div>
+                            <div class="metric-small">
+                                <span class="metric-num">100%</span>
+                                <span class="metric-lbl">Успешни API заявки (HTTP 200 OK)</span>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testing Artifacts Section -->
+    <section class="artifacts-section" id="artifacts">
+        <div class="section-container">
+            <div class="section-header">
+                <h2>Професионални артефакти</h2>
+                <p>Примери за документация и структура, гарантиращи контрол над качеството</p>
+            </div>
+
+            <div class="artifacts-container">
+                <!-- Tabs Navigation -->
+                <div class="artifacts-tabs">
+                    <button class="tab-btn active" data-tab="testplan">Тест План (Стратегия)</button>
+                    <button class="tab-btn" data-tab="bugreport">Качествен Бъг Репорт</button>
+                    <button class="tab-btn" data-tab="framework">Структура на Фреймуорк</button>
+                </div>
+
+                <!-- Tabs Content -->
+                <div class="tab-content active" id="tab-testplan">
+                    <div class="artifact-preview">
+                        <div class="doc-header">
+                            <h4>ТЕСТ ПЛАН: МОДУЛ "БАНКОВИ РАЗПЛАЩАНИЯ"</h4>
+                            <span class="doc-meta">ID: TP-PAY-2026 • Версия 1.2</span>
+                        </div>
+                        <div class="doc-body">
+                            <h5>1. Обхват на тестването</h5>
+                            <p>Функционално, интеграционно и регресионно тестване на интеграцията на разплащателния портал (Stripe API) в E-Commerce уеб платформата.</p>
+                            
+                            <h5>2. Тест нива & Подходи</h5>
+                            <ul>
+                                <li><strong>API Ниво:</strong> Позитивни/негативни тестове с невалидни данни за карти и лимити (Postman автоматизация).</li>
+                                <li><strong>UI Ниво:</strong> E2E сценарии за завършване на поръчка като гост и логнат потребител с 3D Secure верификация (Playwright).</li>
+                            </ul>
+
+                            <h5>3. Критерии за старт и край (Entry/Exit Criteria)</h5>
+                            <ul>
+                                <li><strong>Старт:</strong> Готов билдинг в Dev среда, успешни Unit тестове (>80%), наличен пясъчник (sandbox) за плащания.</li>
+                                <li><strong>Край:</strong> 100% изпълнение на E2E тестовете, 0 критични (Blocker/Critical) дефекти, 100% успешно автоматизирано тестване на API.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-content" id="tab-bugreport">
+                    <div class="artifact-preview">
+                        <div class="doc-header">
+                            <h4>ДЕФЕКТ: Срив на количката при бързо кликане на бутона "Поръчай"</h4>
+                            <span class="doc-meta tag-severity-high">CRITICAL • BUG-402</span>
+                        </div>
+                        <div class="doc-body">
+                            <h5>Описание:</h5>
+                            <p>При бързо двукратно натискане на бутона "Плащане" системата изпраща две паралелни POST заявки към `/api/checkout`, което води до двойно таксуване на клиента и грешка 500 от страна на сървъра.</p>
+                            
+                            <h5>Стъпки за възпроизвеждане:</h5>
+                            <ol>
+                                <li>Добавете продукт в количката.</li>
+                                <li>Преминете към екрана за плащане.</li>
+                                <li>Кликнете върху бутона "Плащане" бързо два пъти последователно (double click).</li>
+                            </ol>
+
+                            <h5>Очакван резултат:</h5>
+                            <p>Бутонът да се деактивира след първия клик (disabled) и да се извърши еднократно плащане.</p>
+
+                            <h5>Реален резултат:</h5>
+                            <p>Бутонът остава активен. Сървърът обработва две заявки. Потребителят вижда екран "Грешка 500", а картата му е таксувана два пъти.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-content" id="tab-framework">
+                    <div class="artifact-preview">
+                        <div class="doc-header">
+                            <h4>ПРОЕКТНА СТРУКТУРА: PLAYWRIGHT E2E FRAMEWORK</h4>
+                            <span class="doc-meta">TypeScript / Page Object Model</span>
+                        </div>
+                        <div class="doc-body">
+                            <pre class="code-tree">
+playwright-e2e-framework/
+├── .github/
+│   └── workflows/
+│       └── playwright.yml         # CI/CD GitHub Actions конфиг
+├── pages/
+│   ├── base.page.ts               # Базов клас с общи методи (wait, click)
+│   ├── login.page.ts              # POM за форма за вход
+│   └── checkout.page.ts           # POM за финализиране на поръчка
+├── tests/
+│   ├── login.spec.ts              # Тестове за аутентикация
+│   └── checkout.spec.ts           # Тестове за плащания и поръчки
+├── utils/
+│   └── test-data.ts               # Генератор на тест данни
+├── playwright.config.ts           # Основна конфигурация на Playwright
+└── package.json                   # Дефиниция на зависимости и команди
+                            </pre>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="about-section" id="about">
+        <div class="section-container">
+            <div class="about-grid">
+                <div class="about-image-card">
+                    <!-- Dynamic Placeholder made with UI in mind -->
+                    <div class="qa-graphic">
+                        <div class="graphic-line"><span class="lbl-prop">Suite:</span> <span class="val-prop">e2e-regression</span></div>
+                        <div class="graphic-line"><span class="lbl-prop">Tests:</span> <span class="val-prop">142 passed</span></div>
+                        <div class="graphic-line"><span class="lbl-prop">Status:</span> <span class="val-prop status-pass">PASSED</span></div>
+                        <div class="graphic-circle">QA</div>
+                    </div>
+                </div>
+                <div class="about-info">
+                    <h2>За мен & Професионален опит</h2>
+                    <p class="about-lead">Казвам се Алек Петров и съм отдаден на каузата да помагам на софтуерните проекти да работят стабилно и безгрешно.</p>
+                    <p>С над 5 години опит в софтуерното тестване, моят фокус е в изграждането на автоматизация от нулата. Вярвам, че автоматизираното тестване не е просто пускане на скриптове, а част от цялостната DevOps култура и качество на кода. Работил съм с гъвкави екипи (Scrum) за създаване на висококачествени продукти в сферата на e-commerce, финтех и SaaS.</p>
+                    
+                    <div class="certifications-list">
+                        <h4>Сертификати:</h4>
+                        <div class="certs-grid">
+                            <div class="cert-item">
+                                <strong>ISTQB Certified Tester</strong>
+                                <span>Foundation Level (FL)</span>
+                            </div>
+                            <div class="cert-item">
+                                <strong>Playwright Automation</strong>
+                                <span>Udemy / Advanced Certificate</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="contact-section" id="contact">
+        <div class="section-container">
+            <div class="contact-card">
+                <div class="section-header">
+                    <h2>Свържете се с мен</h2>
+                    <p>Имате нужда от консултация за автоматизация или търсите QA инженер за вашия екип? Изпратете съобщение!</p>
+                </div>
+                
+                <form id="contact-form" class="contact-form" onsubmit="return false;">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="name">Име</label>
+                            <input type="text" id="name" required placeholder="Вашето име">
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Имейл</label>
+                            <input type="email" id="email" required placeholder="name@company.com">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="message">Съобщение</label>
+                        <textarea id="message" rows="5" required placeholder="Как мога да Ви помогна?"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">Изпрати запитване</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="section-container footer-container">
+            <p>&copy; 2026 Алек Петров - QA Automation Portfolio. Всички права запазени.</p>
+            <div class="footer-links">
+                <a href="https://github.com" target="_blank" rel="noopener">GitHub</a>
+                <a href="https://linkedin.com" target="_blank" rel="noopener">LinkedIn</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Script File -->
+    <script src="script.js"></script>
+</body>
+</html>
