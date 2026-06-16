@@ -35,7 +35,7 @@
     var sigGroup = infoPanel.add("group");
     sigGroup.add("statictext", undefined, "Размер на колата (страници):");
     var sigSizes = [];
-    for (var s = 4; s <= 128; s += 4) {
+    for (var s = 4; s <= 64; s += 4) {
         sigSizes.push(s.toString());
     }
     var sigDropdown = sigGroup.add("dropdownlist", undefined, sigSizes);
