@@ -63,7 +63,7 @@
                     <!-- Pages Input -->
                     <div class="form-group">
                         <label for="pages" id="label-pages">
-                            Брой страници
+                            Брой страници в книгата
                             <span class="info-bubble" title="Броят на страниците в книжното тяло">?</span>
                         </label>
                         <div class="input-with-controls">
@@ -119,6 +119,22 @@
                         </div>
                     </div>
 
+                    <!-- Signature Size Select -->
+                    <div class="form-group">
+                        <label for="signature-size">
+                            Размер на колата (страници)
+                            <span class="info-bubble" title="Броят на страниците в една кола за сгъване/шиене. Определя размера на избутването и коефициента на набухване при шиене.">?</span>
+                        </label>
+                        <div class="select-wrapper">
+                            <select id="signature-size" name="signature_size" required>
+                                <option value="4">4 страници (1 сгъвка)</option>
+                                <option value="8">8 страници (2 сгъвки)</option>
+                                <option value="16" selected>16 страници (3 сгъвки - стандартно)</option>
+                                <option value="32">32 страници (4 сгъвки)</option>
+                            </select>
+                        </div>
+                    </div>
+
                     <!-- Softcover Options Group -->
                     <div id="softcover-options" class="conditional-options transition-group">
                         <div class="form-group">
@@ -160,7 +176,7 @@
                             <div class="select-wrapper">
                                 <select id="spine-shape" name="spine_shape">
                                     <option value="flat" selected>Прав гръб (Flat)</option>
-                                    <option value="rounded">Закръглен гръб (+15%)</option>
+                                    <option value="rounded">Закръглен гръб (+15% на книжното тяло)</option>
                                 </select>
                             </div>
                         </div>
@@ -171,7 +187,7 @@
                         <label class="checkbox-container">
                             <input type="checkbox" id="sewing-checkbox" name="sewing_checkbox">
                             <span class="checkbox-checkmark"></span>
-                            Шита с конци (+8% набухване на тялото)
+                            Шита с конци (набухването зависи от колата)
                         </label>
                     </div>
 
@@ -196,7 +212,7 @@
                             <span class="tile-value" id="result-creep">7.75</span>
                             <span class="tile-unit">мм</span>
                         </div>
-                        <div class="tile-subtext">Общо изместване на колите</div>
+                        <div class="tile-subtext">Относно колата за шиене</div>
                     </div>
                 </div>
 
@@ -235,17 +251,14 @@
                         <div class="math-expr">
                             Гръбче = Тяло + (2 × Картон корица) + Лепило
                         </div>
-                        <p><strong>Тяло:</strong> страниците × дебелината / 2. При шиене с конци добавяме 8% набухване на книгата. <strong>Лепило:</strong> EVA термолепило (+0.5 мм) или PUR лепило (+0.25 мм).</p>
+                        <p><strong>Тяло:</strong> страниците × дебелината / 2. При шиене с конци добавяме набухване според колата: 4стр. (+12%), 8стр. (+10%), 16стр. (+8%), 32стр. (+5%). <strong>Лепило:</strong> EVA (+0.5 мм) или PUR (+0.25 мм).</p>
                     </div>
                     <div class="formula-card">
-                        <h4>Твърда корица (Hardcover)</h4>
+                        <h4>Твърда корица (Hardcover) & Избутване</h4>
                         <div class="math-expr">
-                            Гръбче (Прав) = Тяло + (2 × Мукава) + 1.5 мм
+                            Избутване = (Размер на колата / 4 - 1) × Дебелина на хартия
                         </div>
-                        <div class="math-expr">
-                            Гръбче (Закръглен) = (Тяло × 1.15) + (2 × Мукава) + 1.5 мм
-                        </div>
-                        <p>Добавя се толеранс от 1.5 мм за прегъване на облицовката и лепилото. Мукавата е с дебелина от 1.5 до 3.0 мм.</p>
+                        <p>Добавя се толеранс от 1.5 мм за прегъване на облицовката на мукавата (от 1.5 до 3.0 мм). Избутването се калкулира за вътрешните страници на една отделна кола, което е необходимо за предпечат при шиене.</p>
                     </div>
                 </div>
             </div>
