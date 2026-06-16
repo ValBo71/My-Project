@@ -207,17 +207,17 @@
                 // Определяне на точка на закотвяне (Anchor) спрямо гръбчето (spine):
                 // Лява страница (LEFT_HAND) -> Гръбчето е отдясно -> Закотвяме отдясно (RIGHT_CENTER)
                 // Дясна страница (RIGHT_HAND) -> Гръбчето е отляво -> Закотвяме отляво (LEFT_CENTER)
-                var anchor = AnchorPoint.LEFT_CENTER;
+                var anchor = AnchorPoint.LEFT_CENTER_ANCHOR;
                 if (page.side === PageSideOptions.LEFT_HAND) {
-                    anchor = AnchorPoint.RIGHT_CENTER;
+                    anchor = AnchorPoint.RIGHT_CENTER_ANCHOR;
                 } else if (page.side === PageSideOptions.RIGHT_HAND) {
-                    anchor = AnchorPoint.LEFT_CENTER;
+                    anchor = AnchorPoint.LEFT_CENTER_ANCHOR;
                 } else {
                     // Ако не е в режим разтвори (facing pages)
                     if (pageInSig % 2 === 0) {
-                        anchor = AnchorPoint.RIGHT_CENTER; // Лява
+                        anchor = AnchorPoint.RIGHT_CENTER_ANCHOR; // Лява
                     } else {
-                        anchor = AnchorPoint.LEFT_CENTER; // Дясна
+                        anchor = AnchorPoint.LEFT_CENTER_ANCHOR; // Дясна
                     }
                 }
 
