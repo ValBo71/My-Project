@@ -6,4 +6,6 @@ public class TestSettings
     public bool Headed { get; set; } = false;
     public int SlowMo { get; set; } = 0;
     public int TimeoutMs { get; set; } = 30000;
+    public string Username { get; set; } = string.Empty;
+    public string Password { get; set; } = string.Empty;
 }

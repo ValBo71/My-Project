@@ -12,7 +12,7 @@ public class LocatorDebugger : BaseTest
     {
         var loginPage = new LoginPage(Page);
         await loginPage.GotoAsync();
-        await loginPage.LoginAsync("test_mailbox", "***REMOVED***");
+        await loginPage.LoginAsync(Settings.Username, Settings.Password);
 
         // Wait a bit for login to complete and dashboard to load
         await Task.Delay(5000);
