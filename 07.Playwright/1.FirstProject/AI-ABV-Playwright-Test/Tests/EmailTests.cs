@@ -29,14 +29,14 @@ public class EmailTests : BaseTest
         TestContext.Progress.WriteLine("Navigating to ABV.bg login page...");
         await _loginPage.GotoAsync();
 
-        string username = "isi_test_isi";
-        string password = ".AZau$Dq*-6_dJ-";
+        string username = Settings.Username;
+        string password = Settings.Password;
 
         TestContext.Progress.WriteLine("Logging in...");
         await _loginPage.LoginAsync(username, password);
 
         // Validate successful login (Wait for an inbox element)
-        bool isAvatarVisible = await _inboxPage.IsUserAvatarVisibleAsync();
+        bool isAvatarVisible = await _inboxPage.IsUserAvatarVisibleAsync(username);
         Assert.That(isAvatarVisible, Is.True, "Failed to login. User avatar not visible.");
 
         // ============================================
@@ -48,7 +48,7 @@ public class EmailTests : BaseTest
         TestContext.Progress.WriteLine("Waiting for composer to load...");
         await _composePage.WaitForComposerToLoadAsync();
 
-        string targetEmail = "isi_test_isi@abv.bg";
+        string targetEmail = $"{username}@abv.bg";
         string timestamp = DateTime.Now.ToString("yyyyMMdd-HHmmss");
         string subject = $"AI-ABV-Playwright-Test-{timestamp}";
         string body = "AI-ABV-Playwright-Test";

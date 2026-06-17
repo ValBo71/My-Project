@@ -19,10 +19,10 @@ public class InboxPage
         return await _page.Locator(InboxSelectors.InboxMenuLink).First.IsVisibleAsync();
     }
     
-    public async Task<bool> IsUserAvatarVisibleAsync()
+    public async Task<bool> IsUserAvatarVisibleAsync(string username)
     {
-        await _page.Locator(InboxSelectors.UserAvatar).First.WaitForAsync(new LocatorWaitForOptions { Timeout = 15000 });
-        return await _page.Locator(InboxSelectors.UserAvatar).First.IsVisibleAsync();
+        await _page.Locator(InboxSelectors.UserAvatar(username)).First.WaitForAsync(new LocatorWaitForOptions { Timeout = 15000 });
+        return await _page.Locator(InboxSelectors.UserAvatar(username)).First.IsVisibleAsync();
     }
 
     public async Task GotoInboxAsync()

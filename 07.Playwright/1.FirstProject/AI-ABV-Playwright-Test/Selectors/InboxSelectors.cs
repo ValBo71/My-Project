@@ -6,5 +6,5 @@ public static class InboxSelectors
     public const string InboxMenuLink = "text=Кутия";
     
     // The logged in user's email is visible
-    public const string UserAvatar = "text=isi_test_isi@abv.bg";
+    public static string UserAvatar(string username) => $"text={username}@abv.bg";
 }

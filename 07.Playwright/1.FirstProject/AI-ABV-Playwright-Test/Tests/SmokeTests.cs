@@ -20,9 +20,9 @@ public class SmokeTests : BaseTest
         // 3. Perform login
         TestContext.Progress.WriteLine("Filling login credentials...");
         
-        // Data is hardcoded temporarily as per instructions, later could go to Config
-        string username = "isi_test_isi";
-        string password = ".AZau$Dq*-6_dJ-";
+        // Data is loaded from Config
+        string username = Settings.Username;
+        string password = Settings.Password;
         
         await loginPage.LoginAsync(username, password);
 
@@ -32,7 +32,7 @@ public class SmokeTests : BaseTest
         bool isInboxMenuVisible = await inboxPage.IsInboxMenuVisibleAsync();
         Assert.That(isInboxMenuVisible, Is.True, "The 'Кутия' menu link should be visible in the inbox.");
         
-        bool isAvatarVisible = await inboxPage.IsUserAvatarVisibleAsync();
+        bool isAvatarVisible = await inboxPage.IsUserAvatarVisibleAsync(username);
         Assert.That(isAvatarVisible, Is.True, "User avatar should be visible in the inbox.");
     }
 }
