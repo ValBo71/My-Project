@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Флаш Карти – Интерактивно Учене на Чужди Думи</title>
+  <meta name="description" content="Локално уеб приложение за лесно и ефективно изучаване на чужди думи с флашкарти, интелигентни сесии от 20 думи и импорт от Excel.">
+  
+  <!-- Google Fonts for premium typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Ubuntu:wght@400;500;700&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="light-theme">
+  <div class="app-container">
+    <!-- Header with logo and theme toggler -->
+    <header class="app-header">
+      <div class="header-logo">
+        <i class="fa-solid fa-graduation-cap logo-icon"></i>
+        <h1 class="logo-text" id="app-heading">ФЛАШ КАРТИ</h1>
+      </div>
+      <div class="header-actions">
+        <button id="theme-toggle-btn" class="icon-btn" title="Смяна на темата">
+          <i class="fa-solid fa-sun" id="theme-icon-light"></i>
+          <i class="fa-solid fa-moon" id="theme-icon-dark"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Navigation Tabs -->
+    <nav class="app-nav" aria-label="Основна навигация">
+      <button id="nav-btn-study" class="nav-tab active" data-tab="study-tab-content">
+        <i class="fa-solid fa-brain"></i>
+        <span>Учене</span>
+      </button>
+      <button id="nav-btn-dictionary" class="nav-tab" data-tab="dictionary-tab-content">
+        <i class="fa-solid fa-book-open"></i>
+        <span>Речник</span>
+      </button>
+      <button id="nav-btn-import" class="nav-tab" data-tab="import-tab-content">
+        <i class="fa-solid fa-file-import"></i>
+        <span>Импорт & Резервно копие</span>
+      </button>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="app-main">
+      
+      <!-- TAB 1: STUDY MODE -->
+      <section id="study-tab-content" class="tab-panel active">
+        <div class="study-setup" id="study-setup-container">
+          <div class="card-panel glass-panel">
+            <h2 class="section-title"><i class="fa-solid fa-sliders"></i> Настройки на сесията</h2>
+            <p class="section-subtitle">Изберете език и тип на сесията, за да започнете ученето.</p>
+            
+            <div class="form-group">
+              <label for="study-lang-select">Език за изучаване:</label>
+              <select id="study-lang-select" class="form-control">
+                <!-- Will be dynamically populated -->
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="study-type-select">Тип сесия (Сет от 20 думи):</label>
+              <select id="study-type-select" class="form-control">
+                <option value="random">Случайни 20 думи</option>
+                <option value="newest">Най-новите 20 думи</option>
+                <option value="difficult">Трудни думи (с нисък стрийк)</option>
+                <option value="all-sequential">Последователно преминаване</option>
+              </select>
+            </div>
+
+            <div class="form-group" id="study-files-container">
+              <label for="study-files-dropdown-toggle">Файлове за изучаване:</label>
+              <div class="multiselect-dropdown" id="study-files-dropdown">
+                <button type="button" id="study-files-dropdown-toggle" class="multiselect-toggle" aria-haspopup="true" aria-expanded="false">
+                  <span id="multiselect-selected-text">Всички</span>
+                  <i class="fa-solid fa-chevron-down"></i>
+                </button>
+                <div id="study-files-options" class="multiselect-options">
+                  <!-- Will be dynamically populated with checkboxes -->
+                </div>
+              </div>
+            </div>
+
+            <button id="btn-start-study" class="btn btn-primary btn-block">
+              <i class="fa-solid fa-play"></i> Започни сесията
+            </button>
+          </div>
+        </div>
+
+        <div class="study-session hidden" id="study-session-container">
+          <!-- Session Header / Progress -->
+          <div class="session-status-row">
+            <button id="btn-quit-session" class="btn btn-secondary btn-sm" title="Отказ от сесията">
+              <i class="fa-solid fa-arrow-left"></i> Назад
+            </button>
+            <div class="session-progress-text">
+              Карта <span id="current-card-num">0</span> от <span id="total-cards-num">20</span>
+            </div>
+            <div class="session-score">
+              <i class="fa-solid fa-circle-check text-success"></i> <span id="correct-count">0</span>
+              &nbsp;&nbsp;
+              <i class="fa-solid fa-circle-xmark text-danger"></i> <span id="incorrect-count">0</span>
+            </div>
+          </div>
+
+          <!-- Progress Bar -->
+          <div class="progress-bar-container">
+            <div id="session-progress-bar" class="progress-bar" style="width: 0%"></div>
+          </div>
+
+          <!-- Flashcard Wrapper -->
+          <div class="flashcard-wrapper">
+            <div class="flashcard" id="flashcard-element" role="button" tabindex="0" aria-label="Флашкарта. Натиснете за показване на превода.">
+              <!-- Front Side -->
+              <div class="card-side card-front" id="card-front-side">
+                <div class="card-lang-tag" id="card-lang-badge">EN</div>
+                <div class="card-word-display" id="card-word-text">word</div>
+                <div class="card-hint">
+                  <i class="fa-solid fa-arrows-rotate"></i> Кликнете върху картата за превод
+                </div>
+              </div>
+              <!-- Back Side -->
+              <div class="card-side card-back" id="card-back-side">
+                <div class="card-lang-tag">Български</div>
+                <div class="card-word-display" id="card-translation-text">превод</div>
+                <div class="card-hint">Кликнете отново, за да обърнете обратно</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="session-actions hidden" id="session-actions-container">
+            <button id="btn-action-incorrect" class="btn btn-danger btn-lg flex-1">
+              <i class="fa-solid fa-xmark"></i> Не я знам
+            </button>
+            <button id="btn-action-correct" class="btn btn-success btn-lg flex-1">
+              <i class="fa-solid fa-check"></i> Знам я
+            </button>
+          </div>
+          <div class="session-info-tip" id="session-tip-text">
+            * Обърнете картата, за да оцените дали я знаете.
+          </div>
+        </div>
+
+        <!-- Session Finished Screen -->
+        <div class="study-results hidden" id="study-results-container">
+          <div class="card-panel glass-panel text-center">
+            <div class="result-icon-container">
+              <i class="fa-solid fa-circle-check result-success-icon"></i>
+            </div>
+            <h2 class="section-title">Сесията завърши!</h2>
+            <p class="result-summary-text" id="result-summary-text-element">
+              Поздравления! Вие преминахте през сета от 20 думи.
+            </p>
+            
+            <div class="score-display-box">
+              <div class="score-circle">
+                <span id="result-percentage">100%</span>
+                <span class="score-label">Верни</span>
+              </div>
+              <div class="score-details-list">
+                <div class="score-detail-item">
+                  <span>Знаени думи:</span>
+                  <strong class="text-success" id="result-know-count">0</strong>
+                </div>
+                <div class="score-detail-item">
+                  <span>Незнаени думи:</span>
+                  <strong class="text-danger" id="result-dontknow-count">0</strong>
+                </div>
+              </div>
+            </div>
+
+            <div class="results-actions">
+              <button id="btn-restart-session" class="btn btn-primary">
+                <i class="fa-solid fa-rotate-right"></i> Още един сет
+              </button>
+              <button id="btn-go-to-dictionary" class="btn btn-secondary">
+                <i class="fa-solid fa-book-open"></i> Виж речника
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 2: DICTIONARY MANAGEMENT -->
+      <section id="dictionary-tab-content" class="tab-panel">
+        <div class="dictionary-layout">
+          <!-- Add Word Sidebar -->
+          <div class="dict-sidebar">
+            <div class="card-panel glass-panel">
+              <h3 class="panel-subtitle-large"><i class="fa-solid fa-plus-circle"></i> Нова дума</h3>
+              <form id="form-add-word">
+                <div class="form-group">
+                  <label for="add-word-input">Дума (на чужд език):</label>
+                  <input type="text" id="add-word-input" class="form-control" placeholder="напр. apple" required autocomplete="off">
+                </div>
+                <div class="form-group">
+                  <label for="add-translation-input">Превод на български:</label>
+                  <input type="text" id="add-translation-input" class="form-control" placeholder="напр. ябълка" required autocomplete="off">
+                </div>
+                <div class="form-group">
+                  <label for="add-lang-select">Език:</label>
+                  <select id="add-lang-select" class="form-control" required>
+                    <option value="en">Английски (EN)</option>
+                    <option value="de">Немски (DE)</option>
+                    <option value="fr">Френски (FR)</option>
+                    <option value="es">Испански (ES)</option>
+                    <option value="ru">Руски (RU)</option>
+                    <option value="it">Италиански (IT)</option>
+                    <option value="other">Друг</option>
+                  </select>
+                </div>
+                <!-- Extra field if Other language is chosen -->
+                <div class="form-group hidden" id="other-lang-container">
+                  <label for="add-lang-other-input">Име на езика (код):</label>
+                  <input type="text" id="add-lang-other-input" class="form-control" placeholder="напр. TR, GR" maxlength="10">
+                </div>
+                <button type="submit" id="btn-submit-add-word" class="btn btn-primary btn-block">
+                  <i class="fa-solid fa-plus"></i> Добави в речника
+                </button>
+              </form>
+            </div>
+            
+            <!-- Quick Stats Panel -->
+            <div class="card-panel glass-panel stats-panel">
+              <h3><i class="fa-solid fa-chart-simple"></i> Статистика</h3>
+              <div class="stats-grid">
+                <div class="stat-box">
+                  <span class="stat-number" id="stats-total-words">0</span>
+                  <span class="stat-label">Общо думи</span>
+                </div>
+                <div class="stat-box">
+                  <span class="stat-number" id="stats-mastered-words">0</span>
+                  <span class="stat-label">Научени</span>
+                </div>
+              </div>
+              <div id="stats-languages-breakdown" class="languages-breakdown-list">
+                <!-- Dynamically populated list of languages -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Dictionary Table View -->
+          <div class="dict-main">
+            <div class="card-panel glass-panel">
+              <div class="table-header-filters">
+                <div class="search-box-container">
+                  <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                  <input type="text" id="dict-search-input" placeholder="Търсене на дума или превод...">
+                </div>
+                <div class="filter-box-container" style="display: flex; gap: 0.5rem;">
+                  <label for="dict-filter-lang" class="sr-only">Филтър език</label>
+                  <select id="dict-filter-lang" class="form-control-sm">
+                    <option value="all">Всички езици</option>
+                    <!-- Dynamically populated -->
+                  </select>
+                  <label for="dict-filter-file" class="sr-only">Филтър файл</label>
+                  <select id="dict-filter-file" class="form-control-sm">
+                    <option value="all">Всички файлове</option>
+                    <!-- Dynamically populated -->
+                  </select>
+                </div>
+              </div>
+
+              <!-- Word Table -->
+              <div class="table-scroll-container">
+                <table class="dict-table" id="words-table-element">
+                  <thead>
+                    <tr>
+                      <th scope="col">Език</th>
+                      <th scope="col">Дума</th>
+                      <th scope="col">Превод (БГ)</th>
+                      <th scope="col">Източник</th>
+                      <th scope="col" class="text-center">Стрийк</th>
+                      <th scope="col" class="text-center">Статус</th>
+                      <th scope="col" class="text-center">Действия</th>
+                    </tr>
+                  </thead>
+                  <tbody id="dict-words-tbody">
+                    <!-- Loaded dynamically -->
+                    <tr>
+                      <td colspan="7" class="text-center text-muted py-4">Няма въведени думи в речника. Добавете нова дума или импортирайте от Excel.</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              
+              <!-- Pagination / Word Count -->
+              <div class="table-footer-pagination">
+                <div class="pagination-info">
+                  Показване на <span id="pagination-showing-count">0</span> от общо <span id="pagination-total-count">0</span> думи
+                </div>
+                <div class="pagination-controls" id="pagination-buttons-container">
+                  <!-- Generated dynamically -->
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 3: IMPORT & BACKUP -->
+      <section id="import-tab-content" class="tab-panel">
+        <div class="import-layout">
+          <!-- Excel Import Card -->
+          <div class="card-panel glass-panel">
+            <h2 class="section-title"><i class="fa-solid fa-file-excel text-success"></i> Импорт от Excel файл</h2>
+            <p class="section-subtitle">
+              Качете файл в формат `.xlsx`, `.xls` или `.csv`. Файлът трябва да съдържа **две колони**: първата с думите на чуждия език, а втората с превода им на български.
+            </p>
+
+            <div class="import-config-row">
+              <div class="form-group flex-1">
+                <label for="import-lang-select">Език на импортираните думи:</label>
+                <select id="import-lang-select" class="form-control">
+                  <option value="en">Английски (EN)</option>
+                  <option value="de">Немски (DE)</option>
+                  <option value="fr">Френски (FR)</option>
+                  <option value="es">Испански (ES)</option>
+                  <option value="ru">Руски (RU)</option>
+                  <option value="it">Италиански (IT)</option>
+                </select>
+              </div>
+              <div class="form-group flex-1">
+                <label for="import-has-headers-select">Първият ред съдържа ли заглавия?</label>
+                <select id="import-has-headers-select" class="form-control">
+                  <option value="yes">Да (пропусни първия ред)</option>
+                  <option value="no">Не (импортирай всички редове)</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Drag and Drop Zone -->
+            <div class="drag-drop-zone" id="excel-drag-drop-zone">
+              <i class="fa-solid fa-cloud-arrow-up drag-drop-icon"></i>
+              <p class="drag-drop-text">Провлачете Excel файла тук или кликнете, за да изберете</p>
+              <span class="file-name-display" id="import-file-name">Няма избран файл</span>
+              <input type="file" id="excel-file-selector" accept=".xlsx, .xls, .csv" class="hidden-file-input">
+            </div>
+
+            <div class="import-actions-row">
+              <button id="btn-process-import" class="btn btn-success btn-lg" disabled>
+                <i class="fa-solid fa-circle-check"></i> Изпълни импортирането
+              </button>
+            </div>
+            
+            <!-- Excel structure hint -->
+            <div class="excel-hint-box">
+              <h5><i class="fa-solid fa-lightbulb text-warning"></i> Примерна структура на Excel файла:</h5>
+              <table class="mini-table">
+                <thead>
+                  <tr>
+                    <th>Колона А (Дума)</th>
+                    <th>Колона B (Превод)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>hello</td>
+                    <td>здравей</td>
+                  </tr>
+                  <tr>
+                    <td>thank you</td>
+                    <td>благодаря</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Backup & Database Management -->
+          <div class="card-panel glass-panel">
+            <h2 class="section-title"><i class="fa-solid fa-database text-info"></i> Резервно копие & База данни</h2>
+            <p class="section-subtitle">Управлявайте и архивирайте вашите данни на твърдия диск под формата на JSON файл.</p>
+
+            <div class="backup-buttons-grid">
+              <!-- Export Database JSON -->
+              <div class="backup-card">
+                <h4>Експорт на базата</h4>
+                <p>Свалете пълно резервно копие на всички думи и техния статус като JSON файл.</p>
+                <button id="btn-backup-export-json" class="btn btn-secondary btn-block">
+                  <i class="fa-solid fa-download"></i> Свали JSON архив
+                </button>
+              </div>
+
+              <!-- Import Database JSON -->
+              <div class="backup-card">
+                <h4>Импорт от JSON архив</h4>
+                <p>Възстановете базата данни от предварително свален JSON файл (ще се слеят с настоящите).</p>
+                <div class="file-input-wrapper-btn">
+                  <button class="btn btn-secondary btn-block" id="btn-trigger-json-file">
+                    <i class="fa-solid fa-upload"></i> Качи JSON архив
+                  </button>
+                  <input type="file" id="json-file-selector" accept=".json" class="hidden">
+                </div>
+              </div>
+
+              <!-- Export Database Excel -->
+              <div class="backup-card">
+                <h4>Експорт в Excel</h4>
+                <p>Свалете всички думи от речника в готов Excel файл (подходящо за редактиране).</p>
+                <button id="btn-backup-export-excel" class="btn btn-secondary btn-block">
+                  <i class="fa-solid fa-file-excel"></i> Свали Excel файл
+                </button>
+              </div>
+
+              <!-- Danger Zone Clear Database -->
+              <div class="backup-card border-danger">
+                <h4 class="text-danger">Опасна зона</h4>
+                <p>Изтриване на цялата база данни. Действието е необратимо!</p>
+                <button id="btn-danger-clear-database" class="btn btn-danger btn-block">
+                  <i class="fa-solid fa-trash-can"></i> Изтрий речника
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="app-footer-bar">
+      <p>&copy; 2026 Флаш Карти – Локално приложение за изучаване на езици.</p>
+    </footer>
+  </div>
+
+  <!-- EDIT WORD MODAL -->
+  <div class="modal" id="edit-word-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-content glass-panel">
+      <div class="modal-header">
+        <h3 id="modal-title" class="modal-title-text">Редактиране на дума</h3>
+        <button id="btn-close-modal" class="close-btn" aria-label="Затвори">&times;</button>
+      </div>
+      <form id="form-edit-word">
+        <input type="hidden" id="edit-word-id">
+        <div class="form-group">
+          <label for="edit-word-input">Дума (на чужд език):</label>
+          <input type="text" id="edit-word-input" class="form-control" required autocomplete="off">
+        </div>
+        <div class="form-group">
+          <label for="edit-translation-input">Превод на български:</label>
+          <input type="text" id="edit-translation-input" class="form-control" required autocomplete="off">
+        </div>
+        <div class="form-group">
+          <label for="edit-lang-select">Език:</label>
+          <select id="edit-lang-select" class="form-control" required>
+            <option value="en">Английски (EN)</option>
+            <option value="de">Немски (DE)</option>
+            <option value="fr">Френски (FR)</option>
+            <option value="es">Испански (ES)</option>
+            <option value="ru">Руски (RU)</option>
+            <option value="it">Италиански (IT)</option>
+            <option value="other">Друг</option>
+          </select>
+        </div>
+        <div class="modal-footer-actions">
+          <button type="button" id="btn-cancel-edit" class="btn btn-secondary">Отказ</button>
+          <button type="submit" class="btn btn-primary">Запази промените</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- SheetJS Library for local Excel parsing -->
+  <script src="lib/xlsx.full.min.js"></script>
+  <!-- Application JS logic -->
+  <script src="app.js"></script>
+</body>
+</html>
