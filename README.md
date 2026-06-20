@@ -63,6 +63,9 @@ Projects using Playwright — a modern tool for UI and API automation:
 * **08.Observer**: Main Project (Automation QA Jobs Tracker) — A full-featured Python Flask and SQLite dashboard scraping job listings from dev.bg, LinkedIn, and jobs.bg, standardizing dates, filtering results, and inheritance of company flags.
 * **11.Observer v2**: Jobs Tracker v2 — Upgraded version of the job tracker introducing dynamic scraping URLs configuration directly in the UI settings panel, selective/optional scraping support, database resetting, and running on port 5001.
 
+### 🛠️ 9. Other Tools / Utilities (`09. Other tools/03.Dictionary`)
+* [03.Dictionary](file:///E:/Programing/My_project/GitHub/MyProject/09.%20Other%20tools/03.Dictionary/README.md): Flash Cards (Флаш Карти) — A local, zero-setup, offline-capable single-page application (SPA) for vocabulary flashcard study. Features 3D card flipping, learning progress tracking (streaks, master status), manual additions with duplication check, dynamic multi-file select dropdown to filter study sessions, and JSON database backup/restoration.
+
 ---
 
 ## 🚀 Main Projects: **Observer (Jobs Tracker) - Versions 1 & 2**
@@ -271,6 +274,26 @@ An interactive personal portfolio website showcasing professional career details
   * **BGN ⇄ EUR Currency Converter**: A dedicated sub-app with card layout, glassmorphic accents, and bi-directional calculation logic using the Bulgarian fixed rate of `1.95583`.
   * **Contact & Resume Integration**: Validated email contact form powered by `jqBootstrapValidation` alongside downloadable PDF CV links.
 * **Tech Stack**: HTML5, CSS3 (Bootstrap v3 base), JavaScript/jQuery.
+
+---
+
+## 🛠️ Other Tools / Utilities (`09. Other tools`)
+
+### 🎴 Flash Cards Application (`09. Other tools/03.Dictionary`)
+`Flash Cards` (Флаш Карти) is a local, offline-capable single-page application designed for studying foreign language vocabulary (English, German, Spanish, etc.) using interactive flashcards.
+
+* **Local Database (IndexedDB)**: Runs entirely client-side inside the browser using IndexedDB to store words, translation, correctness streak, and imported file sources. No server or backend configuration required.
+* **Interactive 3D Card Flipping**: 3D card flipping animation with timing adjustments to display translation text exactly halfway through the rotation.
+* **Dynamic Multi-File Selection**: Custom dropdown component with checked options allowing users to combine or restrict learning sessions to specific imported files (e.g. only studying phrasal verbs, idioms, or specific vocabulary lists). Features a quick "Select All" ("Всички") checkbox.
+* **Data Backup & Restore**: Download/export entire database locally as a JSON backup or Excel spreadsheet, and restore the database state easily using JSON file uploads.
+* **Excel Imports**: Seamlessly imports large vocabulary sheets using SheetJS with automated duplicate row filtering.
+* **Pre-compiled Vocabularies Included**:
+  - `b2_vocabulary.xlsx`: 3000 B2 English words.
+  - `de_vocabulary.xlsx`: 3050 German words (A1-B2).
+  - `es_vocabulary.xlsx`: 3050 Spanish words (A1-B2).
+  - `en_idioms.xlsx`: 119 English and Bulgarian idiom equivalents.
+  - `en_phrasal_verbs.xlsx`: 150 essential English phrasal verbs.
+* **Tech Stack**: HTML5, Vanilla CSS3 (3D transformations, flexbox, CSS custom properties), JavaScript (Vanilla JS), SheetJS library.
 
 ---
 
