@@ -88,6 +88,20 @@
               </div>
             </div>
 
+            <!-- TTS Settings -->
+            <div class="form-group" id="study-tts-group">
+              <label for="study-tts-voice-select">Произношение (Глас):</label>
+              <select id="study-tts-voice-select" class="form-control">
+                <option value="off">Без произношение</option>
+                <!-- Dynamically populated -->
+              </select>
+            </div>
+
+            <div class="form-group tts-autoplay-group" style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1.5rem;">
+              <input type="checkbox" id="study-tts-autoplay" checked style="width: auto; cursor: pointer; margin: 0;">
+              <label for="study-tts-autoplay" style="margin-bottom: 0; cursor: pointer; font-weight: normal; user-select: none;">Автоматично произнасяне при показване</label>
+            </div>
+
             <button id="btn-start-study" class="btn btn-primary btn-block">
               <i class="fa-solid fa-play"></i> Започни сесията
             </button>
@@ -121,7 +135,12 @@
               <!-- Front Side -->
               <div class="card-side card-front" id="card-front-side">
                 <div class="card-lang-tag" id="card-lang-badge">EN</div>
-                <div class="card-word-display" id="card-word-text">word</div>
+                <div class="card-word-container">
+                  <div class="card-word-display" id="card-word-text">word</div>
+                  <button id="btn-speak-word" class="btn-speak" title="Прослушай думата" type="button">
+                    <i class="fa-solid fa-volume-high"></i>
+                  </button>
+                </div>
                 <div class="card-hint">
                   <i class="fa-solid fa-arrows-rotate"></i> Кликнете върху картата за превод
                 </div>
