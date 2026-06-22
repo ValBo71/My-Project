@@ -42,6 +42,10 @@ const studyFilesOptions = document.getElementById('study-files-options');
 const btnStartStudy = document.getElementById('btn-start-study');
 const btnQuitSession = document.getElementById('btn-quit-session');
 
+const studyTtsVoiceSelect = document.getElementById('study-tts-voice-select');
+const studyTtsAutoplay = document.getElementById('study-tts-autoplay');
+const btnSpeakWord = document.getElementById('btn-speak-word');
+
 const currentCardNumSpan = document.getElementById('current-card-num');
 const totalCardsNumSpan = document.getElementById('total-cards-num');
 const correctCountSpan = document.getElementById('correct-count');
@@ -111,6 +115,7 @@ const btnDangerClearDatabase = document.getElementById('btn-danger-clear-databas
 // --- Initialization ---
 document.addEventListener('DOMContentLoaded', () => {
   initTheme();
+  initTtsSettings();
   setupNavigation();
   setupEventListeners();
   
@@ -155,6 +160,11 @@ function setupNavigation() {
     tab.addEventListener('click', () => {
       const targetPanelId = tab.getAttribute('data-tab');
       
+      // Stop speech when navigating away
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+      }
+      
       // Update active nav button
       navTabs.forEach(t => t.classList.remove('active'));
       tab.classList.add('active');
@@ -172,6 +182,7 @@ function setupNavigation() {
       if (targetPanelId === 'study-tab-content' && !sessionState.isActive) {
         populateStudyLanguages();
         populateStudyFiles();
+        populateTtsOptions();
       } else if (targetPanelId === 'dictionary-tab-content') {
         populateDictLanguageFilters();
         populateDictFileFilters();
@@ -288,6 +299,7 @@ function refreshData() {
     allWords = words;
     populateStudyLanguages();
     populateStudyFiles();
+    populateTtsOptions();
     populateDictLanguageFilters();
     populateDictFileFilters();
     renderStats();
@@ -512,6 +524,7 @@ function populateStudyFiles() {
 
 studyLangSelect.addEventListener('change', () => {
   populateStudyFiles();
+  populateTtsOptions();
 });
 
 function populateDictLanguageFilters() {
@@ -864,6 +877,13 @@ function loadCard(index) {
   
   const progressPercent = (index / sessionState.words.length) * 100;
   sessionProgressBar.style.width = `${progressPercent}%`;
+
+  // Autoplay voice if checked and not set to off
+  if (studyTtsAutoplay.checked && studyTtsVoiceSelect.value !== 'off') {
+    setTimeout(() => {
+      speakCurrentWord();
+    }, 200);
+  }
 }
 
 // Flip flashcard
@@ -943,6 +963,11 @@ function processAnswer(isCorrect) {
 function showResults() {
   sessionState.isActive = false;
   
+  // Cancel active speech
+  if ('speechSynthesis' in window) {
+    window.speechSynthesis.cancel();
+  }
+
   studySessionContainer.classList.add('hidden');
   studyResultsContainer.classList.remove('hidden');
 
@@ -964,6 +989,10 @@ function showResults() {
 btnQuitSession.addEventListener('click', () => {
   if (confirm('Сигурни ли сте, че искате да прекратите тази сесия? Прогресът за вече отговорените думи ще бъде запазен.')) {
     sessionState.isActive = false;
+    // Cancel active speech
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+    }
     studySessionContainer.classList.add('hidden');
     studySetupContainer.classList.remove('hidden');
     refreshData();
@@ -1339,4 +1368,157 @@ function setupEventListeners() {
       }
     });
   }
+
+  // Speak word button click handler
+  if (btnSpeakWord) {
+    btnSpeakWord.addEventListener('click', (e) => {
+      e.stopPropagation(); // Prevent card from flipping
+      speakCurrentWord();
+    });
+  }
+}
+
+// --- Text-to-Speech (TTS) Helpers ---
+
+// Initialize user preferences for TTS
+function initTtsSettings() {
+  if (!studyTtsAutoplay) return;
+
+  const savedAutoplay = localStorage.getItem('flashcards-tts-autoplay');
+  if (savedAutoplay === 'false') {
+    studyTtsAutoplay.checked = false;
+  } else {
+    studyTtsAutoplay.checked = true; // default is true
+  }
+
+  studyTtsAutoplay.addEventListener('change', () => {
+    localStorage.setItem('flashcards-tts-autoplay', studyTtsAutoplay.checked);
+  });
+
+  // Listen to voice loading (SpeechSynthesis is asynchronous on some browsers)
+  if ('speechSynthesis' in window) {
+    window.speechSynthesis.onvoiceschanged = () => {
+      populateTtsOptions();
+    };
+  }
+}
+
+// Populate voice selections dynamically based on the active language
+function populateTtsOptions() {
+  if (!studyTtsVoiceSelect || !studyLangSelect) return;
+
+  const selectedLang = studyLangSelect.value;
+  if (!selectedLang) {
+    studyTtsVoiceSelect.innerHTML = '<option value="off">Без произношение</option>';
+    return;
+  }
+
+  studyTtsVoiceSelect.innerHTML = '';
+  const savedTtsPref = localStorage.getItem(`flashcards-tts-voice-${selectedLang}`);
+
+  if (selectedLang.toLowerCase() === 'en') {
+    // English gets US and UK accents
+    const optUS = document.createElement('option');
+    optUS.value = 'en-US';
+    optUS.textContent = 'Американски английски (US)';
+
+    const optUK = document.createElement('option');
+    optUK.value = 'en-GB';
+    optUK.textContent = 'Британски английски (UK)';
+
+    studyTtsVoiceSelect.appendChild(optUS);
+    studyTtsVoiceSelect.appendChild(optUK);
+
+    if (savedTtsPref === 'en-GB') {
+      optUK.selected = true;
+    } else {
+      optUS.selected = true; // default US
+    }
+  } else {
+    // Other languages get one native option
+    const optNative = document.createElement('option');
+    let locale = selectedLang;
+    
+    // Map code to standard speech synthesis locales
+    const lowerLang = selectedLang.toLowerCase();
+    if (lowerLang === 'de') locale = 'de-DE';
+    else if (lowerLang === 'es') locale = 'es-ES';
+    else if (lowerLang === 'fr') locale = 'fr-FR';
+    else if (lowerLang === 'ru') locale = 'ru-RU';
+    else if (lowerLang === 'it') locale = 'it-IT';
+
+    optNative.value = locale;
+    optNative.textContent = `${getLanguageName(selectedLang)} (${selectedLang.toUpperCase()}) - Оригинален`;
+    studyTtsVoiceSelect.appendChild(optNative);
+    optNative.selected = true;
+  }
+
+  // Add the "off" option at the end
+  const optOff = document.createElement('option');
+  optOff.value = 'off';
+  optOff.textContent = 'Без произношение';
+  studyTtsVoiceSelect.appendChild(optOff);
+
+  if (savedTtsPref === 'off') {
+    optOff.selected = true;
+  }
+
+  // Event listener to save voice preference
+  studyTtsVoiceSelect.addEventListener('change', () => {
+    localStorage.setItem(`flashcards-tts-voice-${selectedLang}`, studyTtsVoiceSelect.value);
+  });
+}
+
+// Pronounce the current flashcard word
+function speakCurrentWord() {
+  if (!('speechSynthesis' in window)) return;
+
+  const currentIdx = sessionState.currentIndex;
+  if (!sessionState.isActive || sessionState.words.length === 0) return;
+
+  const currentWord = sessionState.words[currentIdx];
+  const ttsSetting = studyTtsVoiceSelect.value;
+
+  if (ttsSetting === 'off') return;
+
+  // Cancel any active speech synthesis
+  window.speechSynthesis.cancel();
+
+  // Create utterance with target word
+  const utterance = new SpeechSynthesisUtterance(currentWord.word);
+  utterance.lang = ttsSetting;
+
+  // Find matching voice
+  const voices = window.speechSynthesis.getVoices();
+  
+  // Filter voices matching exact locale (e.g. en-US)
+  let matchingVoices = voices.filter(v => v.lang.replace('_', '-').toLowerCase() === ttsSetting.toLowerCase());
+  
+  if (matchingVoices.length === 0) {
+    // Prefix fallback (e.g. starts with "en-US")
+    matchingVoices = voices.filter(v => v.lang.replace('_', '-').toLowerCase().startsWith(ttsSetting.toLowerCase()));
+  }
+  
+  if (matchingVoices.length === 0) {
+    // General language code fallback (e.g. starts with "en")
+    const langPrefix = ttsSetting.split('-')[0].toLowerCase();
+    matchingVoices = voices.filter(v => v.lang.toLowerCase().startsWith(langPrefix));
+  }
+
+  if (matchingVoices.length > 0) {
+    // Prioritize natural, online, google, neural, premium, or siri voices
+    const naturalKeywords = ['natural', 'google', 'neural', 'premium', 'online', 'siri'];
+    const bestVoice = matchingVoices.find(v => {
+      const nameLower = v.name.toLowerCase();
+      return naturalKeywords.some(keyword => nameLower.includes(keyword));
+    });
+    
+    utterance.voice = bestVoice || matchingVoices[0];
+  }
+
+  // Speech settings
+  utterance.rate = 0.9; // slightly slower for better learning clarity
+  utterance.pitch = 1.0;
+
+  window.speechSynthesis.speak(utterance);
 }
