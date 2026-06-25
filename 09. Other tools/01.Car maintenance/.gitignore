@@ -1,0 +1,19 @@
+## Build folders
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+
+## Visual Studio
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+## User Uploaded Files (Web assets)
+CarMaintenance.Web/wwwroot/uploads/
+
+## OS-generated files
+Thumbs.db
+ehthumbs.db
+Desktop.ini

@@ -1,0 +1,108 @@
+@page
+@model CarMaintenance.Web.Pages.Cars.EditModel
+@{
+    ViewData["Title"] = "Редактирай автомобил";
+}
+
+<div class="page-title">
+    <h2><i class="fa-solid fa-pen"></i> Редактиране на автомобил</h2>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card card-premium">
+            <div class="card-header">
+                <i class="fa-solid fa-car-side"></i> Промяна на данни за автомобила
+            </div>
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                    <input type="hidden" asp-for="Car.Id" />
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Car.Make" class="form-label">Марка *</label>
+                            <input asp-for="Car.Make" class="form-control" required />
+                            <span asp-validation-for="Car.Make" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Car.Model" class="form-label">Модел *</label>
+                            <input asp-for="Car.Model" class="form-control" required />
+                            <span asp-validation-for="Car.Model" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Car.Engine" class="form-label">Двигател *</label>
+                            <input asp-for="Car.Engine" class="form-control" required />
+                            <span asp-validation-for="Car.Engine" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Car.Year" class="form-label">Година на производство *</label>
+                            <input asp-for="Car.Year" class="form-control" type="number" min="1900" max="2100" required />
+                            <span asp-validation-for="Car.Year" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Car.RegistrationNumber" class="form-label">Регистрационен Номер *</label>
+                            <input asp-for="Car.RegistrationNumber" class="form-control" required />
+                            <span asp-validation-for="Car.RegistrationNumber" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Car.Vin" class="form-label">VIN (Рама)</label>
+                            <input asp-for="Car.Vin" class="form-control" />
+                            <span asp-validation-for="Car.Vin" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Car.Fuel" class="form-label">Тип Гориво *</label>
+                            <select asp-for="Car.Fuel" class="form-select" asp-items="Html.GetEnumSelectList<CarMaintenance.Core.Enums.FuelType>()"></select>
+                            <span asp-validation-for="Car.Fuel" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Car.CurrentMileage" class="form-label">Текущ Пробег (км) *</label>
+                            <input asp-for="Car.CurrentMileage" class="form-control" type="number" min="0" required />
+                            <span asp-validation-for="Car.CurrentMileage" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="UploadedImage" class="form-label">Смени снимката на автомобила</label>
+                        <input asp-for="UploadedImage" type="file" class="form-control" accept="image/*" />
+                    </div>
+
+                    <div class="mb-4">
+                        <label asp-for="Car.Notes" class="form-label">Бележки / Описание</label>
+                        <textarea asp-for="Car.Notes" class="form-control" rows="3"></textarea>
+                        <span asp-validation-for="Car.Notes" class="text-danger"></span>
+                    </div>
+
+                    <div class="d-flex gap-2 justify-content-end">
+                        <a asp-page="./Index" class="btn btn-premium-outline">Отказ</a>
+                        <button type="submit" class="btn btn-premium">Запази промените</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card card-premium">
+            <div class="card-header">
+                Текуща снимка
+            </div>
+            <div class="card-body text-center">
+                <img src="@Model.Car.ImagePath" class="img-fluid border" alt="Car Image" style="max-height: 250px; object-fit: cover;" />
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

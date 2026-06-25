@@ -1,0 +1,77 @@
+@page
+@model CarMaintenance.Web.Pages.Cars.IndexModel
+@{
+    ViewData["Title"] = "Автомобили";
+}
+
+<div class="d-flex justify-content-between align-items-center page-title">
+    <h2><i class="fa-solid fa-car"></i> Управление на Автомобили</h2>
+    <a asp-page="/Cars/Create" class="btn btn-premium"><i class="fa-solid fa-plus"></i> Добави автомобил</a>
+</div>
+
+<div class="row">
+    @if (!Model.Cars.Any())
+    {
+        <div class="col-12">
+            <div class="alert alert-info">
+                <i class="fa-solid fa-info-circle"></i> Все още няма добавени автомобили. Добавете първия си автомобил, за да започнете!
+            </div>
+        </div>
+    }
+    else
+    {
+        @foreach (var car in Model.Cars)
+        {
+            var isActive = car.Id == Model.ActiveCarId;
+            <div class="col-md-6 col-lg-4">
+                <div class="card card-premium @(isActive ? "border-dark border-2" : "")">
+                    <img src="@(string.IsNullOrEmpty(car.ImagePath) ? "/images/default_car.png" : car.ImagePath)" class="car-profile-image" alt="@car.Make @car.Model" />
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h4 class="card-title m-0">@car.Make @car.Model</h4>
+                            @if (isActive)
+                            {
+                                <span class="badge bg-dark status-badge">Активен</span>
+                            }
+                        </div>
+                        <p class="text-muted mb-3" style="font-size: 0.9rem;">@car.Engine | @car.Year г.</p>
+                        
+                        <table class="table table-sm table-borderless text-muted mb-4" style="font-size: 0.9rem;">
+                            <tr>
+                                <td><i class="fa-solid fa-barcode"></i> Рег. Номер:</td>
+                                <td class="text-dark font-weight-bold">@car.RegistrationNumber</td>
+                            </tr>
+                            <tr>
+                                <td><i class="fa-solid fa-gauge-high"></i> Пробег:</td>
+                                <td class="text-dark">@car.CurrentMileage.ToString("N0") км</td>
+                            </tr>
+                            <tr>
+                                <td><i class="fa-solid fa-gas-pump"></i> Гориво:</td>
+                                <td class="text-dark">@car.Fuel.ToString()</td>
+                            </tr>
+                        </table>
+
+                        <div class="d-flex gap-2">
+                            @if (!isActive)
+                            {
+                                <form method="post" asp-page-handler="SetActive" asp-route-id="@car.Id" class="flex-grow-1">
+                                    <button type="submit" class="btn btn-premium-outline w-100 btn-sm">
+                                        <i class="fa-solid fa-check"></i> Избери
+                                    </button>
+                                </form>
+                            }
+                            <a asp-page="/Cars/Edit" asp-route-id="@car.Id" class="btn btn-light btn-sm border flex-grow-1">
+                                <i class="fa-solid fa-pen"></i> Редактирай
+                            </a>
+                            <form method="post" asp-page-handler="Delete" asp-route-id="@car.Id" onsubmit="return confirm('Сигурни ли сте, че искате да изтриете този автомобил и цялата му сервизна история?');">
+                                <button type="submit" class="btn btn-danger btn-sm rounded-0">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+</div>

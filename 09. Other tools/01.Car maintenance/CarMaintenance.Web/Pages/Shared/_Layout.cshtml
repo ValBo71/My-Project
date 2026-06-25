@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Дневник на Автомобила</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <i class="fa-solid fa-screwdriver-wrench"></i> Дневник на Колата
+            </div>
+            <ul class="sidebar-menu">
+                @{
+                    var currentPage = ViewContext.RouteData.Values["page"]?.ToString() ?? "";
+                }
+                <li class="@(currentPage == "/Index" ? "active" : "")">
+                    <a asp-page="/Index">
+                        <i class="fa-solid fa-chart-pie"></i> Табло (Dashboard)
+                    </a>
+                </li>
+                <li class="@(currentPage.StartsWith("/Cars") ? "active" : "")">
+                    <a asp-page="/Cars/Index">
+                        <i class="fa-solid fa-car"></i> Автомобили
+                    </a>
+                </li>
+                <li class="@(currentPage.StartsWith("/Services") ? "active" : "")">
+                    <a asp-page="/Services/Index">
+                        <i class="fa-solid fa-clipboard-list"></i> Сервизен дневник
+                    </a>
+                </li>
+                <li class="@(currentPage.StartsWith("/Rules") ? "active" : "")">
+                    <a asp-page="/Rules/Index">
+                        <i class="fa-solid fa-bell"></i> Напомняния
+                    </a>
+                </li>
+            </ul>
+            <div class="p-3 text-muted border-top text-center" style="font-size: 0.8rem;">
+                &copy; 2026 - Car Maintenance MVP
+            </div>
+        </aside>
+
+        <main class="main-content">
+            @RenderBody()
+        </main>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

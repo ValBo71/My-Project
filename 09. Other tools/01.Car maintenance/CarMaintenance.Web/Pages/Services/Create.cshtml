@@ -1,0 +1,114 @@
+@page
+@model CarMaintenance.Web.Pages.Services.CreateModel
+@{
+    ViewData["Title"] = "Добави сервизен запис";
+}
+
+<div class="page-title">
+    <h2><i class="fa-solid fa-plus"></i> Нов запис в сервизния дневник</h2>
+</div>
+
+<div class="row">
+    <div class="col-md-10 offset-md-1">
+        <div class="card card-premium">
+            <div class="card-header">
+                <i class="fa-solid fa-wrench"></i> Детайли за ремонта или обслужването
+            </div>
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                    <input type="hidden" asp-for="ServiceRecord.CarId" />
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="ServiceRecord.Date" class="form-label">Дата *</label>
+                            <input asp-for="ServiceRecord.Date" class="form-control" type="date" required />
+                            <span asp-validation-for="ServiceRecord.Date" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="ServiceRecord.Mileage" class="form-label">Пробег (км) *</label>
+                            <input asp-for="ServiceRecord.Mileage" class="form-control" type="number" min="0" required />
+                            <span asp-validation-for="ServiceRecord.Mileage" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="ServiceRecord.Type" class="form-label">Тип запис *</label>
+                            <select asp-for="ServiceRecord.Type" class="form-select" asp-items="Html.GetEnumSelectList<CarMaintenance.Core.Enums.RecordType>()"></select>
+                            <span asp-validation-for="ServiceRecord.Type" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="ServiceRecord.Category" class="form-label">Категория *</label>
+                            <select asp-for="ServiceRecord.Category" class="form-select" required>
+                                <option value="Масло и филтри">Масло и филтри</option>
+                                <option value="Ремъци и голямо обслужване">Ремъци и голямо обслужване</option>
+                                <option value="Спирачки">Спирачки</option>
+                                <option value="Окачване">Окачване</option>
+                                <option value="Охладителна система">Охладителна система</option>
+                                <option value="Горивна система">Горивна система</option>
+                                <option value="Електроника">Електроника</option>
+                                <option value="Гуми">Гуми</option>
+                                <option value="Документи">Документи</option>
+                                <option value="Диагностика">Диагностика</option>
+                            </select>
+                            <span asp-validation-for="ServiceRecord.Category" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="ServiceRecord.Title" class="form-label">Заглавие / Дейност *</label>
+                            <input asp-for="ServiceRecord.Title" class="form-control" placeholder="напр. Смяна на масло и маслен филтър" required />
+                            <span asp-validation-for="ServiceRecord.Title" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="ServiceRecord.ServiceName" class="form-label">Сервиз / Обект</label>
+                            <input asp-for="ServiceRecord.ServiceName" class="form-control" placeholder="напр. Автосервиз Експрес" />
+                            <span asp-validation-for="ServiceRecord.ServiceName" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="ServiceRecord.PartsCost" class="form-label">Цена за Части (€) *</label>
+                            <input asp-for="ServiceRecord.PartsCost" class="form-control" type="number" step="0.01" min="0" required />
+                            <span asp-validation-for="ServiceRecord.PartsCost" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="ServiceRecord.LaborCost" class="form-label">Цена за Труд (€) *</label>
+                            <input asp-for="ServiceRecord.LaborCost" class="form-control" type="number" step="0.01" min="0" required />
+                            <span asp-validation-for="ServiceRecord.LaborCost" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="ServiceRecord.Description" class="form-label">Описание на извършената дейност</label>
+                        <textarea asp-for="ServiceRecord.Description" class="form-control" rows="3" placeholder="Опишете какво е направено, използвани части, препоръки..."></textarea>
+                        <span asp-validation-for="ServiceRecord.Description" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="UploadedFile" class="form-label">Прикачи документ / фактура (PDF / Изображение)</label>
+                        <input asp-for="UploadedFile" type="file" class="form-control" accept="image/*,application/pdf" />
+                    </div>
+
+                    <div class="mb-4">
+                        <label asp-for="ServiceRecord.Notes" class="form-label">Лични бележки</label>
+                        <textarea asp-for="ServiceRecord.Notes" class="form-control" rows="2"></textarea>
+                        <span asp-validation-for="ServiceRecord.Notes" class="text-danger"></span>
+                    </div>
+
+                    <div class="d-flex gap-2 justify-content-end">
+                        <a asp-page="./Index" class="btn btn-premium-outline">Отказ</a>
+                        <button type="submit" class="btn btn-premium">Добави в дневника</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

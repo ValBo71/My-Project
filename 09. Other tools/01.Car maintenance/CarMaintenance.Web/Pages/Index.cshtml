@@ -1,0 +1,185 @@
+@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Начало";
+}
+
+@if (Model.Car != null)
+{
+    <!-- Header with vehicle details -->
+    <div class="row align-items-center mb-4 page-title pb-3">
+        <div class="col-md-7">
+            <h2>
+                <i class="fa-solid fa-chart-pie"></i> Табло на @Model.Car.Make @Model.Car.Model
+                <small class="text-muted" style="font-size: 1.1rem;">(@Model.Car.Engine, @Model.Car.Year г.)</small>
+            </h2>
+            <div class="text-muted">
+                <i class="fa-solid fa-barcode"></i> Рег. номер: <strong>@Model.Car.RegistrationNumber</strong> &nbsp;|&nbsp; 
+                <i class="fa-solid fa-fingerprint"></i> VIN: <strong>@Model.Car.Vin</strong>
+            </div>
+        </div>
+        <div class="col-md-5 text-md-end mt-3 mt-md-0">
+            <a asp-page="/Services/Create" class="btn btn-premium btn-sm"><i class="fa-solid fa-plus"></i> Нов сервизен запис</a>
+            <a asp-page="/Rules/Create" class="btn btn-premium-outline btn-sm"><i class="fa-solid fa-bell"></i> Ново напомняне</a>
+            <a asp-page="/Cars/Index" class="btn btn-light btn-sm border"><i class="fa-solid fa-arrows-spin"></i> Смени кола</a>
+        </div>
+    </div>
+
+    <!-- Status banner -->
+    @if (Model.OverdueRules.Any())
+    {
+        <div class="alert alert-danger rounded-0 mb-4 d-flex align-items-center gap-3">
+            <i class="fa-solid fa-triangle-exclamation fa-2x"></i>
+            <div>
+                <h5 class="alert-heading m-0 font-weight-bold">ВНИМАНИЕ! Имате просрочени обслужвания!</h5>
+                <p class="m-0">@Model.OverdueRules.Count() обслужвания изискват незабавно внимание.</p>
+            </div>
+        </div>
+    }
+    else if (Model.WarningRules.Any())
+    {
+        <div class="alert alert-warning rounded-0 mb-4 d-flex align-items-center gap-3">
+            <i class="fa-solid fa-circle-exclamation fa-2x"></i>
+            <div>
+                <h5 class="alert-heading m-0 font-weight-bold">Внимание: Наближаващи обслужвания</h5>
+                <p class="m-0">@Model.WarningRules.Count() напомняния са в жълт статус.</p>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-success rounded-0 mb-4 d-flex align-items-center gap-3">
+            <i class="fa-solid fa-circle-check fa-2x"></i>
+            <div>
+                <h5 class="alert-heading m-0 font-weight-bold">Всички обслужвания са в срок</h5>
+                <p class="m-0">Автомобилът е напълно обслужен и изправен според въведените правила.</p>
+            </div>
+        </div>
+    }
+
+    <!-- Quick stats widgets -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="widget-stat">
+                <span class="widget-stat-label"><i class="fa-solid fa-gauge-high"></i> Текущ пробег</span>
+                <span class="widget-stat-value">@Model.Car.CurrentMileage.ToString("N0") км</span>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="widget-stat">
+                <span class="widget-stat-label"><i class="fa-solid fa-calendar-days"></i> Разходи за @DateTime.Today.Year г.</span>
+                <span class="widget-stat-value">@Model.TotalSpentThisYear.ToString("N2") €</span>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="widget-stat">
+                <span class="widget-stat-label"><i class="fa-solid fa-bell-slash"></i> Активни сигнали</span>
+                <span class="widget-stat-value text-danger">@(Model.OverdueRules.Count() + Model.WarningRules.Count())</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Warnings and alerts column -->
+        <div class="col-lg-6 mb-4">
+            <div class="card card-premium h-100">
+                <div class="card-header"><i class="fa-solid fa-bell text-danger"></i> Проблеми и Напомняния</div>
+                <div class="card-body p-0">
+                    @if (!Model.OverdueRules.Any() && !Model.WarningRules.Any())
+                    {
+                        <div class="p-4 text-center text-muted">
+                            <i class="fa-solid fa-circle-check fa-3x mb-3 text-success"></i>
+                            <p class="m-0">Няма спешни или наближаващи обслужвания.</p>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="list-group list-group-flush">
+                            @foreach (var rule in Model.OverdueRules)
+                            {
+                                <div class="list-group-item d-flex justify-content-between align-items-center p-3 border-bottom">
+                                    <div>
+                                        <h6 class="m-0 font-weight-bold text-danger">@rule.Name</h6>
+                                        <small class="text-muted">Категория: @rule.Category</small>
+                                        @if (rule.NextDueMileage.HasValue)
+                                        {
+                                            <div class="text-danger font-weight-bold" style="font-size: 0.85rem;">
+                                                Просрочено с @(Model.Car.CurrentMileage - rule.NextDueMileage.Value) км
+                                            </div>
+                                        }
+                                        @if (rule.NextDueDate.HasValue)
+                                        {
+                                            <small class="text-danger d-block">
+                                                Изтекло на: @rule.NextDueDate.Value.ToString("dd.MM.yyyy г.")
+                                            </small>
+                                        }
+                                    </div>
+                                    <span class="status-badge red">Просрочено</span>
+                                </div>
+                            }
+                            @foreach (var rule in Model.WarningRules)
+                            {
+                                <div class="list-group-item d-flex justify-content-between align-items-center p-3 border-bottom">
+                                    <div>
+                                        <h6 class="m-0 font-weight-bold text-warning">@rule.Name</h6>
+                                        <small class="text-muted">Категория: @rule.Category</small>
+                                        @if (rule.NextDueMileage.HasValue)
+                                        {
+                                            <div class="text-dark" style="font-size: 0.85rem;">
+                                                Остават: @(rule.NextDueMileage.Value - Model.Car.CurrentMileage) км
+                                            </div>
+                                        }
+                                        @if (rule.NextDueDate.HasValue)
+                                        {
+                                            <small class="text-muted d-block">
+                                                Срок до: @rule.NextDueDate.Value.ToString("dd.MM.yyyy г.")
+                                            </small>
+                                        }
+                                    </div>
+                                    <span class="status-badge yellow">Наближава</span>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Services column -->
+        <div class="col-lg-6 mb-4">
+            <div class="card card-premium h-100">
+                <div class="card-header"><i class="fa-solid fa-history"></i> Последни записвания в дневника</div>
+                <div class="card-body p-0">
+                    @if (!Model.RecentServices.Any())
+                    {
+                        <div class="p-4 text-center text-muted">
+                            <i class="fa-solid fa-clipboard-question fa-3x mb-3 text-muted"></i>
+                            <p class="m-0">Няма въведени сервизни записвания.</p>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="list-group list-group-flush">
+                            @foreach (var service in Model.RecentServices)
+                            {
+                                <div class="list-group-item p-3 border-bottom">
+                                    <div class="d-flex justify-content-between">
+                                        <h6 class="m-0 font-weight-bold text-dark">@service.Title</h6>
+                                        <span class="font-weight-bold text-dark">@service.TotalCost.ToString("F2") €</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between text-muted mt-1" style="font-size: 0.85rem;">
+                                        <span>@service.Date.ToString("dd.MM.yyyy г.") | @service.Mileage.ToString("N0") км</span>
+                                        <span>@service.Category</span>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                        <div class="card-footer bg-white text-center p-3">
+                            <a asp-page="/Services/Index" class="btn btn-premium-outline btn-sm w-100">Преглед на пълната история</a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+}

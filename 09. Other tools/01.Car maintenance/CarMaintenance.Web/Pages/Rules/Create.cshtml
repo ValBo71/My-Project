@@ -1,0 +1,98 @@
+@page
+@model CarMaintenance.Web.Pages.Rules.CreateModel
+@{
+    ViewData["Title"] = "Добави напомняне";
+}
+
+<div class="page-title">
+    <h2><i class="fa-solid fa-plus"></i> Ново напомняне за поддръжка</h2>
+</div>
+
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <div class="card card-premium">
+            <div class="card-header">
+                <i class="fa-solid fa-bell"></i> Параметри на напомнянето
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                    <input type="hidden" asp-for="MaintenanceRule.CarId" />
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="MaintenanceRule.Name" class="form-label">Име на обслужването *</label>
+                            <input asp-for="MaintenanceRule.Name" class="form-control" placeholder="напр. Смяна на масло" required />
+                            <span asp-validation-for="MaintenanceRule.Name" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="MaintenanceRule.Category" class="form-label">Категория *</label>
+                            <select asp-for="MaintenanceRule.Category" class="form-select" required>
+                                <option value="Масло и филтри">Масло и филтри</option>
+                                <option value="Ремъци и голямо обслужване">Ремъци и голямо обслужване</option>
+                                <option value="Спирачки">Спирачки</option>
+                                <option value="Окачване">Окачване</option>
+                                <option value="Охладителна система">Охладителна система</option>
+                                <option value="Горивна система">Горивна система</option>
+                                <option value="Електроника">Електроника</option>
+                                <option value="Гуми">Гуми</option>
+                                <option value="Документи">Документи</option>
+                                <option value="Диагностика">Диагностика</option>
+                            </select>
+                            <span asp-validation-for="MaintenanceRule.Category" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="MaintenanceRule.IntervalKm" class="form-label">Интервал (км)</label>
+                            <input asp-for="MaintenanceRule.IntervalKm" class="form-control" type="number" min="0" placeholder="напр. 10000" />
+                            <span asp-validation-for="MaintenanceRule.IntervalKm" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="MaintenanceRule.IntervalMonths" class="form-label">Интервал (месеци)</label>
+                            <input asp-for="MaintenanceRule.IntervalMonths" class="form-control" type="number" min="0" placeholder="напр. 12" />
+                            <span asp-validation-for="MaintenanceRule.IntervalMonths" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="MaintenanceRule.LastDoneMileage" class="form-label">Последно направено на пробег (км)</label>
+                            <input asp-for="MaintenanceRule.LastDoneMileage" class="form-control" type="number" min="0" placeholder="напр. 180000" />
+                            <span asp-validation-for="MaintenanceRule.LastDoneMileage" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="MaintenanceRule.LastDoneDate" class="form-label">Последна дата на извършване</label>
+                            <input asp-for="MaintenanceRule.LastDoneDate" class="form-control" type="date" />
+                            <span asp-validation-for="MaintenanceRule.LastDoneDate" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <h5 class="mt-4 mb-3 border-bottom pb-2 text-muted" style="font-size: 0.95rem;">Параметри за предупреждение (жълт статус)</h5>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="MaintenanceRule.WarningKmBefore" class="form-label">Предупреди ни (км) по-рано</label>
+                            <input asp-for="MaintenanceRule.WarningKmBefore" class="form-control" type="number" min="0" required />
+                            <span asp-validation-for="MaintenanceRule.WarningKmBefore" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="MaintenanceRule.WarningDaysBefore" class="form-label">Предупреди ни (дни) по-рано</label>
+                            <input asp-for="MaintenanceRule.WarningDaysBefore" class="form-control" type="number" min="0" required />
+                            <span asp-validation-for="MaintenanceRule.WarningDaysBefore" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-2 justify-content-end mt-4">
+                        <a asp-page="./Index" class="btn btn-premium-outline">Отказ</a>
+                        <button type="submit" class="btn btn-premium">Създай напомняне</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
