@@ -1,0 +1,287 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+:root {
+    --bg-primary: #ffffff;
+    --bg-secondary: #f8fafc;
+    --text-primary: #0f172a;
+    --text-secondary: #64748b;
+    --border-color: #e2e8f0;
+    --accent-color: #0f172a;
+    
+    /* Vibrant Status Colors */
+    --status-green: #10b981;
+    --status-yellow: #f59e0b;
+    --status-red: #ef4444;
+    --status-gray: #64748b;
+    
+    --sidebar-width: 260px;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    margin: 0;
+    padding: 0;
+    font-size: 0.95rem;
+}
+
+/* Ensure sharp corners across all standard interactive elements as per UI Style Guide */
+button, 
+input, 
+select, 
+textarea, 
+.card, 
+.panel,
+.badge,
+.btn,
+.form-control,
+.form-select,
+.alert,
+.modal-content,
+.list-group-item,
+.nav-link,
+.dropdown-menu {
+    border-radius: 0px !important;
+}
+
+/* Layout */
+.app-container {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* Sidebar Navigation */
+.sidebar {
+    width: var(--sidebar-width);
+    background-color: #ffffff;
+    border-right: 1px solid var(--border-color);
+    position: fixed;
+    height: 100vh;
+    left: 0;
+    top: 0;
+    display: flex;
+    flex-direction: column;
+    z-index: 100;
+}
+
+.sidebar-header {
+    padding: 24px;
+    border-bottom: 1px solid var(--border-color);
+    font-weight: 700;
+    font-size: 1.2rem;
+    letter-spacing: -0.5px;
+    color: var(--accent-color);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.sidebar-menu {
+    list-style: none;
+    padding: 16px 0;
+    margin: 0;
+    flex-grow: 1;
+}
+
+.sidebar-menu li a {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 24px;
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-weight: 500;
+    border-left: 3px solid transparent;
+    transition: all 0.2s ease;
+}
+
+.sidebar-menu li a:hover {
+    color: var(--text-primary);
+    background-color: #f1f5f9;
+}
+
+.sidebar-menu li.active a {
+    color: var(--text-primary);
+    background-color: #f1f5f9;
+    border-left-color: var(--accent-color);
+    font-weight: 600;
+}
+
+/* Main Content Area */
+.main-content {
+    margin-left: var(--sidebar-width);
+    flex-grow: 1;
+    padding: 40px;
+    background-color: #ffffff;
+}
+
+/* Header & Typography */
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    color: var(--text-primary);
+}
+
+.page-title {
+    margin-bottom: 24px;
+    border-bottom: 2px solid var(--text-primary);
+    padding-bottom: 10px;
+}
+
+/* Premium flat Cards */
+.card-premium {
+    background-color: #ffffff;
+    border: 1px solid var(--border-color);
+    margin-bottom: 24px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card-premium:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.card-premium .card-header {
+    background-color: #ffffff;
+    border-bottom: 1px solid var(--border-color);
+    font-weight: 600;
+    padding: 16px 20px;
+}
+
+.card-premium .card-body {
+    padding: 20px;
+}
+
+/* Form Styling - Premium flat fields */
+.form-control, .form-select {
+    border: 1px solid #cbd5e1;
+    padding: 10px 14px;
+    font-size: 0.95rem;
+    background-color: #ffffff;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--accent-color);
+    box-shadow: none;
+    background-color: #ffffff;
+}
+
+/* Buttons - Premium Flat */
+.btn-premium {
+    background-color: var(--accent-color);
+    color: #ffffff;
+    border: 1px solid var(--accent-color);
+    font-weight: 600;
+    padding: 10px 20px;
+    letter-spacing: 0.3px;
+    transition: all 0.2s ease;
+}
+
+.btn-premium:hover {
+    background-color: #334155;
+    border-color: #334155;
+    color: #ffffff;
+}
+
+.btn-premium-outline {
+    background-color: transparent;
+    color: var(--accent-color);
+    border: 1px solid var(--accent-color);
+    font-weight: 600;
+    padding: 10px 20px;
+    transition: all 0.2s ease;
+}
+
+.btn-premium-outline:hover {
+    background-color: var(--accent-color);
+    color: #ffffff;
+}
+
+/* Table - Flat and clean */
+.table-premium {
+    border: 1px solid var(--border-color);
+}
+
+.table-premium th {
+    background-color: #f8fafc;
+    color: var(--text-primary);
+    font-weight: 600;
+    border-bottom: 2px solid var(--border-color);
+    padding: 12px 16px;
+}
+
+.table-premium td {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border-color);
+    vertical-align: middle;
+}
+
+/* Badges for Statuses */
+.status-badge {
+    display: inline-block;
+    padding: 6px 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #ffffff;
+}
+
+.status-badge.green {
+    background-color: var(--status-green);
+}
+
+.status-badge.yellow {
+    background-color: var(--status-yellow);
+}
+
+.status-badge.red {
+    background-color: var(--status-red);
+}
+
+.status-badge.gray {
+    background-color: var(--status-gray);
+}
+
+/* Highlight boxes */
+.info-box {
+    padding: 16px;
+    border-left: 4px solid var(--accent-color);
+    background-color: var(--bg-secondary);
+    margin-bottom: 20px;
+}
+
+.info-box-title {
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+/* Dashboard Widgets */
+.widget-stat {
+    border: 1px solid var(--border-color);
+    padding: 24px;
+    background-color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.widget-stat-label {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+    text-transform: uppercase;
+}
+
+.widget-stat-value {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.car-profile-image {
+    width: 100%;
+    max-height: 250px;
+    object-fit: cover;
+    border: 1px solid var(--border-color);
+}

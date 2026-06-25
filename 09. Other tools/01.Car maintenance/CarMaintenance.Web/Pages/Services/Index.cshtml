@@ -1,0 +1,149 @@
+@page
+@model CarMaintenance.Web.Pages.Services.IndexModel
+@{
+    ViewData["Title"] = "Сервизен Дневник";
+}
+
+<div class="d-flex justify-content-between align-items-center page-title">
+    <h2><i class="fa-solid fa-clipboard-list"></i> Сервизен дневник за @Model.Car.Make @Model.Car.Model</h2>
+    <a asp-page="/Services/Create" class="btn btn-premium"><i class="fa-solid fa-plus"></i> Добави запис</a>
+</div>
+
+<!-- Stats widgets -->
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="widget-stat">
+            <span class="widget-stat-label"><i class="fa-solid fa-calculator"></i> Общ разход</span>
+            <span class="widget-stat-value">@Model.TotalSpent.ToString("N2") €</span>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="widget-stat">
+            <span class="widget-stat-label"><i class="fa-solid fa-gears"></i> Стойност части</span>
+            <span class="widget-stat-value">@Model.PartsSpent.ToString("N2") €</span>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="widget-stat">
+            <span class="widget-stat-label"><i class="fa-solid fa-user-gear"></i> Стойност труд</span>
+            <span class="widget-stat-value">@Model.LaborSpent.ToString("N2") €</span>
+        </div>
+    </div>
+</div>
+
+<!-- Filter Bar -->
+<div class="card card-premium mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-3 align-items-end">
+            <div class="col-md-4">
+                <label class="form-label font-weight-bold" style="font-size: 0.85rem;">Търсене по ключова дума</label>
+                <input asp-for="SearchQuery" class="form-control form-control-sm" placeholder="напр. масло, предни накладки..." />
+            </div>
+            <div class="col-md-3">
+                <label class="form-label font-weight-bold" style="font-size: 0.85rem;">Тип запис</label>
+                <select asp-for="SelectedType" class="form-select form-select-sm" asp-items="Html.GetEnumSelectList<CarMaintenance.Core.Enums.RecordType>()">
+                    <option value="">Всички</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label font-weight-bold" style="font-size: 0.85rem;">Категория</label>
+                <select asp-for="SelectedCategory" class="form-select form-select-sm">
+                    <option value="">Всички</option>
+                    <option value="Масло и филтри">Масло и филтри</option>
+                    <option value="Ремъци и голямо обслужване">Ремъци и голямо обслужване</option>
+                    <option value="Спирачки">Спирачки</option>
+                    <option value="Окачване">Окачване</option>
+                    <option value="Охладителна система">Охладителна система</option>
+                    <option value="Горивна система">Горивна система</option>
+                    <option value="Електроника">Електроника</option>
+                    <option value="Гуми">Гуми</option>
+                    <option value="Документи">Документи</option>
+                    <option value="Диагностика">Диагностика</option>
+                </select>
+            </div>
+            <div class="col-md-2 d-flex gap-2">
+                <button type="submit" class="btn btn-premium btn-sm w-100"><i class="fa-solid fa-filter"></i></button>
+                <a asp-page="./Index" class="btn btn-light btn-sm border w-100"><i class="fa-solid fa-rotate-left"></i></a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- History Log -->
+@if (!Model.ServiceRecords.Any())
+{
+    <div class="alert alert-info">
+        <i class="fa-solid fa-info-circle"></i> Няма намерени сервизни записи за избраните критерии.
+    </div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-hover table-premium bg-white">
+            <thead>
+                <tr>
+                    <th>Дата / Пробег</th>
+                    <th>Тип & Категория</th>
+                    <th>Заглавие / Сервиз</th>
+                    <th class="text-end">Части</th>
+                    <th class="text-end">Труд</th>
+                    <th class="text-end font-weight-bold">Общо</th>
+                    <th>Файлове</th>
+                    <th class="text-center">Действия</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var record in Model.ServiceRecords)
+                {
+                    <tr>
+                        <td>
+                            <div class="font-weight-bold text-dark">@record.Date.ToString("dd.MM.yyyy г.")</div>
+                            <small class="text-muted"><i class="fa-solid fa-gauge-high"></i> @record.Mileage.ToString("N0") км</small>
+                        </td>
+                        <td>
+                            <div>
+                                <span class="badge bg-light text-dark border">@record.Type.ToString()</span>
+                            </div>
+                            <small class="text-muted">@record.Category</small>
+                        </td>
+                        <td>
+                            <div class="font-weight-bold text-dark">@record.Title</div>
+                            <small class="text-muted"><i class="fa-solid fa-warehouse"></i> @(string.IsNullOrEmpty(record.ServiceName) ? "Не е посочен сервиз" : record.ServiceName)</small>
+                            @if (!string.IsNullOrEmpty(record.Description))
+                            {
+                                <div class="text-muted mt-1" style="font-size: 0.85rem; max-width: 350px;">
+                                    @record.Description
+                                </div>
+                            }
+                        </td>
+                        <td class="text-end">@record.PartsCost.ToString("F2") €</td>
+                        <td class="text-end">@record.LaborCost.ToString("F2") €</td>
+                        <td class="text-end font-weight-bold text-dark">@record.TotalCost.ToString("F2") €</td>
+                        <td>
+                            @if (record.AttachedDocuments.Any())
+                            {
+                                @foreach (var doc in record.AttachedDocuments)
+                                {
+                                    <a href="@doc.FilePath" target="_blank" class="btn btn-sm btn-link text-decoration-none p-0 text-dark" title="@doc.Name">
+                                        <i class="fa-solid fa-file-pdf fa-lg text-danger"></i>
+                                    </a>
+                                }
+                            }
+                            else
+                            {
+                                <span class="text-muted">-</span>
+                            }
+                        </td>
+                        <td class="text-center">
+                            <form method="post" asp-page-handler="Delete" asp-route-id="@record.Id" onsubmit="return confirm('Наистина ли искате да изтриете този запис?');">
+                                <button type="submit" class="btn btn-danger btn-sm rounded-0">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
