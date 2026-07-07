@@ -38,6 +38,10 @@
         <i class="fa-solid fa-brain"></i>
         <span>Учене</span>
       </button>
+      <button id="nav-btn-exam" class="nav-tab" data-tab="exam-tab-content">
+        <i class="fa-solid fa-list-check"></i>
+        <span>Изпит</span>
+      </button>
       <button id="nav-btn-dictionary" class="nav-tab" data-tab="dictionary-tab-content">
         <i class="fa-solid fa-book-open"></i>
         <span>Речник</span>
@@ -201,6 +205,170 @@
                 <i class="fa-solid fa-rotate-right"></i> Още един сет
               </button>
               <button id="btn-go-to-dictionary" class="btn btn-secondary">
+                <i class="fa-solid fa-book-open"></i> Виж речника
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB: EXAM MODE -->
+      <section id="exam-tab-content" class="tab-panel">
+        <div class="exam-setup" id="exam-setup-container">
+          <div class="card-panel glass-panel">
+            <h2 class="section-title"><i class="fa-solid fa-file-signature"></i> Настройки на изпита</h2>
+            <p class="section-subtitle">Проверете знанията си чрез писмен изпит върху речника.</p>
+            
+            <div class="form-group">
+              <label for="exam-lang-select">Език за изпитване:</label>
+              <select id="exam-lang-select" class="form-control">
+                <!-- Will be dynamically populated -->
+              </select>
+            </div>
+
+            <div class="form-group" id="exam-files-container">
+              <label for="exam-files-dropdown-toggle">Източници на думи:</label>
+              <div class="multiselect-dropdown" id="exam-files-dropdown">
+                <button type="button" id="exam-files-dropdown-toggle" class="multiselect-toggle" aria-haspopup="true" aria-expanded="false">
+                  <span id="exam-files-selected-text">Всички</span>
+                  <i class="fa-solid fa-chevron-down"></i>
+                </button>
+                <div id="exam-files-options" class="multiselect-options">
+                  <!-- Will be dynamically populated with checkboxes -->
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="exam-size-select">Брой думи:</label>
+              <select id="exam-size-select" class="form-control">
+                <option value="10">10 думи</option>
+                <option value="20" selected>20 думи</option>
+                <option value="50">50 думи</option>
+                <option value="all">Всички думи от избраните източници</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="exam-direction-select">Посока на изпитване:</label>
+              <select id="exam-direction-select" class="form-control">
+                <option value="mixed">Случайна посока (и в двете посоки)</option>
+                <option value="foreign-to-bg">Чужд език ➔ Български</option>
+                <option value="bg-to-foreign">Български ➔ Чужд език</option>
+              </select>
+            </div>
+
+            <button id="btn-start-exam" class="btn btn-primary btn-block">
+              <i class="fa-solid fa-play"></i> Започни изпита
+            </button>
+          </div>
+        </div>
+
+        <div class="exam-session hidden" id="exam-session-container">
+          <!-- Session Header / Progress -->
+          <div class="session-status-row">
+            <button id="btn-quit-exam" class="btn btn-secondary btn-sm" title="Отказ от изпита">
+              <i class="fa-solid fa-arrow-left"></i> Назад
+            </button>
+            <div class="session-progress-text">
+              Въпрос <span id="current-exam-num">0</span> от <span id="total-exam-num">20</span>
+            </div>
+            <div class="session-score">
+              <i class="fa-solid fa-circle-check text-success"></i> <span id="exam-correct-count">0</span>
+              &nbsp;&nbsp;
+              <i class="fa-solid fa-circle-xmark text-danger"></i> <span id="exam-incorrect-count">0</span>
+            </div>
+          </div>
+
+          <!-- Progress Bar -->
+          <div class="progress-bar-container">
+            <div id="exam-progress-bar" class="progress-bar" style="width: 0%"></div>
+          </div>
+
+          <!-- Exam Card Panel -->
+          <div class="card-panel glass-panel text-center" style="margin-top: 1rem;">
+            <div id="exam-direction-badge" class="card-lang-tag" style="display: inline-block; margin-bottom: 1.5rem;">Преведете на български</div>
+            
+            <div class="card-word-container" style="min-height: 120px;">
+              <div class="card-word-display" id="exam-prompt-text" style="font-size: 2.2rem;">word</div>
+              <button id="btn-speak-exam-word" class="btn-speak" title="Прослушай думата" type="button" style="margin-top: 0.5rem;">
+                <i class="fa-solid fa-volume-high"></i>
+              </button>
+            </div>
+
+            <!-- Answer Submission Form -->
+            <form id="form-exam-answer" style="width: 100%; margin-top: 1.5rem;" autocomplete="off">
+              <div class="form-group" style="margin-bottom: 1rem;">
+                <input type="text" id="exam-answer-input" class="form-control text-center" placeholder="Въведете вашия отговор тук..." autofocus required autocomplete="off" name="exam_ans">
+              </div>
+              <button type="submit" id="btn-submit-exam-answer" class="btn btn-primary btn-block">
+                Провери отговора
+              </button>
+            </form>
+
+            <!-- Feedback Area -->
+            <div id="exam-feedback-container" class="hidden" style="margin-top: 1.5rem; padding: 1rem; text-align: center;">
+              <div id="exam-feedback-title" style="font-weight: 700; font-size: 1.2rem; margin-bottom: 0.5rem;">Правилно!</div>
+              <div id="exam-feedback-detail" style="font-size: 0.95rem; color: var(--text-muted);"></div>
+              <button id="btn-next-exam-question" class="btn btn-primary btn-block" style="margin-top: 1rem;">
+                Напред <i class="fa-solid fa-arrow-right"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Exam finished screen -->
+        <div class="exam-results hidden" id="exam-results-container">
+          <div class="card-panel glass-panel text-center">
+            <div class="result-icon-container">
+              <i class="fa-solid fa-graduation-cap result-success-icon" style="color: var(--primary);"></i>
+            </div>
+            <h2 class="section-title" style="justify-content: center;">Изпитът завърши!</h2>
+            <p class="result-summary-text" id="exam-result-summary-text">
+              Поздравления! Вие завършихте изпита.
+            </p>
+            
+            <div class="score-display-box">
+              <div class="score-circle" id="exam-score-circle">
+                <span id="exam-result-percentage">100%</span>
+                <span class="score-label">Успех</span>
+              </div>
+              <div class="score-details-list">
+                <div class="score-detail-item">
+                  <span>Верни отговори:</span>
+                  <strong class="text-success" id="exam-result-correct-count">0</strong>
+                </div>
+                <div class="score-detail-item">
+                  <span>Грешни отговори:</span>
+                  <strong class="text-danger" id="exam-result-incorrect-count">0</strong>
+                </div>
+              </div>
+            </div>
+
+            <!-- Exam Errors Detailed list -->
+            <div id="exam-errors-panel" class="hidden" style="text-align: left; margin-bottom: 2rem;">
+              <h4 style="margin-bottom: 1rem; border-bottom: 1px solid var(--panel-border); padding-bottom: 0.5rem;"><i class="fa-solid fa-triangle-exclamation text-danger"></i> Преглед на грешките:</h4>
+              <div class="table-scroll-container" style="max-height: 250px; overflow-y: auto;">
+                <table class="dict-table" style="font-size: 0.9rem;">
+                  <thead>
+                    <tr>
+                      <th>Дума</th>
+                      <th>Вашият отговор</th>
+                      <th>Правилен отговор</th>
+                    </tr>
+                  </thead>
+                  <tbody id="exam-errors-tbody">
+                    <!-- Dynamic -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="results-actions">
+              <button id="btn-restart-exam" class="btn btn-primary">
+                <i class="fa-solid fa-rotate-right"></i> Нов изпит
+              </button>
+              <button id="btn-exam-go-to-dictionary" class="btn btn-secondary">
                 <i class="fa-solid fa-book-open"></i> Виж речника
               </button>
             </div>

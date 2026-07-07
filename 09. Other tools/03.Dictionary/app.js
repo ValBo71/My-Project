@@ -24,6 +24,16 @@ let sessionState = {
   isFlipped: false
 };
 
+// Exam State
+let examState = {
+  isActive: false,
+  questions: [],
+  currentIndex: 0,
+  correctCount: 0,
+  incorrectCount: 0,
+  errors: []
+};
+
 // --- DOM Elements ---
 const themeToggleBtn = document.getElementById('theme-toggle-btn');
 const navTabs = document.querySelectorAll('.nav-tab');
@@ -112,6 +122,47 @@ const jsonFileSelector = document.getElementById('json-file-selector');
 const btnBackupExportExcel = document.getElementById('btn-backup-export-excel');
 const btnDangerClearDatabase = document.getElementById('btn-danger-clear-database');
 
+// Exam Panel Elements
+const examLangSelect = document.getElementById('exam-lang-select');
+const examFilesDropdown = document.getElementById('exam-files-dropdown');
+const examFilesDropdownToggle = document.getElementById('exam-files-dropdown-toggle');
+const examFilesSelectedText = document.getElementById('exam-files-selected-text');
+const examFilesOptions = document.getElementById('exam-files-options');
+const examSizeSelect = document.getElementById('exam-size-select');
+const examDirectionSelect = document.getElementById('exam-direction-select');
+const btnStartExam = document.getElementById('btn-start-exam');
+
+const examSessionContainer = document.getElementById('exam-session-container');
+const examSetupContainer = document.getElementById('exam-setup-container');
+const btnQuitExam = document.getElementById('btn-quit-exam');
+const currentExamNum = document.getElementById('current-exam-num');
+const totalExamNum = document.getElementById('total-exam-num');
+const examCorrectCount = document.getElementById('exam-correct-count');
+const examIncorrectCount = document.getElementById('exam-incorrect-count');
+const examProgressBar = document.getElementById('exam-progress-bar');
+const examDirectionBadge = document.getElementById('exam-direction-badge');
+const examPromptText = document.getElementById('exam-prompt-text');
+const btnSpeakExamWord = document.getElementById('btn-speak-exam-word');
+
+const formExamAnswer = document.getElementById('form-exam-answer');
+const examAnswerInput = document.getElementById('exam-answer-input');
+const btnSubmitExamAnswer = document.getElementById('btn-submit-exam-answer');
+
+const examFeedbackContainer = document.getElementById('exam-feedback-container');
+const examFeedbackTitle = document.getElementById('exam-feedback-title');
+const examFeedbackDetail = document.getElementById('exam-feedback-detail');
+const btnNextExamQuestion = document.getElementById('btn-next-exam-question');
+
+const examResultsContainer = document.getElementById('exam-results-container');
+const examResultSummaryText = document.getElementById('exam-result-summary-text');
+const examResultPercentage = document.getElementById('exam-result-percentage');
+const examResultCorrectCount = document.getElementById('exam-result-correct-count');
+const examResultIncorrectCount = document.getElementById('exam-result-incorrect-count');
+const btnRestartExam = document.getElementById('btn-restart-exam');
+const btnExamGoToDictionary = document.getElementById('btn-exam-go-to-dictionary');
+const examErrorsPanel = document.getElementById('exam-errors-panel');
+const examErrorsTbody = document.getElementById('exam-errors-tbody');
+
 // --- Initialization ---
 document.addEventListener('DOMContentLoaded', () => {
   initTheme();
@@ -178,11 +229,14 @@ function setupNavigation() {
         }
       });
 
-      // Special action: if entering Study or Dictionary tab, refresh display
+      // Special action: if entering Study, Exam or Dictionary tab, refresh display
       if (targetPanelId === 'study-tab-content' && !sessionState.isActive) {
         populateStudyLanguages();
         populateStudyFiles();
         populateTtsOptions();
+      } else if (targetPanelId === 'exam-tab-content' && !examState.isActive) {
+        populateExamLanguages();
+        populateExamFiles();
       } else if (targetPanelId === 'dictionary-tab-content') {
         populateDictLanguageFilters();
         populateDictFileFilters();
@@ -300,6 +354,8 @@ function refreshData() {
     populateStudyLanguages();
     populateStudyFiles();
     populateTtsOptions();
+    populateExamLanguages();
+    populateExamFiles();
     populateDictLanguageFilters();
     populateDictFileFilters();
     renderStats();
@@ -526,6 +582,108 @@ studyLangSelect.addEventListener('change', () => {
   populateStudyFiles();
   populateTtsOptions();
 });
+
+function populateExamLanguages() {
+  if (!examLangSelect) return;
+  const activeLang = examLangSelect.value;
+  const langs = [...new Set(allWords.map(w => w.language))];
+  
+  examLangSelect.innerHTML = '';
+  
+  if (langs.length === 0) {
+    examLangSelect.innerHTML = '<option value="">(Няма добавени езици)</option>';
+    return;
+  }
+
+  langs.sort().forEach(lang => {
+    const opt = document.createElement('option');
+    opt.value = lang;
+    opt.textContent = `${getLanguageName(lang)} (${lang.toUpperCase()})`;
+    if (lang === activeLang) opt.selected = true;
+    examLangSelect.appendChild(opt);
+  });
+}
+
+function populateExamFiles() {
+  if (!examLangSelect || !examFilesOptions || !examFilesSelectedText) return;
+  const selectedLang = examLangSelect.value;
+  
+  if (!selectedLang) {
+    examFilesOptions.innerHTML = '<div class="text-muted p-3">Първо изберете език.</div>';
+    examFilesSelectedText.textContent = 'Няма източници';
+    return;
+  }
+
+  const wordsForLang = allWords.filter(w => w.language === selectedLang);
+  const uniqueFiles = [...new Set(wordsForLang.map(w => w.sourceFile || 'Ръчно добавени'))].sort();
+
+  examFilesOptions.innerHTML = '';
+  
+  if (uniqueFiles.length === 0) {
+    examFilesOptions.innerHTML = '<div class="text-muted p-3">Няма открити източници.</div>';
+    examFilesSelectedText.textContent = 'Няма източници';
+    return;
+  }
+
+  // Create "Всички" (All) option
+  const allOption = document.createElement('label');
+  allOption.className = 'multiselect-option';
+  allOption.innerHTML = `
+    <input type="checkbox" id="cb-all-exam-files" checked>
+    <span><strong>Всички</strong></span>
+  `;
+  examFilesOptions.appendChild(allOption);
+
+  // Create individual file options
+  uniqueFiles.forEach(file => {
+    const option = document.createElement('label');
+    option.className = 'multiselect-option';
+    option.innerHTML = `
+      <input type="checkbox" name="exam-file-cb" value="${escapeHTML(file)}" checked>
+      <span>${escapeHTML(file)}</span>
+    `;
+    examFilesOptions.appendChild(option);
+  });
+
+  // Attach checkbox logic
+  const cbAll = document.getElementById('cb-all-exam-files');
+  const cbs = examFilesOptions.querySelectorAll('input[name="exam-file-cb"]');
+
+  cbAll.addEventListener('change', () => {
+    cbs.forEach(cb => cb.checked = cbAll.checked);
+    updateSelectedText();
+  });
+
+  cbs.forEach(cb => {
+    cb.addEventListener('change', () => {
+      const allChecked = Array.from(cbs).every(c => c.checked);
+      cbAll.checked = allChecked;
+      updateSelectedText();
+    });
+  });
+
+  function updateSelectedText() {
+    const checkedBoxes = Array.from(cbs).filter(c => c.checked);
+    if (checkedBoxes.length === 0) {
+      examFilesSelectedText.textContent = 'Няма избрани файлове';
+    } else if (checkedBoxes.length === cbs.length) {
+      examFilesSelectedText.textContent = 'Всички';
+    } else if (checkedBoxes.length === 1) {
+      examFilesSelectedText.textContent = checkedBoxes[0].value;
+    } else {
+      examFilesSelectedText.textContent = `Избрани: ${checkedBoxes.length} файла`;
+    }
+  }
+
+  // Initial call
+  updateSelectedText();
+}
+
+if (examLangSelect) {
+  examLangSelect.addEventListener('change', () => {
+    populateExamFiles();
+  });
+}
 
 function populateDictLanguageFilters() {
   const activeFilter = dictFilterLang.value;
@@ -1369,6 +1527,23 @@ function setupEventListeners() {
     });
   }
 
+  // Toggle exam files multiselect dropdown
+  if (examFilesDropdownToggle && examFilesDropdown) {
+    examFilesDropdownToggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      examFilesDropdown.classList.toggle('active');
+      const expanded = examFilesDropdown.classList.contains('active');
+      examFilesDropdownToggle.setAttribute('aria-expanded', expanded);
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!examFilesDropdown.contains(e.target)) {
+        examFilesDropdown.classList.remove('active');
+        examFilesDropdownToggle.setAttribute('aria-expanded', 'false');
+      }
+    });
+  }
+
   // Speak word button click handler
   if (btnSpeakWord) {
     btnSpeakWord.addEventListener('click', (e) => {
@@ -1521,4 +1696,359 @@ function speakCurrentWord() {
   utterance.pitch = 1.0;
 
   window.speechSynthesis.speak(utterance);
+}
+
+// --- Exam Session Logic ---
+
+if (btnStartExam) {
+  btnStartExam.addEventListener('click', () => {
+    const selectedLang = examLangSelect.value;
+    if (!selectedLang) {
+      alert('Първо добавете думи в речника!');
+      return;
+    }
+
+    // Get selected files from dropdown checklist
+    const checkedBoxes = examFilesOptions.querySelectorAll('input[name="exam-file-cb"]:checked');
+    if (checkedBoxes.length === 0) {
+      alert('Моля, изберете поне един файл/източник за изпита!');
+      return;
+    }
+
+    const selectedFiles = Array.from(checkedBoxes).map(cb => cb.value);
+    const sizeSetting = examSizeSelect.value;
+    const directionSetting = examDirectionSelect.value;
+
+    // Filter by language AND selected source files
+    const wordsForExam = allWords.filter(w => {
+      const wordFile = w.sourceFile || 'Ръчно добавени';
+      return w.language === selectedLang && selectedFiles.includes(wordFile);
+    });
+
+    if (wordsForExam.length === 0) {
+      alert(`Няма намерени думи за избраните източници. Добавете думи преди да започнете!`);
+      return;
+    }
+
+    // Select words of sizeSetting
+    let chosenWords = shuffleArray([...wordsForExam]);
+    if (sizeSetting !== 'all') {
+      const targetSize = parseInt(sizeSetting);
+      if (chosenWords.length > targetSize) {
+        chosenWords = chosenWords.slice(0, targetSize);
+      }
+    }
+
+    // Construct questions
+    const questions = chosenWords.map(w => {
+      // Determine direction
+      let dir = directionSetting;
+      if (directionSetting === 'mixed') {
+        dir = Math.random() < 0.5 ? 'foreign-to-bg' : 'bg-to-foreign';
+      }
+
+      let prompt = '';
+      let correctAnswer = '';
+      
+      if (dir === 'foreign-to-bg') {
+        prompt = w.word;
+        correctAnswer = w.translation;
+      } else {
+        prompt = w.translation;
+        correctAnswer = w.word;
+      }
+
+      return {
+        wordObj: w,
+        direction: dir,
+        prompt: prompt,
+        correctAnswer: correctAnswer
+      };
+    });
+
+    // Setup Exam State
+    examState = {
+      isActive: true,
+      questions: questions,
+      currentIndex: 0,
+      correctCount: 0,
+      incorrectCount: 0,
+      errors: []
+    };
+
+    // UI Setup
+    examSetupContainer.classList.add('hidden');
+    examResultsContainer.classList.add('hidden');
+    examSessionContainer.classList.remove('hidden');
+    
+    loadExamQuestion(0);
+  });
+}
+
+function loadExamQuestion(index) {
+  const currentQuestion = examState.questions[index];
+  examState.currentIndex = index;
+
+  // Reset elements
+  examAnswerInput.value = '';
+  examAnswerInput.disabled = false;
+  btnSubmitExamAnswer.disabled = false;
+  examFeedbackContainer.classList.add('hidden');
+
+  // Load texts
+  examPromptText.textContent = currentQuestion.prompt;
+  
+  if (currentQuestion.direction === 'foreign-to-bg') {
+    examDirectionBadge.textContent = `Преведете на български`;
+    examDirectionBadge.className = `card-lang-tag bg-to-bg`; // default light style
+  } else {
+    const langName = getLanguageName(currentQuestion.wordObj.language);
+    examDirectionBadge.textContent = `Преведете на ${langName}`;
+    examDirectionBadge.className = `card-lang-tag ${currentQuestion.wordObj.language}`;
+  }
+
+  // Progress UI
+  currentExamNum.textContent = index + 1;
+  totalExamNum.textContent = examState.questions.length;
+  examCorrectCount.textContent = examState.correctCount;
+  examIncorrectCount.textContent = examState.incorrectCount;
+  
+  const progressPercent = (index / examState.questions.length) * 100;
+  examProgressBar.style.width = `${progressPercent}%`;
+
+  // Focus input
+  setTimeout(() => {
+    examAnswerInput.focus();
+  }, 100);
+}
+
+// Speak exam word
+if (btnSpeakExamWord) {
+  btnSpeakExamWord.addEventListener('click', (e) => {
+    e.stopPropagation();
+    speakExamWord();
+  });
+}
+
+function speakExamWord() {
+  if (!('speechSynthesis' in window)) return;
+  if (!examState.isActive || examState.questions.length === 0) return;
+
+  const currentQuestion = examState.questions[examState.currentIndex];
+  // We can only speak the foreign word.
+  // The foreign word is either in the prompt or in the correctAnswer.
+  const foreignWord = currentQuestion.wordObj.word;
+  const langCode = currentQuestion.wordObj.language;
+
+  // Get matching TTS settings/voices
+  const savedTtsPref = localStorage.getItem(`flashcards-tts-voice-${langCode}`) || 'en-US';
+  let ttsSetting = savedTtsPref;
+  
+  if (ttsSetting === 'off') {
+    // If preference is off, fallback to default locale
+    if (langCode.toLowerCase() === 'en') ttsSetting = 'en-US';
+    else if (langCode.toLowerCase() === 'de') ttsSetting = 'de-DE';
+    else if (langCode.toLowerCase() === 'es') ttsSetting = 'es-ES';
+    else if (langCode.toLowerCase() === 'fr') ttsSetting = 'fr-FR';
+    else if (langCode.toLowerCase() === 'ru') ttsSetting = 'ru-RU';
+    else if (langCode.toLowerCase() === 'it') ttsSetting = 'it-IT';
+    else ttsSetting = langCode;
+  }
+
+  // Cancel any active speech synthesis
+  window.speechSynthesis.cancel();
+
+  const utterance = new SpeechSynthesisUtterance(foreignWord);
+  utterance.lang = ttsSetting;
+
+  const voices = window.speechSynthesis.getVoices();
+  let matchingVoices = voices.filter(v => v.lang.replace('_', '-').toLowerCase() === ttsSetting.toLowerCase());
+  
+  if (matchingVoices.length === 0) {
+    matchingVoices = voices.filter(v => v.lang.replace('_', '-').toLowerCase().startsWith(ttsSetting.toLowerCase()));
+  }
+  
+  if (matchingVoices.length === 0) {
+    const langPrefix = ttsSetting.split('-')[0].toLowerCase();
+    matchingVoices = voices.filter(v => v.lang.toLowerCase().startsWith(langPrefix));
+  }
+
+  if (matchingVoices.length > 0) {
+    const naturalKeywords = ['natural', 'google', 'neural', 'premium', 'online', 'siri'];
+    const bestVoice = matchingVoices.find(v => {
+      const nameLower = v.name.toLowerCase();
+      return naturalKeywords.some(keyword => nameLower.includes(keyword));
+    });
+    utterance.voice = bestVoice || matchingVoices[0];
+  }
+
+  utterance.rate = 0.9;
+  utterance.pitch = 1.0;
+  window.speechSynthesis.speak(utterance);
+}
+
+// Answer Submission
+if (formExamAnswer) {
+  formExamAnswer.addEventListener('submit', (e) => {
+    e.preventDefault();
+    if (!examState.isActive) return;
+
+    const userInput = examAnswerInput.value.trim();
+    if (!userInput) return;
+
+    // Disable input and button
+    examAnswerInput.disabled = true;
+    btnSubmitExamAnswer.disabled = true;
+
+    const currentQuestion = examState.questions[examState.currentIndex];
+    const isCorrect = checkExamAnswer(userInput, currentQuestion.correctAnswer);
+
+    // Update streak and status in database to reward user
+    const wordObj = currentQuestion.wordObj;
+    if (isCorrect) {
+      examState.correctCount++;
+      wordObj.correctStreak++;
+      if (wordObj.correctStreak >= 3) {
+        wordObj.status = 'mastered';
+      }
+    } else {
+      examState.incorrectCount++;
+      wordObj.correctStreak = 0;
+      wordObj.status = 'learning';
+      
+      // Save error details
+      examState.errors.push({
+        prompt: currentQuestion.prompt,
+        userAnswer: userInput,
+        correctAnswer: currentQuestion.correctAnswer
+      });
+    }
+
+    // Save progress to IndexedDB
+    updateWordInDB(wordObj).catch(err => console.error('Грешка при запис на прогрес от изпит:', err));
+
+    // Show feedback
+    examFeedbackContainer.classList.remove('hidden');
+    
+    if (isCorrect) {
+      examFeedbackTitle.textContent = 'Правилно!';
+      examFeedbackTitle.className = 'text-success';
+      examFeedbackDetail.textContent = `Вашият отговор съвпада с речника.`;
+    } else {
+      examFeedbackTitle.textContent = 'Грешно!';
+      examFeedbackTitle.className = 'text-danger';
+      examFeedbackDetail.innerHTML = `Правилният отговор е: <strong>${escapeHTML(currentQuestion.correctAnswer)}</strong>`;
+    }
+
+    // Focus next button
+    setTimeout(() => {
+      btnNextExamQuestion.focus();
+    }, 100);
+  });
+}
+
+function checkExamAnswer(userInput, correctAnswer) {
+  const clean = str => {
+    return str
+      .toLowerCase()
+      .replace(/\([^)]*\)/g, "") // remove text in parentheses e.g. (мъжки кон)
+      .replace(/\s+/g, " ")       // normalize multiple spaces to a single space
+      .trim();
+  };
+
+  const userClean = clean(userInput);
+  
+  // Split by common delimiters in translations
+  const synonyms = correctAnswer.split(/[/,;]/).map(s => clean(s));
+  
+  // Match if the user's cleaned input matches any cleaned synonym
+  return synonyms.some(syn => syn === userClean);
+}
+
+if (btnNextExamQuestion) {
+  btnNextExamQuestion.addEventListener('click', () => {
+    const nextIdx = examState.currentIndex + 1;
+    if (nextIdx < examState.questions.length) {
+      loadExamQuestion(nextIdx);
+    } else {
+      // Finish Exam
+      examProgressBar.style.width = '100%';
+      setTimeout(() => {
+        showExamResults();
+      }, 500);
+    }
+  });
+}
+
+function showExamResults() {
+  examState.isActive = false;
+  
+  if ('speechSynthesis' in window) {
+    window.speechSynthesis.cancel();
+  }
+
+  examSessionContainer.classList.add('hidden');
+  examResultsContainer.classList.remove('hidden');
+
+  const total = examState.questions.length;
+  const correct = examState.correctCount;
+  const incorrect = examState.incorrectCount;
+  const percentage = total > 0 ? Math.round((correct / total) * 100) : 0;
+
+  examResultPercentage.textContent = `${percentage}%`;
+  examResultCorrectCount.textContent = correct;
+  examResultIncorrectCount.textContent = incorrect;
+  examResultSummaryText.textContent = `Завършихте изпита с ${correct} верни отговора от общо ${total} въпроса.`;
+
+  // Render errors panel
+  examErrorsTbody.innerHTML = '';
+  if (examState.errors.length > 0) {
+    examErrorsPanel.classList.remove('hidden');
+    examState.errors.forEach(err => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td class="font-weight-bold">${escapeHTML(err.prompt)}</td>
+        <td class="text-danger">${escapeHTML(err.userAnswer)}</td>
+        <td class="text-success">${escapeHTML(err.correctAnswer)}</td>
+      `;
+      examErrorsTbody.appendChild(tr);
+    });
+  } else {
+    examErrorsPanel.classList.add('hidden');
+  }
+
+  refreshData(); // Refresh UI dictionary stats
+}
+
+if (btnQuitExam) {
+  btnQuitExam.addEventListener('click', () => {
+    if (confirm('Сигурни ли сте, че искате да прекратите изпита? Прогресът за вече отговорените въпроси ще бъде запазен.')) {
+      examState.isActive = false;
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+      }
+      examSessionContainer.classList.add('hidden');
+      examSetupContainer.classList.remove('hidden');
+      refreshData();
+    }
+  });
+}
+
+if (btnRestartExam) {
+  btnRestartExam.addEventListener('click', () => {
+    examResultsContainer.classList.add('hidden');
+    examSetupContainer.classList.remove('hidden');
+    populateExamLanguages();
+    populateExamFiles();
+  });
+}
+
+if (btnExamGoToDictionary) {
+  btnExamGoToDictionary.addEventListener('click', () => {
+    examResultsContainer.classList.add('hidden');
+    examSetupContainer.classList.remove('hidden');
+    
+    // Trigger dictionary tab click
+    document.getElementById('nav-btn-dictionary').click();
+  });
 }
