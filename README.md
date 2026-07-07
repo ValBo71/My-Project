@@ -1,101 +1,101 @@
 # QA Automation & Software Engineering Portfolio
 
-Добре дошли в моето портфолио! Тук ще намерите различни проекти, задачи и практически приложения в областите на софтуерното тестване (QA), автоматизацията, уеб разработката и полиграфическите инструменти, създадени по време на обучението ми в **Telerik Academy** и като лични практически проекти.
+Welcome to my portfolio! Here you will find various projects, tasks, and practical applications in the fields of software testing (QA), automation, web development, and printing pre-press utilities, created during my training at **Telerik Academy** as well as personal practice projects.
 
 ---
 
-## 📂 Структура на хранилището (Repository Structure)
+## 📂 Repository Structure
 
-Проектите са организирани логически по категории и технологичен стек:
+The projects are logically organized by categories and technology stack:
 
-### 🔍 1. Уеб проекти (`01. WEB project`)
-* **01. Telerik web project**: "Bug Hunters" Profile Portal — Отзивчив, двуезичен статичен портал, представящ профилите на 6 членове на екипа с 3D карти с обръщане (card-flip), хоби галерии и интерактивни страници. (HTML5, CSS, JS/jQuery).
-* **02. Personal site**: Личен портфолио сайт — Интерактивен личен сайт с графично представяне на уменията (radial diagrams), филтрируемо портфолио и вграден валутен калкулатор (BGN ⇄ EUR). (HTML5, Bootstrap v3, JS/jQuery).
+### 🔍 1. Web Projects (`01. WEB project`)
+* **01. Telerik web project**: "Bug Hunters" Profile Portal — A responsive, multilingual static portal website featuring the profiles, personality index cards (with 3D card flip animations), about pages, and interactive hobby galleries for 6 team members. Developed using HTML5, Vanilla CSS, and JavaScript/jQuery.
+* **02. Personal site**: Personal Portfolio Website — An interactive, responsive personal portal detailing professional experience, dynamic skill diagrams (radial and progress bars), filterable project cards, and an integrated BGN ⇄ EUR currency converter utility. Developed using HTML5, Bootstrap v3, and JavaScript/jQuery.
 
-### 🖥️ 2. Автоматизация на потребителския интерфейс (`02. UI Testing`)
-* **01. Cucumber**: BDD UI тест автоматизационна рамка (JBehave + JUnit 4) с персонализиран Selenium WebDriver wrapper, динамично изчакване за видимост на елементите и оптимизирано кеширане на конфигурациите.
-* **02. Selenium_PageObject**: Тестове, имплементиращи **Page Object Model (POM)**:
-  * **Java/01. Exam2_Selenium_PageObject**: Автоматизирано докладване на бъгове в Jira (Selenium Page Factory + JUnit 4) с автоматично управление на жизнения цикъл на браузъра.
-  * **Java/02. WeareSocialNetwork**: Пълен UI тестов пакет за социалната мрежа WEare. Автоматизира регистрация, публикации, приятелства, профили и администраторски роли.
-  * **Java/03. PageObject_TestNG**: Тестов пакет за портала realt.by (TestNG + Java), включващ автоматично съгласие за бисквитки, динамични филтри за имоти и Chrome управление чрез TestNG куки.
-  * **C#/1.httpsautomationexercise.com**: C# Selenium NUnit рамка за UI автоматизация на 20 тестови сценария. Включва заобикаляне на Google Vignette реклами, GDPR съгласие и прикачване на екранни снимки при грешка.
+### 🖥️ 2. UI Automation (`02. UI Testing`)
+* **01. Cucumber**: BDD UI Test Automation framework utilizing JBehave and JUnit 4, featuring a custom Selenium WebDriver wrapper with dynamic element visibility waits and optimized configuration caching.
+* **02. Selenium_PageObject**: Tests built with Selenium WebDriver implementing the **Page Object Model (POM)** design pattern:
+  * **Java/01. Exam2_Selenium_PageObject**: Jira bug reporting UI automation framework utilizing Selenium Page Factory and JUnit 4. Automates project creation, issue reporting (description iframe rendering), and search queries.
+  * **Java/02. WeareSocialNetwork**: Selenium PageObject UI test suite for the WEare social network. Automates registration, login, profile updates, posting, liking, friend requests, and admin actions in sequential order.
+  * **Java/03. PageObject_TestNG**: Selenium PageObject UI test suite built with TestNG and Java. Automates search functionality on the realt.by portal, featuring custom cookie consent handling, dynamic room filters, and automated ChromeDriver lifecycle management with TestNG suite hooks.
+  * **C#/1.httpsautomationexercise.com**: C# Selenium WebDriver & NUnit UI automation project covering 20 test cases from the official practice list. Features a clean Page Object Model with isolated locators, stale-proof wait utilities, automatic GDPR consent handling, dynamic Google Vignette ad bypass, and failure screenshot attachment.
 
-### 🖼️ 3. Sikuli GUI автоматизация (`03. Sikuli`)
-* **01. ValentinBogdanov.sikuli**: Десктоп GUI автоматизационен скрипт, базиран на разпознаване на изображения (image recognition) чрез SikuliX за автоматизиране на E2E процеса по регистрация и създаване на проекти в Jira.
+### 🖼️ 3. Sikuli GUI Automation (`03. Sikuli`)
+* **01. ValentinBogdanov.sikuli**: Desktop GUI automation script based on image recognition using SikuliX to automate the end-to-end Jira registration, sandbox setup, and bug reporting flow.
 
-### 🔌 4. Тестване на API (`04. API Testing`)
-* **01. API testing with Postman**: Автоматизирани Postman колекции за регресионно тестване:
-  * **01. Approval Book iMX**: Тестване на XML входни данни и проверка на коректността им в REST API отговорите на системата iMX, захранвани с CSV файлове.
-  * **03. WeareSocialNetwork**: Newman колекция (91 скрипта) за тестване на аутентификация, публикации, коментари и администрация на социалната мрежа WEare, с htmlextra репорти.
+### 🔌 4. API Testing (`04. API Testing`)
+* **01. API testing with Postman**: Test collections and environments for automated testing in Postman:
+  * **01. Approval Book iMX**: Postman regression testing collection verifying that XML inputs entered into the iMX system are correctly loaded and verified in REST API responses, using CSV dataloaders for collection variables.
+  * **03. WeareSocialNetwork**: Newman-runnable Postman API test collection (91 scripts) covering authentication, administrator actions, posts, and comments on the WEare social network. Includes custom environment settings and htmlextra reporting.
 * **02. API testing with RestAssured (Java)**:
-  * **01. GoogleAPI**: Maven + TestNG проект за тестване на JSONPlaceholder, SWAPI и пълно CRUD тестване на Google Places API.
-  * **02. ProjectGoogleApi**: Model-Based REST API тестване на Google Places Search API с Lombok билдери, външни конфигурации на credentials и positive/negative тест сценарии.
+  * **01. GoogleAPI**: Maven + TestNG API testing framework targeting JSONPlaceholder, SWAPI, and a complete CRUD integration lifecycle of a Place using the Google Places API sandbox. Features separated Request/Response specifications to isolate endpoint configurations.
+  * **02. ProjectGoogleApi**: Model-Based Java Maven + TestNG API testing project targeting Google Places Find Place Search API. Implements Lombok builders, property-based credentials, and positive/negative test suites.
 * **03. API testing with RestSharp (C#)**:
-  * **01. AutomationExercise.RestSharp.ApiTests**: C# NUnit API рамка за `automationexercise.com` (14 API сценария), включваща силна типизация, генериране на динамични данни и Allure репорти.
+  * **01. AutomationExercise.RestSharp.ApiTests**: Complete C# NUnit API Automation framework for `automationexercise.com` covering all 14 API scenarios from the official practice list. Features a clean client-based architecture, strongly-typed models, dynamic data generation, request/response logging, and Allure reporting.
 
-### ⚡ 5. Тестване на производителност и натоварване (`05. Performance Tests`)
-* **01. JMeter**: Performance сценарии (JMX):
-  * **01. WEare**: Натоварване и стрес тестове с 30 и 60 виртуални потребители.
-  * **02. AutomationExercise**: API натоварване за `automationexercise.com` с 20 и 40 потребители с рандомизирани таймери, CSV параметризация и HTML репорти.
-* **02. K6**: Скриптове за производителност на базата на JavaScript с Grafana k6:
-  * **01. AutomationExercise**: Симулиране на 20 и 40 потребители с ramping-vus, проверки на SLAs и прагове на грешки (< 5%).
+### ⚡ 5. Performance & Load Testing (`05. Performance Tests`)
+* **01. JMeter**: Test plans (JMX) for performance and load testing with Apache JMeter:
+  * **01. WEare**: Load and stress tests with 30 and 60 users.
+  * **02. AutomationExercise**: Parameterized API performance testing project for `automationexercise.com` simulating 20 and 40 virtual users, featuring response/JSON assertions, random timers, CSV config, and automated HTML report generation.
+* **02. K6**: Modern JavaScript-based load testing scripts executed with Grafana k6:
+  * **01. AutomationExercise**: Replicated API performance testing project for `automationexercise.com` simulating 20 and 40 virtual users using ramping-vus, check assertions, and SLA thresholds (error rate < 5%).
 
-### 🎮 6. JavaScript приложения (`06. JavaScript application`)
-* **01. JavaScript Web Games**: Колекция от 7 класически игри, разработени с чист JavaScript, HTML5 Canvas и CSS:
-  * **01. Snake**: Ретро змия с контрол на границите, генериране на храна и опашна колизия.
-  * **02. Dino**: Безкрайно бягане (Chrome Dino клонинг) с keyframe анимации и collision detection.
-  * **03. Bird**: Скролираща игра (Flappy Bird) с физика на гравитацията и динамични тръби.
-  * **04. Shooting_Range**: Игра за стрелба с мерник, 3D въртящи се мишени и звукови ефекти.
-  * **05. Clickr**: Бърз кликер с брояч на кликове и милисекундна точност.
-  * **06. Sea Chess One**: Морски шах с AI опонент с нива на трудност (дефанзивно/офанзивно).
-  * **07. Retro Fighting Game**: 2D аркадна бойна игра с ООП физика, AI на противника и здравни индикатори.
+### 🎮 6. JavaScript Applications (`06. JavaScript application`)
+* **01. JavaScript Web Games**: A premium collection of 7 classic interactive web games developed from scratch using HTML5, Vanilla CSS (with responsive layouts and glassmorphic designs), and pure JavaScript (Vanilla JS):
+  * **01. Snake**: Classic retro game featuring canvas rendering, grid movement, apple consumption mechanics, tail collision detection, and screen-rendered boundary checks.
+  * **02. Dino**: Fast-paced endless runner game featuring custom CSS keyframe animations, jump collision detection, and clean state reset scripts to avoid alert interrupts.
+  * **03. Bird**: Side-scrolling 2D Flappy Bird clone featuring gravity physics, dynamic obstacle spawning, audio triggers, and safe asset loading.
+  * **04. Shooting_Range**: Interactive crosshair clicker game featuring custom target-seeking controls, 3D rotating targets, audio triggers, and duplicate hit filtering.
+  * **05. Clickr**: Rapid-clicking reflex game with custom retro design styling, high-precision millisecond timing, and score-state tracking.
+  * **06. Sea Chess One**: Advanced Tic-Tac-Toe game featuring a dual-difficulty defensive/offensive computer AI, session score history tracking, and board-level event delegation.
+  * **07. Retro Fighting Game**: 2D arcade cyber-themed fighter game built with OOP classes, physics gravity, computer AI combat behaviors, visual hit flash notifications, and clean UI health metrics.
 
-### 🎭 7. Playwright автоматизация (`07.Playwright`)
-* **1. FirstProject**: Начални скриптове и базови Playwright тестове.
-* **2. Api testing**: Директно подаване на заявки през вградения Playwright API context.
-* **3. TS and Playwright project**: Тестова структура с TypeScript и Playwright Test Runner.
-* **4. Automation at automationexercise.com**: C# Playwright + NUnit UI автоматизация на 26 тестови сценария (POM модел, SlowMo режим и Allure репорти).
-* **5. API Testing on automationexercise.com**: C# Playwright API тестов фреймуърк, покриващ 14 сценария със записване на payloads и Allure интеграция.
+### 🎭 7. Playwright Automation (`07.Playwright`)
+* **1. FirstProject**: Introductory test scenarios demonstrating Playwright capabilities.
+* **2. Api testing**: Automating API requests directly through Playwright context.
+* **3. TS and Playwright project**: Test structures utilizing TypeScript and Playwright Test Runner.
+* **4. Automation at automationexercise.com**: Complete automated C# Playwright & NUnit test suite (26/26 test cases) featuring the Page Object Model (POM) design pattern, automated overload-resilience checks, custom SlowMo debugging, and Allure reporting.
+* **5. API Testing on automationexercise.com**: Complete automated C# Playwright & NUnit API test framework covering all 14 API scenarios from the official practice list. Features a clean client-based architecture, request/response payload capture, Allure attachments, and full state integration tests for account lifecycle orchestration.
 
-### 🚀 8. Тракер за QA обяви за работа — Observer (`08.Observer` & `11.Observer v2`)
-* **08.Observer**: Тракер за Automation QA обяви за работа (v1) — Уеб приложение с Flask и SQLite за скрапване на обяви от LinkedIn (Playwright), dev.bg и jobs.bg, извличане на заплати, технологии и обединяване на компании под общи синоними (работи на порт 5000).
-* **11.Observer v2**: Тракер за работа (v2) — Разширена версия, позволяваща настройка на линковете за скрапване директно от настройките в уеб интерфейса, селективно скрапване и изчистване на базата данни (работи на порт 5001).
+### 🚀 8. QA Jobs Tracker — Observer (`08.Observer` & `11.Observer v2`)
+* **08.Observer**: Main Project (Automation QA Jobs Tracker v1) — A full-featured Python Flask and SQLite dashboard scraping job listings from dev.bg, LinkedIn (Playwright with session persistence), and jobs.bg (Playwright with DataDome bypass). Extracts salaries, annual leaves, and required tech stack (runs on port 5000).
+* **11.Observer v2**: Jobs Tracker v2 — Upgraded version of the job tracker introducing dynamic scraping URLs configuration directly in the UI settings panel, selective/optional scraping support, database resetting capability, and running on port 5001.
 
-### 🛠️ 9. Специализирани инструменти (`09. Other tools`)
-Този раздел съдържа полезни инструменти за полиграфическата индустрия и изучаването на чужди езици:
-* **02.Printing/01.Spine and Creep Calculator**: Уеб калкулатор за изчисляване дебелината на гръбчето на книги (мека и твърда корица, PUR/EVA лепила, сгъване на колите и набухване при шиене) с 3D визуализация в реално време. (HTML5, CSS, Vanilla JS).
-* **02.Printing/02.InDesign Booklet Creep**: Професионален скрипт за Adobe InDesign (ExtendScript/JSX), който автоматично изчислява и прилага хоризонтално скалиране (свиване) на страниците в коли за шиене, компенсирайки дебелината на хартията при сгъване.
-* **02.Printing/03.Catalog**: Каталог за щанци и клишета — Flask + SQLite приложение за архивиране и бързо търсене на щанци (форми, тип, брой гнезда, размери на детайла, CAD файлове) и клишета (преге, топъл печат) в склад на печатница. Разполага с регистронезависимо кирилско търсене, филтриране и интелигентен стартиращ файл `run.bat` с автоматично изтегляне на Portable Python среда при липса на инсталиран такъв на компютъра.
-* **03.Dictionary**: Флаш Карти — Клиентско Single-Page Application (SPA) с IndexedDB база данни, поддържащо 3D анимация на обръщане на картите, импортиране на речници от Excel чрез SheetJS, филтриране по теми/файлове и локален бекъп/възстановяване. Включва готови речници с по над 3000 думи (английски, немски, испански).
+### 🛠️ 9. Special Utilities (`09. Other tools`)
+This section contains helpful tools for the printing industry and foreign vocabulary study:
+* **02.Printing/01.Spine and Creep Calculator**: Web-based pre-press utility calculating book spine thickness (paperback/hardcover, EVA/PUR glue options, paper weight, and thread-sewing swelling coefficients) with real-time 3D book mockup visualization (HTML5, CSS, Vanilla JS).
+* **02.Printing/02.InDesign Booklet Creep**: Professional script for Adobe InDesign (ExtendScript/JSX) that calculates and applies horizontal booklet creep scaling (shrinking) on page items to compensate for paper thickness buildup in folded signatures.
+* **02.Printing/03.Catalog**: Dies & Clichés Catalog — Flask + SQLite warehouse tool for archiving and searching printing dies (shapes, types, ups, plate dimensions, item dimensions, and CAD drawings) and hot foil/embossing clichés. Features Cyrillic case-insensitive search, responsive card/table views, full pagination (10 & 25 rows options), and a custom `run.bat` bootstrapping a zero-dependency local Portable Python env on any Windows machine.
+* **03.Dictionary**: Flash Cards — A local, zero-setup, offline-capable single-page application (SPA) for vocabulary flashcard study. Features 3D card flipping, IndexedDB storage, Excel vocabulary imports via SheetJS, multi-file filters, and JSON database backup/restoration.
 
-### 🤖 10. Асистент за QA инженери (`10.AI QA Assistant Test Case and Automation Generator`)
-* **AI QA Assistant**: Уеб платформа, захранвана от Google Gemini AI, създадена за QA инженери. Генерира структурирани тест кейсове (JSON), намира нетипични гранични случаи (edge cases), съставя API тест планове, генерира автоматизационен код за Playwright (C# POM) и форматира сурови описания на бъгове в детайлни Bug Reports.
-* **Технологичен стек**: C# & .NET 9 Web API, React + TypeScript фронтенд, Entity Framework Core & SQLite (история и одит), DocX за експорт в Word файлове, NUnit & Playwright .NET тестове. Архитектурата следва принципите на **Clean Architecture**.
+### 🤖 10. AI QA Assistant (`10.AI QA Assistant Test Case and Automation Generator`)
+* **AI QA Assistant**: A modern web platform powered by Google Gemini AI designed to automate QA routines. Generates structured test cases (JSON), identifies non-obvious edge cases, designs API test scenarios, writes C# Playwright POM automation skeletons, and formats raw bug descriptions into detail-rich QA Bug Reports.
+* **Tech Stack**: C# & .NET 9 Web API backend (Clean Architecture), React + TypeScript frontend (Vite), Entity Framework Core & SQLite (history audit log), DocX for Word document generation, and NUnit & Playwright .NET tests.
 
 ---
 
-## 🛠️ Основни и най-комплексни проекти (Featured Projects)
+## 🛠️ Featured Complex Projects
 
 ### 1. **AI QA Assistant** (`10.AI QA Assistant...`)
-Модерен уеб асистент за софтуерни специалисти.
-* **Интелигентно генериране**: Интегрира се директно с Gemini API, изисквайки структурирани JSON отговори, които се обработват и изобразяват в красиви UI карти.
-* **Експорт в различни формати**: Възможност за локално изтегляне на резултатите под формата на Markdown, JSON, CSV или оформени Word документи (DOCX).
-* **Архитектура**: Clean Architecture със слоеве: `Domain`, `Application`, `Infrastructure`, и `Api`.
-* **Тестване**: Рамката съдържа Unit тестове и E2E UI тестове, изпълнявани с Playwright за .NET.
+An advanced AI-powered web tool for software testing professionals.
+* **AI Orchestration**: Direct integration with Gemini API, enforcing structured JSON outputs that are parsed and rendered as rich interactive UI cards.
+* **Multi-Format Export**: Generates local downloads of results as Markdown, JSON, CSV, or formatted Word documents (DOCX).
+* **Architecture**: Clean Architecture structure with decoupled layers: `Domain`, `Application`, `Infrastructure`, and `Api`.
+* **Testing**: Includes comprehensive Unit tests and E2E browser tests driven by Playwright for .NET.
 
-### 2. **Observer (QA Jobs Tracker) - Версия 1 & 2** (`08.Observer` & `11.Observer v2`)
-Пълнофункционална система за следене на свободните позиции за Automation QA в България.
-* **Мултиплатформено скрапване**: Извлича данни от dev.bg, jobs.bg (избягване на DataDome защити с Playwright) и LinkedIn (съхранение на бисквитки и сесии).
-* **Обработка на текстове**: Парсва заплати, отпуски и изискван стек от технологии.
-* **Версия 2**: Въвежда настройки директно от потребителския интерфейс, позволяващи динамична промяна на URL адресите за скрапване и селективно сканиране на платформите.
+### 2. **Observer (QA Jobs Tracker) - Versions 1 & 2** (`08.Observer` & `11.Observer v2`)
+Full-featured automated job search and parsing system for Automation QA roles in Bulgaria.
+* **Scraping Engine**: Extracts job listings from dev.bg, jobs.bg (bypassing DataDome using Playwright), and LinkedIn (retaining session credentials).
+* **Smart Parsing**: Automatically extracts salary thresholds, annual leave, and tech stacks.
+* **Version 2**: Introduces an in-app settings panel to configure search URLs dynamically and support selective platform scraping.
 
-### 3. **Каталог за Щанци & Клишета** (`09. Other tools/02.Printing/03.Catalog`)
-Индустриално приложение за управление на инструменти в печатница.
-* **Автономност (Zero-Dependency Bootstrap)**: Стартиращият файл `run.bat` проверява дали на компютъра има Python. При липса на такъв, той автоматично изтегля, разархивира и конфигурира **Portable Python** среда, инсталира `pip` и нужните библиотеки (`Flask`, `Pillow`) изцяло в потребителското пространство без нужда от права на администратор.
-* **Търсене по кирилица**: SQLite базата данни е интегрирана с Unicode функция `py_lower`, позволяваща напълно регистронезависимо търсене за български думи (LIKE с кирилица).
-* **Модерен UI**: Смяна на изгледите (Карти / Таблица по подразбиране), избор на шрифт (`Inter` и `Manrope`), и пълна пагинация с поддръжка на 10 и 25 реда на страница.
+### 3. **Dies & Clichés Catalog** (`09. Other tools/02.Printing/03.Catalog`)
+Industrial tool management catalog for print shops.
+* **Zero-Dependency Bootstrap**: `run.bat` checks for Python. If not found, it downloads, unpacks, and configures a **Portable Python** environment, installs `pip` and required packages (`Flask`, `Pillow`) in user space without requiring admin privileges.
+* **Cyrillic Case-Insensitivity**: Integrates custom `py_lower` Unicode function into SQLite, enabling full case-insensitive searches on Bulgarian text (LIKE operations).
+* **Modern UI**: Clean design featuring responsive card/table views (table default), Inter & Manrope typography, and dynamic pagination supporting 10 and 25 items per page.
 
 ---
 
-✉️ **Контакти**:
-Ако имате въпроси относно някой от проектите или искате да се свържем, можете да посетите моя GitHub профил: [ValBo71](https://github.com/ValBo71).
+✉️ **Contacts**:
+If you have any questions about these projects or would like to get in touch, feel free to visit my GitHub profile: [ValBo71](https://github.com/ValBo71).
