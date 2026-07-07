@@ -1,0 +1,2107 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Каталог за Щанци & Клишета</title>
+  
+  <!-- Google Fonts Outfit & Ubuntu -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Ubuntu:wght@400;500;700&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <style>
+    :root {
+      /* Light Theme (Flat Design) */
+      --bg-color: #f1f5f9;
+      --panel-bg: #ffffff;
+      --panel-bg-secondary: #f8fafc;
+      --panel-border: rgba(0, 0, 0, 0.08);
+      --text-color: #0f172a;
+      --text-muted: #64748b;
+      
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      
+      --color-die: #2563eb;      /* Blue for dies */
+      --color-emboss: #059669;   /* Green for prege */
+      --color-foil: #d97706;     /* Gold for foil */
+      
+      --success: #10b981;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      
+      --card-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+      --transition-speed: 0.2s;
+      --font-main: 'Outfit', 'Ubuntu', -apple-system, sans-serif;
+    }
+
+    body.dark-theme {
+      /* Dark Theme */
+      --bg-color: #0b0f19;
+      --panel-bg: #111827;
+      --panel-bg-secondary: #1f2937;
+      --panel-border: rgba(255, 255, 255, 0.08);
+      --text-color: #f3f4f6;
+      --text-muted: #9ca3af;
+      
+      --primary: #3b82f6;
+      --primary-hover: #60a5fa;
+      
+      --color-die: #3b82f6;
+      --color-emboss: #10b981;
+      --color-foil: #fbbf24;
+      
+      --card-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Flat design reset (No rounded corners) */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      border-radius: 0 !important; /* Flat design enforcement */
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      font-family: var(--font-main);
+      line-height: 1.5;
+      min-height: 100vh;
+      transition: background-color var(--transition-speed), color var(--transition-speed);
+      padding-bottom: 3rem;
+    }
+
+    .app-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+    }
+
+    /* Header */
+    .app-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.5rem 0;
+      border-bottom: 1px solid var(--panel-border);
+      margin-bottom: 2rem;
+    }
+
+    .header-logo {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .logo-icon {
+      font-size: 2.2rem;
+      color: var(--primary);
+    }
+
+    .logo-text {
+      font-size: 1.6rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+
+    .network-badge {
+      background-color: var(--panel-bg-secondary);
+      border: 1px solid var(--panel-border);
+      padding: 0.5rem 1rem;
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 600;
+    }
+
+    .network-status-dot {
+      width: 8px;
+      height: 8px;
+      background-color: var(--success);
+      display: inline-block;
+      box-shadow: 0 0 8px var(--success);
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .icon-btn {
+      background: transparent;
+      border: 1px solid var(--panel-border);
+      color: var(--text-color);
+      font-size: 1.1rem;
+      cursor: pointer;
+      width: 42px;
+      height: 42px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: var(--panel-bg);
+      transition: all var(--transition-speed);
+    }
+
+    .icon-btn:hover {
+      background-color: var(--panel-bg-secondary);
+      border-color: var(--text-muted);
+    }
+
+    /* Search & Filter Section */
+    .controls-panel {
+      background-color: var(--panel-bg);
+      border: 1px solid var(--panel-border);
+      box-shadow: var(--card-shadow);
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .controls-row-top {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .search-box-container {
+      flex: 1;
+      min-width: 280px;
+      position: relative;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 0.75rem 1rem 0.75rem 2.5rem;
+      background: var(--panel-bg-secondary);
+      border: 1px solid var(--panel-border);
+      color: var(--text-color);
+      outline: none;
+      font-family: var(--font-main);
+      font-size: 0.95rem;
+      transition: all var(--transition-speed);
+    }
+
+    .search-input:focus {
+      border-color: var(--primary);
+      background: var(--panel-bg);
+    }
+
+    .filter-select {
+      padding: 0.75rem 2.5rem 0.75rem 1rem;
+      background: var(--panel-bg-secondary);
+      border: 1px solid var(--panel-border);
+      color: var(--text-color);
+      outline: none;
+      font-family: var(--font-main);
+      font-size: 0.95rem;
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 1rem center;
+      background-size: 1.1rem;
+      min-width: 180px;
+    }
+
+    .filter-select:focus {
+      border-color: var(--primary);
+      background-color: var(--panel-bg);
+    }
+
+    /* Category Buttons (Tabs style) */
+    .category-tabs {
+      display: flex;
+      border: 1px solid var(--panel-border);
+      background-color: var(--panel-bg-secondary);
+      align-self: flex-start;
+      overflow: hidden;
+    }
+
+    .tab-btn {
+      padding: 0.75rem 1.5rem;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-family: var(--font-main);
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all var(--transition-speed);
+      border-right: 1px solid var(--panel-border);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .tab-btn:last-child {
+      border-right: none;
+    }
+
+    .tab-btn:hover {
+      color: var(--text-color);
+      background: rgba(0, 0, 0, 0.03);
+    }
+
+    body.dark-theme .tab-btn:hover {
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .tab-btn.active[data-category="all"] {
+      background-color: var(--primary);
+      color: #ffffff;
+    }
+    .tab-btn.active[data-category="die"] {
+      background-color: var(--color-die);
+      color: #ffffff;
+    }
+    .tab-btn.active[data-category="embossing"] {
+      background-color: var(--color-emboss);
+      color: #ffffff;
+    }
+    .tab-btn.active[data-category="foil"] {
+      background-color: var(--color-foil);
+      color: #ffffff;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1.5rem;
+      font-size: 0.95rem;
+      font-weight: 600;
+      font-family: var(--font-main);
+      border: none;
+      cursor: pointer;
+      transition: all var(--transition-speed);
+      text-decoration: none;
+    }
+
+    .btn-primary {
+      background-color: var(--primary);
+      color: #ffffff;
+    }
+
+    .btn-primary:hover {
+      background-color: var(--primary-hover);
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background-color: var(--panel-bg-secondary);
+      border: 1px solid var(--panel-border);
+      color: var(--text-color);
+    }
+
+    .btn-secondary:hover {
+      background-color: rgba(0, 0, 0, 0.04);
+    }
+
+    body.dark-theme .btn-secondary:hover {
+      background-color: rgba(255, 255, 255, 0.04);
+    }
+
+    .btn-danger {
+      background-color: var(--danger);
+      color: #ffffff;
+    }
+
+    .btn-danger:hover {
+      background-color: #dc2626;
+    }
+
+    .btn-block {
+      width: 100%;
+    }
+
+    /* Grid layout for Tool cards */
+    .tools-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .tool-card {
+      background-color: var(--panel-bg);
+      border: 1px solid var(--panel-border);
+      box-shadow: var(--card-shadow);
+      display: flex;
+      flex-direction: column;
+      transition: transform var(--transition-speed), border-color var(--transition-speed);
+      border-top: 4px solid var(--primary);
+      position: relative;
+    }
+
+    .tool-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--text-muted);
+    }
+
+    .tool-card.die { border-top-color: var(--color-die); }
+    .tool-card.embossing { border-top-color: var(--color-emboss); }
+    .tool-card.foil { border-top-color: var(--color-foil); }
+
+    .card-image-wrapper {
+      height: 180px;
+      width: 100%;
+      background-color: var(--panel-bg-secondary);
+      border-bottom: 1px solid var(--panel-border);
+      position: relative;
+      overflow: hidden;
+      cursor: zoom-in;
+    }
+
+    .card-image {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      padding: 0.5rem;
+      transition: transform var(--transition-speed);
+    }
+
+    .card-image-wrapper:hover .card-image {
+      transform: scale(1.03);
+    }
+
+    .no-image-placeholder {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+      gap: 0.5rem;
+    }
+
+    .no-image-icon {
+      font-size: 2.5rem;
+      opacity: 0.4;
+    }
+
+    .card-content {
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      flex-grow: 1;
+    }
+
+    .card-header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .card-code {
+      font-family: 'Ubuntu', monospace;
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: var(--text-color);
+    }
+
+    .card-badge {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      padding: 0.2rem 0.6rem;
+      color: #ffffff;
+    }
+
+    .card-badge.die { background-color: var(--color-die); }
+    .card-badge.embossing { background-color: var(--color-emboss); }
+    .card-badge.foil { background-color: var(--color-foil); }
+
+    .card-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text-color);
+      line-height: 1.3;
+    }
+
+    .card-details {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      font-size: 0.9rem;
+      border-top: 1px dashed var(--panel-border);
+      border-bottom: 1px dashed var(--panel-border);
+      padding: 0.75rem 0;
+      margin: 0.25rem 0;
+    }
+
+    .detail-item {
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .detail-label {
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .detail-val {
+      font-weight: 600;
+      color: var(--text-color);
+    }
+
+    .location-tag {
+      background-color: var(--panel-bg-secondary);
+      border: 1px solid var(--panel-border);
+      padding: 0.1rem 0.4rem;
+      font-family: 'Ubuntu', monospace;
+    }
+
+    .status-tag {
+      font-weight: 700;
+      text-transform: uppercase;
+      font-size: 0.75rem;
+    }
+    .status-tag.active { color: var(--success); }
+    .status-tag.archived { color: var(--danger); }
+    .status-tag.borrowed { color: var(--warning); }
+
+    .card-notes {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      font-style: italic;
+      word-break: break-word;
+      max-height: 60px;
+      overflow-y: auto;
+    }
+
+    .card-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.35rem;
+      margin-top: auto;
+      border-top: 1px solid var(--panel-border);
+      padding-top: 1rem;
+    }
+
+    .card-actions .btn {
+      flex: 1 1 0% !important;
+      min-width: 0 !important;
+      padding: 0.4rem 0.15rem !important;
+      font-size: 0.7rem !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      gap: 0.12rem !important;
+      white-space: nowrap !important;
+      overflow: hidden !important;
+      text-anchor: middle !important;
+    }
+
+    .card-actions .btn i {
+      font-size: 0.72rem !important;
+    }
+
+    .card-actions .btn-danger {
+      flex: 0 0 32px !important;
+      width: 32px !important;
+      padding-left: 0 !important;
+      padding-right: 0 !important;
+    }
+
+    /* Modal System */
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(2px);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+
+    .modal.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-content {
+      background: var(--panel-bg);
+      border: 1px solid var(--panel-border);
+      box-shadow: var(--card-shadow);
+      width: 90%;
+      max-width: 600px;
+      max-height: 90vh;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      animation: modalSlideUp 0.25s ease-out;
+    }
+
+    @keyframes modalSlideUp {
+      from { transform: translateY(15px); }
+      to { transform: translateY(0); }
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid var(--panel-border);
+      background-color: var(--panel-bg-secondary);
+    }
+
+    .modal-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+    }
+
+    .close-btn {
+      background: transparent;
+      border: none;
+      font-size: 1.75rem;
+      line-height: 1;
+      cursor: pointer;
+      color: var(--text-muted);
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: color var(--transition-speed);
+    }
+
+    .close-btn:hover {
+      color: var(--text-color);
+    }
+
+    .modal-body {
+      padding: 1.5rem;
+    }
+
+    .form-group {
+      margin-bottom: 1.25rem;
+    }
+
+    .form-row {
+      display: flex;
+      gap: 1rem;
+    }
+
+    .form-row .form-group {
+      flex: 1;
+    }
+
+    @media (max-width: 600px) {
+      .form-row {
+        flex-direction: column;
+        gap: 0;
+      }
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: var(--text-color);
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      font-size: 0.95rem;
+      background: var(--panel-bg-secondary);
+      border: 1px solid var(--panel-border);
+      color: var(--text-color);
+      font-family: var(--font-main);
+      outline: none;
+      transition: all var(--transition-speed);
+    }
+
+    .form-control:focus {
+      border-color: var(--primary);
+      background-color: var(--panel-bg);
+    }
+
+    select.form-control {
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 1rem center;
+      background-size: 1.1rem;
+      padding-right: 2.5rem;
+    }
+
+    textarea.form-control {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    /* Drag and Drop Upload Area */
+    .file-upload-zone {
+      border: 2px dashed var(--panel-border);
+      background-color: var(--panel-bg-secondary);
+      padding: 2rem 1.5rem;
+      text-align: center;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all var(--transition-speed);
+    }
+
+    .file-upload-zone:hover, .file-upload-zone.dragover {
+      border-color: var(--primary);
+      background-color: rgba(37, 99, 235, 0.02);
+    }
+
+    .upload-icon {
+      font-size: 2.5rem;
+      color: var(--text-muted);
+    }
+
+    .upload-text {
+      font-size: 0.95rem;
+      font-weight: 600;
+    }
+
+    .upload-hint {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .file-preview-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 1rem;
+      background-color: var(--panel-bg-secondary);
+      border: 1px solid var(--panel-border);
+      padding: 0.5rem 1rem;
+      font-size: 0.9rem;
+    }
+
+    .file-preview-name {
+      font-weight: 600;
+      color: var(--primary);
+    }
+
+    .modal-footer {
+      padding: 1rem 1.5rem;
+      border-top: 1px solid var(--panel-border);
+      background-color: var(--panel-bg-secondary);
+      display: flex;
+      justify-content: flex-end;
+      gap: 1rem;
+    }
+
+    /* Fullscreen Lightbox */
+    .lightbox {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.9);
+      z-index: 2000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+
+    .lightbox.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .lightbox-image {
+      max-width: 95%;
+      max-height: 95%;
+      object-fit: contain;
+      box-shadow: 0 4px 30px rgba(0,0,0,0.5);
+    }
+
+    .lightbox-close {
+      position: absolute;
+      top: 1.5rem;
+      right: 1.5rem;
+      color: #ffffff;
+      font-size: 2.5rem;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      width: 50px;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s;
+    }
+
+    .lightbox-close:hover {
+      transform: scale(1.1);
+    }
+
+    /* Empty state */
+    .empty-state-panel {
+      background-color: var(--panel-bg);
+      border: 1px solid var(--panel-border);
+      padding: 4rem 2rem;
+      text-align: center;
+      box-shadow: var(--card-shadow);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      color: var(--text-muted);
+    }
+
+    .empty-state-icon {
+      font-size: 4rem;
+      opacity: 0.3;
+    }
+
+    .empty-state-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text-color);
+    }
+
+    /* View Toggle CSS */
+    .view-toggle-container {
+      display: flex;
+      border: 1px solid var(--panel-border);
+      background-color: var(--panel-bg-secondary);
+      overflow: hidden;
+      align-self: stretch;
+    }
+    
+    .view-toggle-container .icon-btn {
+      border: none;
+      border-right: 1px solid var(--panel-border);
+      width: 42px;
+      height: 42px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      color: var(--text-muted);
+      background: transparent;
+      cursor: pointer;
+      transition: all var(--transition-speed);
+    }
+    
+    .view-toggle-container .icon-btn:last-child {
+      border-right: none;
+    }
+    
+    .view-toggle-container .icon-btn:hover {
+      background-color: rgba(0, 0, 0, 0.03);
+      color: var(--text-color);
+    }
+    
+    body.dark-theme .view-toggle-container .icon-btn:hover {
+      background-color: rgba(255, 255, 255, 0.03);
+    }
+    
+    .view-toggle-container .icon-btn.active {
+      background-color: var(--primary);
+      color: #ffffff;
+    }
+
+    /* Table CSS */
+    .table-responsive {
+      width: 100%;
+      overflow-x: auto;
+      background-color: var(--panel-bg);
+      border: 1px solid var(--panel-border);
+      box-shadow: var(--card-shadow);
+      margin-bottom: 2rem;
+    }
+    
+    .tools-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.95rem;
+    }
+    
+    .tools-table th, .tools-table td {
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid var(--panel-border);
+      vertical-align: middle;
+    }
+    
+    .tools-table th {
+      background-color: var(--panel-bg-secondary);
+      font-weight: 700;
+      color: var(--text-color);
+      text-transform: uppercase;
+      font-size: 0.75rem;
+      letter-spacing: 0.5px;
+    }
+    
+    .tools-table tbody tr:hover {
+      background-color: rgba(0, 0, 0, 0.015);
+    }
+    
+    body.dark-theme .tools-table tbody tr:hover {
+      background-color: rgba(255, 255, 255, 0.015);
+    }
+    
+    .table-thumbnail {
+      width: 40px;
+      height: 40px;
+      object-fit: contain;
+      background-color: var(--panel-bg-secondary);
+      border: 1px solid var(--panel-border);
+      cursor: zoom-in;
+      display: block;
+    }
+    
+    .table-no-image {
+      font-size: 1.1rem;
+      color: var(--text-muted);
+      opacity: 0.5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      background-color: var(--panel-bg-secondary);
+      border: 1px solid var(--panel-border);
+    }
+
+    /* Print styling for Labels */
+    @media print {
+      body * {
+        visibility: hidden;
+      }
+      .print-label-container, .print-label-container * {
+        visibility: visible;
+      }
+      .print-label-container {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 80mm;
+        height: 50mm;
+        border: 2px solid #000000 !important;
+        padding: 5mm;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        font-family: 'Ubuntu', monospace;
+      }
+      .print-label-header {
+        font-size: 16pt;
+        font-weight: bold;
+        border-bottom: 1px solid #000;
+        padding-bottom: 2mm;
+        margin-bottom: 2mm;
+      }
+      .print-label-details {
+        font-size: 11pt;
+        flex-grow: 1;
+      }
+      .print-label-code {
+        font-size: 20pt;
+        font-weight: 900;
+        text-align: center;
+        border: 1px solid #000;
+        padding: 1mm 0;
+        margin-top: 2mm;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Hidden Container for barcode/label printing -->
+  <div id="label-print-target" class="hidden"></div>
+
+  <div class="app-container">
+    
+    <!-- Header -->
+    <header class="app-header">
+      <div class="header-logo">
+        <i class="fa-solid fa-layer-group logo-icon"></i>
+        <div>
+          <h1 class="logo-text">КАТАЛОГ ЗА ЩАНЦИ & КЛИШЕТА</h1>
+        </div>
+      </div>
+      <div class="header-actions">
+        <div class="network-badge" title="Сървърът е активен в локалната мрежа">
+          <span class="network-status-dot"></span>
+          <span>Мрежов достъп: http://{{ local_ip }}:5050</span>
+        </div>
+        <button id="theme-toggle-btn" class="icon-btn" title="Смяна на темата">
+          <i class="fa-solid fa-moon"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- Controls & Filters -->
+    <section class="controls-panel">
+      <div class="controls-row-top">
+        <div class="search-box-container">
+          <i class="fa-solid fa-magnifying-glass search-icon"></i>
+          <input type="text" id="search-input" class="search-input" placeholder="Търсене по код, име, клиент, склад...">
+        </div>
+
+        <div class="search-box-container" style="max-width: 220px; min-width: 150px;">
+          <i class="fa-solid fa-ruler-combined search-icon"></i>
+          <input type="text" id="dim-filter" class="search-input" placeholder="Размер (напр. 150)">
+        </div>
+        
+        <select id="status-filter" class="filter-select">
+          <option value="all">Всички статуси</option>
+          <option value="active">В склада</option>
+          <option value="borrowed">Извън склада</option>
+          <option value="archived">Бракувани / Архив</option>
+        </select>
+
+        <div class="view-toggle-container">
+          <button id="btn-view-grid" class="icon-btn active" title="Преглед като карти">
+            <i class="fa-solid fa-grip"></i>
+          </button>
+          <button id="btn-view-table" class="icon-btn" title="Преглед като таблица">
+            <i class="fa-solid fa-table-list"></i>
+          </button>
+        </div>
+        
+        <button id="btn-open-add-modal" class="btn btn-primary">
+          <i class="fa-solid fa-plus"></i> Нов Инструмент
+        </button>
+      </div>
+      
+      <div class="category-tabs" id="category-tabs-container">
+        <button class="tab-btn active" data-category="all">
+          <i class="fa-solid fa-list"></i> Всички
+        </button>
+        <button class="tab-btn" data-category="die">
+          <i class="fa-solid fa-box-open"></i> Щанци
+        </button>
+        <button class="tab-btn" data-category="embossing">
+          <i class="fa-solid fa-stamp"></i> Преге клишета
+        </button>
+        <button class="tab-btn" data-category="foil">
+          <i class="fa-solid fa-wand-magic-sparkles"></i> Топъл печат
+        </button>
+      </div>
+    </section>
+
+    <!-- Tools Containers (Grid / Table) -->
+    <main style="margin-top: 1rem;">
+      <!-- Grid View Container -->
+      <div id="tools-grid-container" class="tools-grid">
+        <!-- Cards will load dynamically -->
+      </div>
+      
+      <!-- Table View Container -->
+      <div id="tools-table-container" class="table-responsive hidden">
+        <table class="tools-table">
+          <thead>
+            <tr>
+              <th style="width: 60px;">Чертеж</th>
+              <th style="width: 100px;">Код</th>
+              <th style="width: 90px;">Тип</th>
+              <th>Име / Описание</th>
+              <th>Клиент</th>
+              <th>Размери</th>
+              <th style="width: 80px; text-align: center;">Гнезда</th>
+              <th>Спецификация</th>
+              <th>Склад</th>
+              <th>Статус</th>
+              <th style="width: 190px; text-align: center;">Действия</th>
+            </tr>
+          </thead>
+          <tbody id="tools-table-body">
+            <!-- Table rows will load dynamically -->
+          </tbody>
+        </table>
+      </div>
+    </main>
+
+  </div>
+
+  <!-- ADD / EDIT MODAL -->
+  <div class="modal" id="tool-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title" id="modal-title-text">Добавяне на Нов Инструмент</h3>
+        <button class="close-btn" id="btn-close-modal">&times;</button>
+      </div>
+      <form id="tool-form" autocomplete="off">
+        <div class="modal-body">
+          <input type="hidden" id="tool-id">
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="tool-category">Категория на инструмента *</label>
+              <select id="tool-category" class="form-control" required>
+                <option value="" disabled selected>Изберете тип...</option>
+                <option value="die">Щанца (SH)</option>
+                <option value="embossing">Клише за Преге (PR)</option>
+                <option value="foil">Клише за Топъл печат (TP)</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label for="tool-code">Идентификационен Код</label>
+              <input type="text" id="tool-code" class="form-control" placeholder="Оставете празно за автоматичен код">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="tool-name">Име / Описание на инструмента *</label>
+            <input type="text" id="tool-name" class="form-control" placeholder="напр. Кутия за подарък A4, Лого 50x50" required>
+          </div>
+
+          <!-- Specific Fields for Dies only -->
+          <div id="die-specific-fields" class="hidden" style="border: 1px solid var(--panel-border); background-color: var(--panel-bg-secondary); padding: 1rem; margin-bottom: 1.25rem;">
+            <h4 style="margin-bottom: 0.75rem; font-size: 0.95rem; font-weight: 700; border-bottom: 1px solid var(--panel-border); padding-bottom: 0.25rem; color: var(--primary);"><i class="fa-solid fa-gears"></i> Спецификации на щанцата</h4>
+            
+            <div class="form-row">
+              <div class="form-group">
+                <label for="tool-die-shape">Вид/Форма на щанцата</label>
+                <select id="tool-die-shape" class="form-control">
+                  <option value="" selected>Изберете форма...</option>
+                  <option value="box">Кутия / Опаковка</option>
+                  <option value="folder">Папка</option>
+                  <option value="circle">Кръг</option>
+                  <option value="oval">Овал</option>
+                  <option value="playing_cards">Карти за игра</option>
+                  <option value="label">Етикет</option>
+                  <option value="envelope">Плик</option>
+                  <option value="custom">Нестандартна / Друга</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="tool-die-type">Технически вид на щанцата</label>
+                <select id="tool-die-type" class="form-control">
+                  <option value="" selected>Изберете вид...</option>
+                  <option value="flat">Плоска (Flatbed) - Стандартен тигел/машина</option>
+                  <option value="cylindrical">Цилиндрична / Ротационна (Rotary)</option>
+                  <option value="plunger">Бутална (Plunger) - Пакетно рязане с натиск</option>
+                  <option value="steel_rule">Лентова (Steel Rule)</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Size of single item -->
+            <div class="form-group" style="margin-bottom: 1.25rem;">
+              <label style="font-weight: 700; display: block; margin-bottom: 0.5rem; color: var(--text-color);">Размер на единичното изделие (мм) *</label>
+              <div id="single-item-size-inputs-wrapper" style="display: flex; gap: 0.5rem; align-items: center;">
+                <!-- Will be dynamically populated by JS -->
+              </div>
+            </div>
+
+            <div class="form-row" style="margin-bottom: 0;">
+              <div class="form-group" style="margin-bottom: 0;">
+                <label for="tool-ups">Брой размножения (гнезда)</label>
+                <input type="number" id="tool-ups" class="form-control" min="1" value="1" placeholder="напр. 1, 2, 4, 10">
+              </div>
+              <div class="form-group" style="margin-bottom: 0;">
+                <label for="tool-material">Предназначена за материал</label>
+                <select id="tool-material" class="form-control">
+                  <option value="" selected>Изберете материал...</option>
+                  <option value="paper">Хартия</option>
+                  <option value="cardboard">Картон (опаковъчен)</option>
+                  <option value="greyboard">Мукава</option>
+                  <option value="corrugated">Велпапе</option>
+                  <option value="plastic">Пластмаса / Фолио</option>
+                  <option value="other">Друг</option>
+                </select>
+              </div>
+            </div>
+
+            <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.75rem; border-top: 1px dashed var(--panel-border); padding-top: 0.5rem; line-height: 1.4; text-align: left;">
+              <strong>Справка за видове щанци:</strong><br>
+              • <em>Плоска:</em> Подходяща за папки, стандартни кутии, пликове и малки/средни тиражи.<br>
+              • <em>Цилиндрична:</em> Подходяща за ротационни машини, велпапе, кутии за цигари, етикети на ролка.<br>
+              • <em>Бутална:</em> Подходяща за пакетно щанцоване на етикети, овални форми и карти за игра.
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="tool-client">Клиент / Поръчка</label>
+              <input type="text" id="tool-client" class="form-control" placeholder="напр. Софарма, №12543">
+            </div>
+            <div class="form-group">
+              <label for="tool-status">Статус</label>
+              <select id="tool-status" class="form-control">
+                <option value="active">В склада</option>
+                <option value="borrowed">Извън склада / При клиента</option>
+                <option value="archived">Бракуван / Архивиран</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="tool-dimensions">Размери (мм)</label>
+              <input type="text" id="tool-dimensions" class="form-control" placeholder="напр. 150x200 mm">
+            </div>
+            <div class="form-group">
+              <label for="tool-location">Местоположение в склада *</label>
+              <input type="text" id="tool-location" class="form-control" placeholder="напр. A-3-12 (Сектор-Рафт-Кутия)" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Снимка или Чертеж на инструмента</label>
+            <div class="file-upload-zone" id="file-upload-zone">
+              <i class="fa-solid fa-cloud-arrow-up upload-icon"></i>
+              <span class="upload-text">Кликнете или провлачете чертежа тук</span>
+              <span class="upload-hint">Формати: JPG, PNG, PDF, SVG. Максимум 16MB.</span>
+              <input type="file" id="file-input" accept="image/*,application/pdf" style="display: none;">
+            </div>
+            <div id="file-preview-container" class="hidden">
+              <div class="file-preview-row">
+                <span class="file-preview-name" id="file-preview-name">file.png</span>
+                <button type="button" class="btn btn-danger btn-sm" id="btn-remove-file" style="padding: 0.25rem 0.5rem;">Изтрий</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-top: 1rem;">
+            <label for="tool-file-path">Път до оригиналния CAD / дизайн файл на диска</label>
+            <input type="text" id="tool-file-path" class="form-control" placeholder="напр. D:\\Designs\\Box_120x80.dxf">
+          </div>
+
+          <div class="form-group">
+            <label for="tool-notes">Допълнителни бележки</label>
+            <textarea id="tool-notes" class="form-control" placeholder="Технически спецификации, история или особености..."></textarea>
+          </div>
+
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="btn-cancel-modal">Отказ</button>
+          <button type="submit" class="btn btn-primary" id="btn-save-tool">Запази</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- LIGHTBOX -->
+  <div class="lightbox" id="lightbox">
+    <button class="lightbox-close" id="btn-close-lightbox">&times;</button>
+    <img src="" alt="Детайлен чертеж" class="lightbox-image" id="lightbox-img">
+  </div>
+
+  <script>
+    // State variables
+    let tools = [];
+    let currentCategory = 'all';
+    let currentStatus = 'all';
+    let searchQuery = '';
+    let dimQuery = '';
+    let currentViewMode = 'grid'; // Grid or Table
+    let selectedFile = null;
+    let isEditing = false;
+    let deleteImageOnEdit = false;
+
+    // DOM Elements
+    const toolsGridContainer = document.getElementById('tools-grid-container');
+    const toolsTableContainer = document.getElementById('tools-table-container');
+    const toolsTableBody = document.getElementById('tools-table-body');
+    const btnViewGrid = document.getElementById('btn-view-grid');
+    const btnViewTable = document.getElementById('btn-view-table');
+    
+    const searchInput = document.getElementById('search-input');
+    const dimFilter = document.getElementById('dim-filter');
+    const statusFilter = document.getElementById('status-filter');
+    const categoryTabsContainer = document.getElementById('category-tabs-container');
+    const themeToggleBtn = document.getElementById('theme-toggle-btn');
+    
+    // Modal Elements
+    const toolModal = document.getElementById('tool-modal');
+    const toolForm = document.getElementById('tool-form');
+    const modalTitleText = document.getElementById('modal-title-text');
+    const toolIdInput = document.getElementById('tool-id');
+    const toolCategorySelect = document.getElementById('tool-category');
+    const toolCodeInput = document.getElementById('tool-code');
+    const toolNameInput = document.getElementById('tool-name');
+    const toolClientInput = document.getElementById('tool-client');
+    const toolStatusSelect = document.getElementById('tool-status');
+    const toolDimensionsInput = document.getElementById('tool-dimensions');
+    const toolLocationInput = document.getElementById('tool-location');
+    const toolNotesInput = document.getElementById('tool-notes');
+    const toolFilePathInput = document.getElementById('tool-file-path');
+    
+    // New Die Specific Selectors
+    const toolDieShapeSelect = document.getElementById('tool-die-shape');
+    const toolDieTypeSelect = document.getElementById('tool-die-type');
+    const toolUpsInput = document.getElementById('tool-ups');
+    const toolMaterialSelect = document.getElementById('tool-material');
+    const dieSpecificFieldsDiv = document.getElementById('die-specific-fields');
+    const singleItemSizeInputsWrapper = document.getElementById('single-item-size-inputs-wrapper');
+    
+    // File Upload Elements
+    const fileUploadZone = document.getElementById('file-upload-zone');
+    const fileInput = document.getElementById('file-input');
+    const filePreviewContainer = document.getElementById('file-preview-container');
+    const filePreviewName = document.getElementById('file-preview-name');
+    const btnRemoveFile = document.getElementById('btn-remove-file');
+    
+    // Buttons
+    const btnOpenAddModal = document.getElementById('btn-open-add-modal');
+    const btnCloseModal = document.getElementById('btn-close-modal');
+    const btnCancelModal = document.getElementById('btn-cancel-modal');
+    
+    // Lightbox
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImg = document.getElementById('lightbox-img');
+    const btnCloseLightbox = document.getElementById('btn-close-lightbox');
+
+    // Page Load
+    document.addEventListener('DOMContentLoaded', () => {
+      initTheme();
+      fetchTools();
+      setupEventListeners();
+    });
+
+    // Theme Management
+    function initTheme() {
+      const savedTheme = localStorage.getItem('catalog-theme') || 'light';
+      if (savedTheme === 'dark') {
+        document.body.classList.add('dark-theme');
+        themeToggleBtn.innerHTML = '<i class="fa-solid fa-sun"></i>';
+      } else {
+        document.body.classList.remove('dark-theme');
+        themeToggleBtn.innerHTML = '<i class="fa-solid fa-moon"></i>';
+      }
+    }
+
+    themeToggleBtn.addEventListener('click', () => {
+      if (document.body.classList.contains('dark-theme')) {
+        document.body.classList.remove('dark-theme');
+        localStorage.setItem('catalog-theme', 'light');
+        themeToggleBtn.innerHTML = '<i class="fa-solid fa-moon"></i>';
+      } else {
+        document.body.classList.add('dark-theme');
+        localStorage.setItem('catalog-theme', 'dark');
+        themeToggleBtn.innerHTML = '<i class="fa-solid fa-sun"></i>';
+      }
+    });
+
+    // API Calls
+    function fetchTools() {
+      const url = `/api/tools?q=${encodeURIComponent(searchQuery)}&category=${currentCategory}&status=${currentStatus}&dim=${encodeURIComponent(dimQuery)}`;
+      fetch(url)
+        .then(res => res.json())
+        .then(data => {
+          tools = data;
+          renderTools();
+        })
+        .catch(err => {
+          console.error("Грешка при зареждане на инструментите:", err);
+          const errorHtml = `
+            <div class="empty-state-panel" style="grid-column: 1/-1; width: 100%;">
+              <i class="fa-solid fa-circle-exclamation empty-state-icon text-danger" style="opacity: 1;"></i>
+              <div class="empty-state-title">Грешка при връзка със сървъра</div>
+              <p>Моля проверете дали Flask сървърът работи.</p>
+            </div>
+          `;
+          if (currentViewMode === 'grid') {
+            toolsGridContainer.innerHTML = errorHtml;
+          } else {
+            toolsTableBody.innerHTML = `<tr><td colspan="10" style="text-align: center; color: var(--danger); padding: 2rem;"><strong>Грешка при връзка със сървъра</strong></td></tr>`;
+          }
+        });
+    }
+
+    // Render Tools Grid
+    // Render Tools Grid or Table
+    function renderTools() {
+      // Clear both containers
+      toolsGridContainer.innerHTML = '';
+      toolsTableBody.innerHTML = '';
+      
+      if (tools.length === 0) {
+        const emptyStateHtml = `
+          <div class="empty-state-panel" style="grid-column: 1/-1; width: 100%;">
+            <i class="fa-solid fa-magnifying-glass empty-state-icon"></i>
+            <div class="empty-state-title">Няма открити инструменти</div>
+            <p>Променете филтрите за търсене или добавете нов инструмент от бутона по-горе.</p>
+          </div>
+        `;
+        if (currentViewMode === 'grid') {
+          toolsGridContainer.innerHTML = emptyStateHtml;
+          toolsGridContainer.classList.remove('hidden');
+          toolsTableContainer.classList.add('hidden');
+        } else {
+          toolsTableBody.innerHTML = `
+            <tr>
+              <td colspan="10" style="text-align: center; padding: 3rem;">
+                <i class="fa-solid fa-magnifying-glass" style="font-size: 2rem; opacity: 0.3; margin-bottom: 1rem; display: block; color: var(--text-muted);"></i>
+                <strong>Няма открити инструменти</strong><br>
+                <span style="font-size: 0.9rem; color: var(--text-muted);">Променете филтрите за търсене или добавете нов инструмент.</span>
+              </td>
+            </tr>
+          `;
+          toolsGridContainer.classList.add('hidden');
+          toolsTableContainer.classList.remove('hidden');
+        }
+        return;
+      }
+
+      if (currentViewMode === 'grid') {
+        toolsGridContainer.classList.remove('hidden');
+        toolsTableContainer.classList.add('hidden');
+        
+        tools.forEach(t => {
+          const card = document.createElement('article');
+          card.className = `tool-card ${t.category}`;
+          
+          let imgHtml = '';
+          if (t.image_filename) {
+            imgHtml = `<img src="/uploads/${t.image_filename}" class="card-image" alt="${escapeHTML(t.name)}" onclick="openLightbox('/uploads/${t.image_filename}')">`;
+          } else {
+            imgHtml = `
+              <div class="no-image-placeholder">
+                <i class="fa-regular fa-image no-image-icon"></i>
+                <span style="font-size: 0.8rem;">Няма качена графика</span>
+              </div>
+            `;
+          }
+
+          const categoryName = t.category === 'die' ? 'Щанца' : (t.category === 'embossing' ? 'Преге' : 'Топъл печат');
+          const statusName = t.status === 'active' ? 'В склада' : (t.status === 'borrowed' ? 'Извън склада' : 'Бракуван');
+
+          // Build specific die details block
+          let dieDetailsHtml = '';
+          if (t.category === 'die') {
+            const shapeLabels = {
+              'box': 'Кутия / Опаковка',
+              'folder': 'Папка',
+              'circle': 'Кръг',
+              'oval': 'Овал',
+              'playing_cards': 'Карти за игра',
+              'label': 'Етикет',
+              'envelope': 'Плик',
+              'custom': 'Нестандартна / Друга'
+            };
+            const typeLabels = {
+              'flat': 'Плоска (Flatbed)',
+              'cylindrical': 'Цилиндрична (Rotary)',
+              'plunger': 'Бутална (Plunger)',
+              'steel_rule': 'Лентова'
+            };
+            const materialLabels = {
+              'paper': 'Хартия',
+              'cardboard': 'Картон',
+              'greyboard': 'Мукава',
+              'corrugated': 'Велпапе',
+              'plastic': 'Пластмаса/Фолио',
+              'other': 'Друг'
+            };
+
+            const shapeName = shapeLabels[t.die_shape] || t.die_shape || '–';
+            const typeName = typeLabels[t.die_type] || t.die_type || '–';
+            const materialName = materialLabels[t.material] || t.material || '–';
+            const upsCount = t.ups || 1;
+
+            dieDetailsHtml = `
+              <div class="card-details" style="margin-top: 0; border-top: none; background-color: var(--panel-bg-secondary); padding: 0.5rem 0.75rem; font-size: 0.85rem;">
+                <div class="detail-item">
+                  <span class="detail-label">Форма/Вид:</span>
+                  <span class="detail-val">${escapeHTML(shapeName)}</span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">Техн. вид:</span>
+                  <span class="detail-val">${escapeHTML(typeName)}</span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">Размножения:</span>
+                  <span class="detail-val" style="color: var(--color-die); font-weight: bold;">${upsCount} гнездо/а</span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">Материал:</span>
+                  <span class="detail-val">${escapeHTML(materialName)}</span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">Размер на плочата:</span>
+                  <span class="detail-val">${escapeHTML(t.dimensions || '–')}</span>
+                </div>
+              </div>
+            `;
+          }
+
+          card.innerHTML = `
+            <div class="card-image-wrapper">
+              ${imgHtml}
+            </div>
+            <div class="card-content">
+              <div class="card-header-row">
+                <span class="card-code">${escapeHTML(t.code)}</span>
+                <span class="card-badge ${t.category}">${categoryName}</span>
+              </div>
+              <h3 class="card-title" title="${escapeHTML(t.name)}">${escapeHTML(t.name)}</h3>
+              <div class="card-details" style="${t.category === 'die' ? 'margin-bottom: 0; border-bottom: none;' : ''}">
+                <div class="detail-item">
+                  <span class="detail-label">Клиент:</span>
+                  <span class="detail-val">${escapeHTML(t.client || '–')}</span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">${t.category === 'die' ? 'Размери на детайла:' : 'Размери:'}</span>
+                  <span class="detail-val" style="${t.category === 'die' ? 'color: var(--primary); font-weight: bold;' : ''}">
+                    ${escapeHTML(t.category === 'die' ? (t.single_item_dimensions || '–') : (t.dimensions || '–'))}
+                  </span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">Местоположение:</span>
+                  <span class="detail-val"><span class="location-tag">${escapeHTML(t.location)}</span></span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">Статус:</span>
+                  <span class="detail-val status-tag ${t.status}">${statusName}</span>
+                </div>
+                ${t.file_path ? `
+                <div class="detail-item" style="grid-column: span 2; font-size: 0.75rem; border-top: 1px dashed var(--panel-border); padding-top: 0.25rem; margin-top: 0.25rem;">
+                  <span class="detail-label" style="display: inline; font-weight: bold;"><i class="fa-solid fa-file-code"></i> CAD файл:</span>
+                  <span class="detail-val" style="display: inline; font-family: monospace; word-break: break-all; color: var(--text-muted);" title="${escapeHTML(t.file_path)}">${escapeHTML(t.file_path)}</span>
+                </div>
+                ` : ''}
+              </div>
+              
+              ${dieDetailsHtml}
+              
+              ${t.notes ? `<p class="card-notes" title="${escapeHTML(t.notes)}">${escapeHTML(t.notes)}</p>` : ''}
+              
+              <div class="card-actions">
+                <button class="btn btn-secondary" onclick="printLabel(${t.id})" title="Принтирай етикет за склада">
+                  <i class="fa-solid fa-print"></i> Етикет
+                </button>
+                <button class="btn btn-secondary" onclick="exportDesignFile(${t.id})" title="Копирай файл(ове) в папка">
+                  <i class="fa-solid fa-copy"></i> Копирай
+                </button>
+                <button class="btn btn-secondary" onclick="openEditModal(${t.id})">
+                  <i class="fa-solid fa-pen-to-square"></i> Ред.
+                </button>
+                <button class="btn btn-danger btn-sm" onclick="deleteTool(${t.id}, '${escapeHTML(t.code)}')">
+                  <i class="fa-solid fa-trash"></i>
+                </button>
+              </div>
+            </div>
+          `;
+          toolsGridContainer.appendChild(card);
+        });
+      } else {
+        toolsGridContainer.classList.add('hidden');
+        toolsTableContainer.classList.remove('hidden');
+
+        tools.forEach(t => {
+          const tr = document.createElement('tr');
+          
+          let imgHtml = '';
+          if (t.image_filename) {
+            imgHtml = `<img src="/uploads/${t.image_filename}" class="table-thumbnail" alt="${escapeHTML(t.name)}" onclick="openLightbox('/uploads/${t.image_filename}')">`;
+          } else {
+            imgHtml = `<span class="table-no-image"><i class="fa-regular fa-image"></i></span>`;
+          }
+
+          const categoryName = t.category === 'die' ? 'Щанца' : (t.category === 'embossing' ? 'Преге' : 'Топъл печат');
+          const statusName = t.status === 'active' ? 'В склада' : (t.status === 'borrowed' ? 'Извън склада' : 'Бракуван');
+          
+          let displayDimensions = t.dimensions || '–';
+          let displayUps = '–';
+          let specText = '–';
+          
+          if (t.category === 'die') {
+            displayDimensions = t.single_item_dimensions || '–';
+            displayUps = t.ups ? `${t.ups} гн.` : '1 гн.';
+            
+            const shapeLabels = {
+              'box': 'Кутия', 'folder': 'Папка', 'circle': 'Кръг', 'oval': 'Овал', 
+              'playing_cards': 'Карти', 'label': 'Етикет', 'envelope': 'Плик', 'custom': 'Друга'
+            };
+            const typeLabels = { 'flat': 'Плоска', 'cylindrical': 'Ротационна', 'plunger': 'Бутална', 'steel_rule': 'Лентова' };
+            const materialLabels = { 'paper': 'Хартия', 'cardboard': 'Картон', 'greyboard': 'Мукава', 'corrugated': 'Велпапе', 'plastic': 'Пластмаса', 'other': 'Друг' };
+            
+            const shape = shapeLabels[t.die_shape] || '';
+            const type = typeLabels[t.die_type] || '';
+            const mat = materialLabels[t.material] || '';
+            const boardSize = t.dimensions ? `Габарити: ${t.dimensions}` : '';
+            
+            const parts = [shape, type, mat, boardSize].filter(p => p !== '');
+            specText = parts.join(', ') || 'Попълнена';
+          }
+
+          tr.innerHTML = `
+            <td>${imgHtml}</td>
+            <td style="font-family: monospace; font-weight: bold; font-size: 0.95rem;">${escapeHTML(t.code)}</td>
+            <td><span class="card-badge ${t.category}" style="font-size: 0.7rem; padding: 0.1rem 0.4rem;">${categoryName}</span></td>
+            <td style="font-weight: 600;" title="${escapeHTML(t.notes || '')}">${escapeHTML(t.name)}</td>
+            <td>${escapeHTML(t.client || '–')}</td>
+            <td style="${t.category === 'die' ? 'color: var(--primary); font-weight: bold;' : ''}">${escapeHTML(displayDimensions)}</td>
+            <td style="font-weight: bold; text-align: center;">${escapeHTML(displayUps)}</td>
+            <td style="font-size: 0.85rem; color: var(--text-muted); font-style: italic;">${escapeHTML(specText)}</td>
+            <td><span class="location-tag" style="font-size: 0.85rem;">${escapeHTML(t.location)}</span></td>
+            <td><span class="status-tag ${t.status}" style="font-size: 0.8rem;">${statusName}</span></td>
+            <td style="text-align: center;">
+              <button class="btn btn-secondary btn-sm" style="padding: 0.35rem 0.6rem; font-size: 0.8rem;" onclick="printLabel(${t.id})" title="Етикет">
+                <i class="fa-solid fa-print"></i>
+              </button>
+              <button class="btn btn-secondary btn-sm" style="padding: 0.35rem 0.6rem; font-size: 0.8rem;" onclick="exportDesignFile(${t.id})" title="Копирай файлове">
+                <i class="fa-solid fa-copy"></i>
+              </button>
+              <button class="btn btn-secondary btn-sm" style="padding: 0.35rem 0.6rem; font-size: 0.8rem;" onclick="openEditModal(${t.id})">
+                <i class="fa-solid fa-pen-to-square"></i>
+              </button>
+              <button class="btn btn-danger btn-sm" style="padding: 0.35rem 0.5rem; font-size: 0.8rem;" onclick="deleteTool(${t.id}, '${escapeHTML(t.code)}')">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </td>
+          `;
+          toolsTableBody.appendChild(tr);
+        });
+      }
+    }
+
+    // Set up Event Listeners
+    // Helper: Dynamic single item dimensions form fields based on shape selection
+    function updateSingleItemSizeInputs(shape, initialValue = '') {
+      singleItemSizeInputsWrapper.innerHTML = '';
+      
+      const numbers = [];
+      if (initialValue) {
+        // Find all integer matches
+        const matches = initialValue.match(/\d+/g);
+        if (matches) {
+          matches.forEach(m => numbers.push(parseInt(m)));
+        }
+      }
+
+      if (shape === 'box') {
+        // 3 dimensions: W x L x H
+        singleItemSizeInputsWrapper.innerHTML = `
+          <input type="number" id="single-dim-w" class="form-control" placeholder="Ширина (W)" min="1" value="${numbers[0] || ''}" style="flex: 1;" required>
+          <span style="color: var(--text-muted); font-weight: bold;">x</span>
+          <input type="number" id="single-dim-l" class="form-control" placeholder="Дължина (L)" min="1" value="${numbers[1] || ''}" style="flex: 1;" required>
+          <span style="color: var(--text-muted); font-weight: bold;">x</span>
+          <input type="number" id="single-dim-h" class="form-control" placeholder="Височина (H)" min="1" value="${numbers[2] || ''}" style="flex: 1;" required>
+          <span style="font-size: 0.85rem; color: var(--text-muted);">мм</span>
+        `;
+      } else if (shape === 'circle') {
+        // 1 dimension: D
+        singleItemSizeInputsWrapper.innerHTML = `
+          <div style="display: flex; align-items: center; gap: 0.5rem; flex: 1;">
+            <span style="font-weight: 700; font-size: 1.2rem; color: var(--text-muted);">ф</span>
+            <input type="number" id="single-dim-d" class="form-control" placeholder="Диаметър" min="1" value="${numbers[0] || ''}" style="flex: 1;" required>
+            <span style="font-size: 0.85rem; color: var(--text-muted);">мм</span>
+          </div>
+        `;
+      } else if (['oval', 'folder', 'label', 'envelope', 'playing_cards'].includes(shape)) {
+        // 2 dimensions: W x H
+        singleItemSizeInputsWrapper.innerHTML = `
+          <input type="number" id="single-dim-w" class="form-control" placeholder="Ширина (W)" min="1" value="${numbers[0] || ''}" style="flex: 1;" required>
+          <span style="color: var(--text-muted); font-weight: bold;">x</span>
+          <input type="number" id="single-dim-h" class="form-control" placeholder="Височина (H)" min="1" value="${numbers[1] || ''}" style="flex: 1;" required>
+          <span style="font-size: 0.85rem; color: var(--text-muted);">мм</span>
+        `;
+      } else {
+        // General text input
+        const cleanVal = initialValue || '';
+        singleItemSizeInputsWrapper.innerHTML = `
+          <input type="text" id="single-dim-custom" class="form-control" placeholder="напр. 150x200 мм, нестандартен" value="${escapeHTML(cleanVal)}" style="flex: 1;">
+        `;
+      }
+    }
+
+    function setupEventListeners() {
+      // Toggle category-specific fields dynamically
+      toolCategorySelect.addEventListener('change', () => {
+        if (toolCategorySelect.value === 'die') {
+          dieSpecificFieldsDiv.classList.remove('hidden');
+          updateSingleItemSizeInputs(toolDieShapeSelect.value);
+        } else {
+          dieSpecificFieldsDiv.classList.add('hidden');
+        }
+      });
+
+      // Bind shape change listener to dynamically redraw item dimensions input fields
+      toolDieShapeSelect.addEventListener('change', () => {
+        updateSingleItemSizeInputs(toolDieShapeSelect.value);
+      });
+
+      // View Mode Toggle Listeners
+      btnViewGrid.addEventListener('click', () => {
+        currentViewMode = 'grid';
+        btnViewGrid.classList.add('active');
+        btnViewTable.classList.remove('active');
+        renderTools();
+      });
+
+      btnViewTable.addEventListener('click', () => {
+        currentViewMode = 'table';
+        btnViewTable.classList.add('active');
+        btnViewGrid.classList.remove('active');
+        renderTools();
+      });
+
+      // Search
+      searchInput.addEventListener('input', debounce(() => {
+        searchQuery = searchInput.value.trim();
+        fetchTools();
+      }, 300));
+
+      // Dimensions Filter
+      dimFilter.addEventListener('input', debounce(() => {
+        dimQuery = dimFilter.value.trim();
+        fetchTools();
+      }, 300));
+
+      // Status Filter
+      statusFilter.addEventListener('change', () => {
+        currentStatus = statusFilter.value;
+        fetchTools();
+      });
+
+      // Category Tabs
+      categoryTabsContainer.addEventListener('click', (e) => {
+        const btn = e.target.closest('.tab-btn');
+        if (!btn) return;
+        
+        categoryTabsContainer.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        
+        currentCategory = btn.getAttribute('data-category');
+        fetchTools();
+      });
+
+      // Modal Triggers
+      btnOpenAddModal.addEventListener('click', openAddModal);
+      btnCloseModal.addEventListener('click', closeModal);
+      btnCancelModal.addEventListener('click', closeModal);
+      
+      // Close modal on background click
+      window.addEventListener('click', (e) => {
+        if (e.target === toolModal) closeModal();
+      });
+
+      // Drag & Drop Handlers
+      ['dragenter', 'dragover'].forEach(eventName => {
+        fileUploadZone.addEventListener(eventName, (e) => {
+          e.preventDefault();
+          fileUploadZone.classList.add('dragover');
+        }, false);
+      });
+
+      ['dragleave', 'drop'].forEach(eventName => {
+        fileUploadZone.addEventListener(eventName, (e) => {
+          e.preventDefault();
+          fileUploadZone.classList.remove('dragover');
+        }, false);
+      });
+
+      fileUploadZone.addEventListener('drop', (e) => {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+        if (files.length > 0) {
+          handleFile(files[0]);
+        }
+      });
+
+      fileUploadZone.addEventListener('click', () => {
+        fileInput.click();
+      });
+
+      fileInput.addEventListener('change', () => {
+        if (fileInput.files.length > 0) {
+          handleFile(fileInput.files[0]);
+        }
+      });
+
+      btnRemoveFile.addEventListener('click', () => {
+        selectedFile = null;
+        fileInput.value = '';
+        filePreviewContainer.classList.add('hidden');
+        fileUploadZone.classList.remove('hidden');
+        if (isEditing) {
+          deleteImageOnEdit = true;
+        }
+      });
+
+      // Form Submit
+      toolForm.addEventListener('submit', handleFormSubmit);
+
+      // Lightbox Close
+      btnCloseLightbox.addEventListener('click', closeLightbox);
+      lightbox.addEventListener('click', (e) => {
+        if (e.target === lightbox) closeLightbox();
+      });
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          closeLightbox();
+          closeModal();
+        }
+      });
+    }
+
+    // File Handling
+    function handleFile(file) {
+      const allowed = ['png', 'jpg', 'jpeg', 'gif', 'pdf', 'svg'];
+      const ext = file.name.split('.').pop().toLowerCase();
+      
+      if (!allowed.includes(ext)) {
+        alert('Неподдържан формат! Качете картинка (JPG, PNG, SVG) или PDF.');
+        return;
+      }
+      
+      selectedFile = file;
+      filePreviewName.textContent = `${file.name} (${formatBytes(file.size)})`;
+      fileUploadZone.classList.add('hidden');
+      filePreviewContainer.classList.remove('hidden');
+      deleteImageOnEdit = false;
+    }
+
+    // Modal Actions
+    function openAddModal() {
+      isEditing = false;
+      deleteImageOnEdit = false;
+      selectedFile = null;
+      toolForm.reset();
+      toolIdInput.value = '';
+      fileInput.value = '';
+      
+      // Reset specific fields
+      toolDieShapeSelect.value = '';
+      toolDieTypeSelect.value = '';
+      toolUpsInput.value = '1';
+      toolMaterialSelect.value = '';
+      toolFilePathInput.value = '';
+      updateSingleItemSizeInputs('');
+      dieSpecificFieldsDiv.classList.add('hidden');
+      
+      toolCodeInput.placeholder = "Оставете празно за автоматичен код";
+      toolCodeInput.disabled = false;
+      modalTitleText.textContent = "Добавяне на Нов Инструмент";
+      
+      filePreviewContainer.classList.add('hidden');
+      fileUploadZone.classList.remove('hidden');
+      
+      toolModal.classList.add('active');
+    }
+
+    function openEditModal(id) {
+      const tool = tools.find(t => t.id === id);
+      if (!tool) return;
+
+      isEditing = true;
+      deleteImageOnEdit = false;
+      selectedFile = null;
+      
+      toolIdInput.value = tool.id;
+      toolCodeInput.value = tool.code;
+      toolCodeInput.placeholder = "";
+      toolCategorySelect.value = tool.category;
+      toolNameInput.value = tool.name;
+      toolClientInput.value = tool.client || '';
+      toolStatusSelect.value = tool.status;
+      toolDimensionsInput.value = tool.dimensions || '';
+      toolLocationInput.value = tool.location;
+      toolNotesInput.value = tool.notes || '';
+      toolFilePathInput.value = tool.file_path || '';
+      
+      // Populate specific fields
+      if (tool.category === 'die') {
+        dieSpecificFieldsDiv.classList.remove('hidden');
+        toolDieShapeSelect.value = tool.die_shape || '';
+        toolDieTypeSelect.value = tool.die_type || '';
+        toolUpsInput.value = tool.ups || '1';
+        toolMaterialSelect.value = tool.material || '';
+        updateSingleItemSizeInputs(tool.die_shape || '', tool.single_item_dimensions || '');
+      } else {
+        dieSpecificFieldsDiv.classList.add('hidden');
+        toolDieShapeSelect.value = '';
+        toolDieTypeSelect.value = '';
+        toolUpsInput.value = '1';
+        toolMaterialSelect.value = '';
+        updateSingleItemSizeInputs('');
+      }
+      
+      fileInput.value = '';
+      modalTitleText.textContent = `Редактиране на инструмент: ${tool.code}`;
+
+      if (tool.image_filename) {
+        filePreviewName.textContent = `Текущ чертеж: ${tool.image_filename}`;
+        fileUploadZone.classList.add('hidden');
+        filePreviewContainer.classList.remove('hidden');
+      } else {
+        filePreviewContainer.classList.add('hidden');
+        fileUploadZone.classList.remove('hidden');
+      }
+
+      toolModal.classList.add('active');
+    }
+
+    function closeModal() {
+      toolModal.classList.remove('active');
+    }
+
+    // Form Submit logic
+    function handleFormSubmit(e) {
+      e.preventDefault();
+      
+      const category = toolCategorySelect.value;
+      const name = toolNameInput.value.trim();
+      const location = toolLocationInput.value.trim();
+      
+      if (!category || !name || !location) {
+        alert('Моля попълнете всички задължителни полета (*).');
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('category', category);
+      formData.append('code', toolCodeInput.value.trim());
+      formData.append('name', name);
+      formData.append('client', toolClientInput.value.trim());
+      formData.append('status', toolStatusSelect.value);
+      formData.append('dimensions', toolDimensionsInput.value.trim());
+      formData.append('location', location);
+      formData.append('notes', toolNotesInput.value.trim());
+      formData.append('file_path', toolFilePathInput.value.trim());
+      
+      // Append specific fields for dies
+      if (category === 'die') {
+        formData.append('die_shape', toolDieShapeSelect.value);
+        formData.append('die_type', toolDieTypeSelect.value);
+        formData.append('ups', toolUpsInput.value);
+        formData.append('material', toolMaterialSelect.value);
+        
+        // Assemble single item dimensions based on selected shape
+        let singleItemSize = '';
+        const shape = toolDieShapeSelect.value;
+        if (shape === 'box') {
+          const w = document.getElementById('single-dim-w').value.trim();
+          const l = document.getElementById('single-dim-l').value.trim();
+          const h = document.getElementById('single-dim-h').value.trim();
+          if (w && l && h) singleItemSize = `${w}x${l}x${h} mm`;
+        } else if (shape === 'circle') {
+          const d = document.getElementById('single-dim-d').value.trim();
+          if (d) singleItemSize = `ф${d} mm`;
+        } else if (['oval', 'folder', 'label', 'envelope', 'playing_cards'].includes(shape)) {
+          const w = document.getElementById('single-dim-w').value.trim();
+          const h = document.getElementById('single-dim-h').value.trim();
+          if (w && h) singleItemSize = `${w}x${h} mm`;
+        } else {
+          const customInput = document.getElementById('single-dim-custom');
+          if (customInput) singleItemSize = customInput.value.trim();
+        }
+        formData.append('single_item_dimensions', singleItemSize);
+      }
+      
+      if (selectedFile) {
+        formData.append('image', selectedFile);
+      }
+      
+      if (isEditing) {
+        formData.append('delete_image', deleteImageOnEdit ? 'true' : 'false');
+      }
+
+      const id = toolIdInput.value;
+      const url = isEditing ? `/api/tools/${id}` : '/api/tools';
+      const method = isEditing ? 'PUT' : 'POST';
+
+      const saveBtn = document.getElementById('btn-save-tool');
+      saveBtn.disabled = true;
+      saveBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Запис...';
+
+      fetch(url, {
+        method: method,
+        body: formData
+      })
+      .then(res => res.json())
+      .then(data => {
+        saveBtn.disabled = false;
+        saveBtn.textContent = 'Запази';
+        
+        if (data.error) {
+          alert(data.error);
+        } else {
+          closeModal();
+          fetchTools();
+        }
+      })
+      .catch(err => {
+        saveBtn.disabled = false;
+        saveBtn.textContent = 'Запази';
+        console.error("Грешка при запис:", err);
+        alert("Грешка при изпращане на данните.");
+      });
+    }
+
+    // Delete Tool logic
+    function deleteTool(id, code) {
+      if (confirm(`Сигурни ли сте, че искате да изтриете инструмент с код "${code}"?`)) {
+        fetch(`/api/tools/${id}`, {
+          method: 'DELETE'
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            fetchTools();
+          } else {
+            alert('Грешка при изтриването.');
+          }
+        })
+        .catch(err => console.error("Грешка:", err));
+      }
+    }
+
+    // Lightbox triggers
+    function openLightbox(src) {
+      lightboxImg.src = src;
+      lightbox.classList.add('active');
+    }
+
+    function closeLightbox() {
+      lightbox.classList.remove('active');
+      setTimeout(() => {
+        lightboxImg.src = '';
+      }, 200);
+    }
+
+    // Warehouse Labels Printing
+    function printLabel(id) {
+      const tool = tools.find(t => t.id === id);
+      if (!tool) return;
+
+      const categoryName = tool.category === 'die' ? 'ЩАНЦА' : (tool.category === 'embossing' ? 'ПРЕГЕ' : 'ТОПЪЛ ПЕЧАТ');
+      const dateStr = new Date(tool.created_at || Date.now()).toLocaleDateString('bg-BG');
+
+      let dimensionsHtml = '';
+      if (tool.category === 'die') {
+        dimensionsHtml = `
+          <div><strong>Р-р изделие:</strong> ${escapeHTML(tool.single_item_dimensions || '–')}</div>
+          <div><strong>Гнезда:</strong> ${tool.ups || 1} гн.</div>
+          <div><strong>Р-р плоча:</strong> ${escapeHTML(tool.dimensions || '–')}</div>
+        `;
+      } else {
+        dimensionsHtml = `
+          <div><strong>Размери:</strong> ${escapeHTML(tool.dimensions || '–')}</div>
+        `;
+      }
+
+      const printContainer = document.getElementById('label-print-target');
+      printContainer.innerHTML = `
+        <div class="print-label-container">
+          <div class="print-label-header">
+            <span>${categoryName}</span>
+            <span style="float: right; font-size: 10pt; font-weight: normal; margin-top: 2px;">Дата: ${dateStr}</span>
+          </div>
+          <div class="print-label-details" style="font-size: 10.5pt; line-height: 1.35;">
+            <div style="margin-bottom: 1mm; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"><strong>Детайл:</strong> ${escapeHTML(tool.name)}</div>
+            <div style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"><strong>Клиент:</strong> ${escapeHTML(tool.client || '–')}</div>
+            ${dimensionsHtml}
+            <div style="margin-top: 1.5mm;"><strong>Склад / Позиция:</strong> <span style="font-weight: bold; border: 1px solid #000; padding: 0.5mm 1.5mm; background: #eee;">${escapeHTML(tool.location)}</span></div>
+          </div>
+          <div class="print-label-code" style="font-size: 18pt; margin-top: 1mm;">
+            ${escapeHTML(tool.code)}
+          </div>
+        </div>
+      `;
+      window.print();
+    }
+
+    // Export / Copy drawings to local disk folder
+    function exportDesignFile(id) {
+      const tool = tools.find(t => t.id === id);
+      if (!tool) return;
+      
+      const defaultPath = "D:\\Чертежи";
+      const destFolder = prompt(`Въведете път до папка на компютъра, където да се копират файловете за ${tool.code}:\n(Ако папката не съществува, ще бъде създадена)`, defaultPath);
+      
+      if (destFolder === null) return; // User clicked Cancel
+      
+      const cleanPath = destFolder.trim();
+      if (!cleanPath) {
+        alert("Моля въведете път до папка.");
+        return;
+      }
+      
+      fetch(`/api/tools/${id}/copy-file`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ destination_folder: cleanPath })
+      })
+      .then(response => response.json().then(data => ({ status: response.status, body: data })))
+      .then(res => {
+        if (res.status === 200) {
+          alert(res.body.message);
+        } else {
+          alert("Грешка: " + (res.body.error || "Възникна системна грешка при копирането."));
+        }
+      })
+      .catch(error => {
+        console.error('Error exporting file:', error);
+        alert("Възникна мрежова грешка при опит за връзка със сървъра.");
+      });
+    }
+
+    // Helpers
+    function debounce(func, wait) {
+      let timeout;
+      return function(...args) {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func.apply(this, args), wait);
+      };
+    }
+
+    function formatBytes(bytes) {
+      if (bytes === 0) return '0 Bytes';
+      const k = 1024;
+      const sizes = ['Bytes', 'KB', 'MB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+
+    function escapeHTML(str) {
+      if (!str) return '';
+      return str.replace(/[&<>'"]/g, 
+        tag => ({
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          "'": '&#39;',
+          '"': '&quot;'
+        }[tag] || tag)
+      );
+    }
+  </script>
+</body>
+</html>
