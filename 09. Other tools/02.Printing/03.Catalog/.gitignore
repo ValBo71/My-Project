@@ -30,6 +30,7 @@ share/python-wheels/
 venv/
 ENV/
 env/
+python_portable/
 
 # Project specific folders (database and user uploads)
 database/
