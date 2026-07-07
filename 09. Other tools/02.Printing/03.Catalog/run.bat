@@ -20,6 +20,7 @@ if not exist database mkdir database
 if not exist uploads mkdir uploads
 
 echo Server is starting...
+start "" "http://localhost:5050"
 
 python app.py
 goto end
