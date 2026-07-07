@@ -134,8 +134,8 @@ def get_tools():
         params.append(status)
 
     if dim_query:
-        sql += " AND py_lower(dimensions) LIKE py_lower(?)"
-        params.append(f"%{dim_query}%")
+        sql += " AND (py_lower(single_item_dimensions) LIKE py_lower(?) OR py_lower(dimensions) LIKE py_lower(?))"
+        params.extend([f"%{dim_query}%", f"%{dim_query}%"])
 
     if search_query:
         sql += " AND (py_lower(code) LIKE py_lower(?) OR py_lower(name) LIKE py_lower(?) OR py_lower(client) LIKE py_lower(?) OR py_lower(location) LIKE py_lower(?) OR py_lower(notes) LIKE py_lower(?) OR py_lower(dimensions) LIKE py_lower(?) OR py_lower(single_item_dimensions) LIKE py_lower(?) OR py_lower(file_path) LIKE py_lower(?))"
