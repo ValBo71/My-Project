@@ -990,10 +990,10 @@
         </select>
 
         <div class="view-toggle-container">
-          <button id="btn-view-grid" class="icon-btn active" title="Преглед като карти">
+          <button id="btn-view-grid" class="icon-btn" title="Преглед като карти">
             <i class="fa-solid fa-grip"></i>
           </button>
-          <button id="btn-view-table" class="icon-btn" title="Преглед като таблица">
+          <button id="btn-view-table" class="icon-btn active" title="Преглед като таблица">
             <i class="fa-solid fa-table-list"></i>
           </button>
         </div>
@@ -1022,12 +1022,12 @@
     <!-- Tools Containers (Grid / Table) -->
     <main style="margin-top: 1rem;">
       <!-- Grid View Container -->
-      <div id="tools-grid-container" class="tools-grid">
+      <div id="tools-grid-container" class="tools-grid hidden">
         <!-- Cards will load dynamically -->
       </div>
       
       <!-- Table View Container -->
-      <div id="tools-table-container" class="table-responsive hidden">
+      <div id="tools-table-container" class="table-responsive">
         <table class="tools-table">
           <thead>
             <tr>
@@ -1226,7 +1226,7 @@
     let currentStatus = 'all';
     let searchQuery = '';
     let dimQuery = '';
-    let currentViewMode = 'grid'; // Grid or Table
+    let currentViewMode = 'table'; // Grid or Table
     let selectedFile = null;
     let isEditing = false;
     let deleteImageOnEdit = false;
