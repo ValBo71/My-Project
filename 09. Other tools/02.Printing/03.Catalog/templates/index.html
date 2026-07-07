@@ -905,6 +905,73 @@
       border: 1px solid var(--panel-border);
     }
 
+    .pagination-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 2rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--panel-border);
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .pagination-info {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .pagination-buttons {
+      display: flex;
+      gap: 0.25rem;
+      align-items: center;
+    }
+
+    .pagination-btn {
+      background-color: var(--panel-bg-secondary);
+      border: 1px solid var(--panel-border);
+      color: var(--text-color);
+      padding: 0.35rem 0.7rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all var(--transition-speed);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 32px;
+      height: 32px;
+    }
+
+    .pagination-btn:hover:not(:disabled) {
+      background-color: rgba(0, 0, 0, 0.04);
+      border-color: var(--text-muted);
+    }
+
+    body.dark-theme .pagination-btn:hover:not(:disabled) {
+      background-color: rgba(255, 255, 255, 0.04);
+    }
+
+    .pagination-btn.active {
+      background-color: var(--primary) !important;
+      color: #ffffff !important;
+      border-color: var(--primary) !important;
+    }
+
+    .pagination-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .pagination-limit {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
     /* Print styling for Labels */
     @media print {
       body * {
@@ -1053,6 +1120,23 @@
             <!-- Table rows will load dynamically -->
           </tbody>
         </table>
+      </div>
+
+      <!-- Pagination Controls -->
+      <div id="pagination-container" class="pagination-bar">
+        <div class="pagination-info">
+          Показани <span id="pagination-range">0-0</span> от <span id="pagination-total">0</span> инструмента
+        </div>
+        <div class="pagination-buttons" id="pagination-buttons">
+          <!-- Page numbers will load dynamically -->
+        </div>
+        <div class="pagination-limit">
+          <span>Редове на страница:</span>
+          <select id="pagination-size" class="filter-select" style="width: auto; padding: 0.25rem 0.5rem; font-size: 0.85rem;">
+            <option value="10">10</option>
+            <option value="25">25</option>
+          </select>
+        </div>
       </div>
     </main>
 
@@ -1235,6 +1319,8 @@
     let selectedFile = null;
     let isEditing = false;
     let deleteImageOnEdit = false;
+    let currentPage = 1;
+    let pageSize = 10;
 
     // DOM Elements
     const toolsGridContainer = document.getElementById('tools-grid-container');
@@ -1248,6 +1334,12 @@
     const statusFilter = document.getElementById('status-filter');
     const categoryTabsContainer = document.getElementById('category-tabs-container');
     const themeToggleBtn = document.getElementById('theme-toggle-btn');
+    
+    const paginationContainer = document.getElementById('pagination-container');
+    const paginationRange = document.getElementById('pagination-range');
+    const paginationTotal = document.getElementById('pagination-total');
+    const paginationButtons = document.getElementById('pagination-buttons');
+    const paginationSizeSelect = document.getElementById('pagination-size');
     
     // Modal Elements
     const toolModal = document.getElementById('tool-modal');
@@ -1320,8 +1412,10 @@
       }
     });
 
-    // API Calls
-    function fetchTools() {
+    function fetchTools(resetPage = true) {
+      if (resetPage) {
+        currentPage = 1;
+      }
       const url = `/api/tools?q=${encodeURIComponent(searchQuery)}&category=${currentCategory}&status=${currentStatus}&dim=${encodeURIComponent(dimQuery)}`;
       fetch(url)
         .then(res => res.json())
@@ -1354,6 +1448,7 @@
       toolsTableBody.innerHTML = '';
       
       if (tools.length === 0) {
+        paginationContainer.style.display = 'none';
         const emptyStateHtml = `
           <div class="empty-state-panel" style="grid-column: 1/-1; width: 100%;">
             <i class="fa-solid fa-magnifying-glass empty-state-icon"></i>
@@ -1381,11 +1476,27 @@
         return;
       }
 
+      paginationContainer.style.display = 'flex';
+      const totalItems = tools.length;
+      const totalPages = Math.ceil(totalItems / pageSize) || 1;
+      
+      if (currentPage > totalPages) currentPage = totalPages;
+      if (currentPage < 1) currentPage = 1;
+      
+      const startIndex = (currentPage - 1) * pageSize;
+      const endIndex = Math.min(startIndex + pageSize, totalItems);
+      
+      paginationRange.textContent = `${startIndex + 1}-${endIndex}`;
+      paginationTotal.textContent = totalItems;
+      
+      const pageTools = tools.slice(startIndex, endIndex);
+      renderPaginationButtons(totalPages);
+
       if (currentViewMode === 'grid') {
         toolsGridContainer.classList.remove('hidden');
         toolsTableContainer.classList.add('hidden');
         
-        tools.forEach(t => {
+        pageTools.forEach(t => {
           const card = document.createElement('article');
           card.className = `tool-card ${t.category}`;
           
@@ -1526,7 +1637,7 @@
         toolsGridContainer.classList.add('hidden');
         toolsTableContainer.classList.remove('hidden');
 
-        tools.forEach(t => {
+        pageTools.forEach(t => {
           const tr = document.createElement('tr');
           
           let imgHtml = '';
@@ -1592,6 +1703,44 @@
           toolsTableBody.appendChild(tr);
         });
       }
+    }
+
+    function renderPaginationButtons(totalPages) {
+      paginationButtons.innerHTML = '';
+      
+      // Previous Button
+      const prevBtn = document.createElement('button');
+      prevBtn.className = 'pagination-btn';
+      prevBtn.innerHTML = '<i class="fa-solid fa-angle-left"></i>';
+      prevBtn.disabled = currentPage === 1;
+      prevBtn.addEventListener('click', () => {
+        currentPage--;
+        renderTools();
+      });
+      paginationButtons.appendChild(prevBtn);
+      
+      // Numeric Page Buttons
+      for (let i = 1; i <= totalPages; i++) {
+        const btn = document.createElement('button');
+        btn.className = `pagination-btn ${currentPage === i ? 'active' : ''}`;
+        btn.textContent = i;
+        btn.addEventListener('click', () => {
+          currentPage = i;
+          renderTools();
+        });
+        paginationButtons.appendChild(btn);
+      }
+      
+      // Next Button
+      const nextBtn = document.createElement('button');
+      nextBtn.className = 'pagination-btn';
+      nextBtn.innerHTML = '<i class="fa-solid fa-angle-right"></i>';
+      nextBtn.disabled = currentPage === totalPages;
+      nextBtn.addEventListener('click', () => {
+        currentPage++;
+        renderTools();
+      });
+      paginationButtons.appendChild(nextBtn);
     }
 
     // Set up Event Listeners
@@ -1703,6 +1852,13 @@
         
         currentCategory = btn.getAttribute('data-category');
         fetchTools();
+      });
+
+      // Pagination Size Selector
+      paginationSizeSelect.addEventListener('change', () => {
+        pageSize = parseInt(paginationSizeSelect.value, 10);
+        currentPage = 1;
+        renderTools();
       });
 
       // Modal Triggers
