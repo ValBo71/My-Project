@@ -64,12 +64,6 @@ if errorlevel 1 goto piperror
 if not exist database mkdir database
 if not exist uploads mkdir uploads
 
-:: Populate database with mock data if it does not exist
-if not exist database\catalog.db (
-    echo Populating database with mock data...
-    %PYTHON_EXE% scratch\populate_db.py
-)
-
 echo Server is starting...
 start "" "http://localhost:5050"
 %PYTHON_EXE% app.py
