@@ -34,6 +34,10 @@ namespace CarMaintenance.Infrastructure.Data
                 .HasForeignKey(m => m.CarId)
                 .OnDelete(DeleteBehavior.Cascade);
 
+            // Restrict (not Cascade) because Documents also cascades from ServiceRecords via
+            // SetNull below - SQL Server rejects a second cascade path from Car to the same
+            // table. Deleting a Car's Documents is instead handled explicitly in application
+            // code (Cars/Index OnPostDeleteAsync) before the Car itself is removed.
             modelBuilder.Entity<Car>()
                 .HasMany(c => c.Documents)
                 .WithOne(d => d.Car)
@@ -45,6 +49,18 @@ namespace CarMaintenance.Infrastructure.Data
                 .WithOne(m => m.Car)
                 .HasForeignKey(m => m.CarId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            // Links a mileage-history row back to the service record that produced it, so
+            // deleting a service record can remove the exact matching history row (done
+            // explicitly in Services/Index.OnPostDeleteAsync). Restrict (not SetNull/Cascade)
+            // because Car already cascades to both ServiceRecords and MileageHistories
+            // directly - a second cascading path between them would create the same
+            // "multiple cascade paths" conflict SQL Server rejects for Documents above.
+            modelBuilder.Entity<MileageHistory>()
+                .HasOne<ServiceRecord>()
+                .WithMany()
+                .HasForeignKey(m => m.ServiceRecordId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             // Configure ServiceRecord relations
             modelBuilder.Entity<ServiceRecord>()

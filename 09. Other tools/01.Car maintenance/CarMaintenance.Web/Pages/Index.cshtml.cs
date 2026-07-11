@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using CarMaintenance.Core.Entities;
 using CarMaintenance.Infrastructure.Data;
+using CarMaintenance.Web.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,10 +14,12 @@ namespace CarMaintenance.Web.Pages
     public class IndexModel : PageModel
     {
         private readonly ApplicationDbContext _context;
+        private readonly ActiveCarService _activeCarService;
 
-        public IndexModel(ApplicationDbContext context)
+        public IndexModel(ApplicationDbContext context, ActiveCarService activeCarService)
         {
             _context = context;
+            _activeCarService = activeCarService;
         }
 
         public Car? Car { get; set; }
@@ -34,24 +37,12 @@ namespace CarMaintenance.Web.Pages
                 return RedirectToPage("/Cars/Index");
             }
 
-            int carId;
-            if (Request.Cookies.TryGetValue("ActiveCarId", out string value) && int.TryParse(value, out int activeId))
-            {
-                carId = activeId;
-            }
-            else
-            {
-                var firstCar = await _context.Cars.FirstOrDefaultAsync();
-                carId = firstCar!.Id;
-                Response.Cookies.Append("ActiveCarId", carId.ToString());
-            }
-
-            Car = await _context.Cars.FindAsync(carId);
+            Car = await _activeCarService.GetActiveCarAsync(Request, Response);
             if (Car == null)
             {
-                Response.Cookies.Delete("ActiveCarId");
                 return RedirectToPage("/Cars/Index");
             }
+            var carId = Car.Id;
 
             // Get recent service logs
             RecentServices = await _context.ServiceRecords
@@ -60,17 +51,17 @@ namespace CarMaintenance.Web.Pages
                 .Take(5)
                 .ToListAsync();
 
-            // Get overdue and upcoming rules
+            // Get overdue and upcoming rules. Loaded untracked and never saved here: this is a
+            // GET request, so status is computed live for display only, never persisted.
             var rules = await _context.MaintenanceRules
+                .AsNoTracking()
                 .Where(r => r.CarId == carId)
                 .ToListAsync();
 
-            // Run status calculations dynamically to ensure freshness
             foreach (var rule in rules)
             {
                 CarMaintenance.Infrastructure.Services.MaintenanceCalculator.CalculateNextDue(rule, Car.CurrentMileage);
             }
-            await _context.SaveChangesAsync();
 
             OverdueRules = rules.Where(r => r.Status == "Red").ToList();
             WarningRules = rules.Where(r => r.Status == "Yellow").ToList();

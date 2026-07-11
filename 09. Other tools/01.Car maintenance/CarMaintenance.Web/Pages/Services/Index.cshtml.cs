@@ -1,9 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using CarMaintenance.Core.Entities;
 using CarMaintenance.Core.Enums;
 using CarMaintenance.Infrastructure.Data;
+using CarMaintenance.Web.Services;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -15,10 +17,14 @@ namespace CarMaintenance.Web.Pages.Services
     public class IndexModel : PageModel
     {
         private readonly ApplicationDbContext _context;
+        private readonly ActiveCarService _activeCarService;
+        private readonly ILogger<IndexModel> _logger;
 
-        public IndexModel(ApplicationDbContext context)
+        public IndexModel(ApplicationDbContext context, ActiveCarService activeCarService, ILogger<IndexModel> logger)
         {
             _context = context;
+            _activeCarService = activeCarService;
+            _logger = logger;
         }
 
         public Car Car { get; set; } = default!;
@@ -39,23 +45,13 @@ namespace CarMaintenance.Web.Pages.Services
 
         public async Task<IActionResult> OnGetAsync()
         {
-            if (!Request.Cookies.TryGetValue("ActiveCarId", out string value) || !int.TryParse(value, out int carId))
-            {
-                var firstCar = await _context.Cars.FirstOrDefaultAsync();
-                if (firstCar == null)
-                {
-                    return RedirectToPage("/Cars/Index");
-                }
-                carId = firstCar.Id;
-                Response.Cookies.Append("ActiveCarId", carId.ToString());
-            }
-
-            var car = await _context.Cars.FindAsync(carId);
+            var car = await _activeCarService.GetActiveCarAsync(Request, Response);
             if (car == null)
             {
                 return RedirectToPage("/Cars/Index");
             }
             Car = car;
+            var carId = car.Id;
 
             IQueryable<ServiceRecord> query = _context.ServiceRecords
                 .Include(s => s.ServiceItems)
@@ -107,14 +103,16 @@ namespace CarMaintenance.Web.Pages.Services
                     var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", doc.FilePath.TrimStart('/'));
                     if (System.IO.File.Exists(filePath))
                     {
-                        try { System.IO.File.Delete(filePath); } catch {}
+                        try { System.IO.File.Delete(filePath); }
+                        catch (IOException ex) { _logger.LogWarning(ex, "Could not delete document file {FilePath}", filePath); }
                     }
                     _context.Documents.Remove(doc);
                 }
 
-                // Delete associated mileage history entry if it matches the service date and mileage
+                // Delete the mileage-history entry this exact record created (matched by
+                // ServiceRecordId, not by mileage/date, which can collide across records).
                 var historyEntry = await _context.MileageHistories
-                    .FirstOrDefaultAsync(m => m.CarId == carId && m.Mileage == record.Mileage && m.Source == "ServiceLog");
+                    .FirstOrDefaultAsync(m => m.ServiceRecordId == record.Id);
                 if (historyEntry != null)
                 {
                     _context.MileageHistories.Remove(historyEntry);
@@ -123,16 +121,21 @@ namespace CarMaintenance.Web.Pages.Services
                 _context.ServiceRecords.Remove(record);
                 await _context.SaveChangesAsync();
 
-                // Recalculate car's current mileage to max in history
+                // Recalculate car's current mileage to the max of what remains in history.
+                // If no history remains, leave the car's mileage untouched instead of zeroing it.
                 var maxMileage = await _context.MileageHistories
                     .Where(m => m.CarId == carId)
-                    .MaxAsync(m => (int?)m.Mileage) ?? 0;
-                
-                var car = await _context.Cars.FindAsync(carId);
-                if (car != null)
+                    .Select(m => (int?)m.Mileage)
+                    .MaxAsync();
+
+                if (maxMileage.HasValue)
                 {
-                    car.CurrentMileage = maxMileage;
-                    await _context.SaveChangesAsync();
+                    var car = await _context.Cars.FindAsync(carId);
+                    if (car != null)
+                    {
+                        car.CurrentMileage = maxMileage.Value;
+                        await _context.SaveChangesAsync();
+                    }
                 }
             }
 

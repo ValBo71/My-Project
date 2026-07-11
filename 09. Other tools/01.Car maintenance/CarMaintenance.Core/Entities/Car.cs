@@ -11,13 +11,13 @@ namespace CarMaintenance.Core.Entities
         public int Id { get; set; }
 
         [Required, MaxLength(50)]
-        public string Make { get; set; }
+        public string Make { get; set; } = string.Empty;
 
         [Required, MaxLength(50)]
-        public string Model { get; set; }
+        public string Model { get; set; } = string.Empty;
 
         [Required, MaxLength(50)]
-        public string Engine { get; set; }
+        public string Engine { get; set; } = string.Empty;
 
         [Required]
         public int Year { get; set; }
@@ -26,7 +26,7 @@ namespace CarMaintenance.Core.Entities
         public string? Vin { get; set; }
 
         [Required, MaxLength(15)]
-        public string RegistrationNumber { get; set; }
+        public string RegistrationNumber { get; set; } = string.Empty;
 
         [Required]
         public FuelType Fuel { get; set; }

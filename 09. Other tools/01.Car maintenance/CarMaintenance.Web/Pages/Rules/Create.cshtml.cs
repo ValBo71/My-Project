@@ -6,16 +6,19 @@ using System.Threading.Tasks;
 using CarMaintenance.Core.Entities;
 using CarMaintenance.Infrastructure.Data;
 using CarMaintenance.Infrastructure.Services;
+using CarMaintenance.Web.Services;
 
 namespace CarMaintenance.Web.Pages.Rules
 {
     public class CreateModel : PageModel
     {
         private readonly ApplicationDbContext _context;
+        private readonly ActiveCarService _activeCarService;
 
-        public CreateModel(ApplicationDbContext context)
+        public CreateModel(ApplicationDbContext context, ActiveCarService activeCarService)
         {
             _context = context;
+            _activeCarService = activeCarService;
         }
 
         [BindProperty]
@@ -23,17 +26,7 @@ namespace CarMaintenance.Web.Pages.Rules
 
         public async Task<IActionResult> OnGetAsync()
         {
-            if (!Request.Cookies.TryGetValue("ActiveCarId", out string value) || !int.TryParse(value, out int carId))
-            {
-                var firstCar = await _context.Cars.FirstOrDefaultAsync();
-                if (firstCar == null)
-                {
-                    return RedirectToPage("/Cars/Index");
-                }
-                carId = firstCar.Id;
-            }
-
-            var car = await _context.Cars.FindAsync(carId);
+            var car = await _activeCarService.GetActiveCarAsync(Request, Response);
             if (car == null)
             {
                 return RedirectToPage("/Cars/Index");
@@ -41,7 +34,7 @@ namespace CarMaintenance.Web.Pages.Rules
 
             MaintenanceRule = new MaintenanceRule
             {
-                CarId = carId,
+                CarId = car.Id,
                 WarningKmBefore = 1000,
                 WarningDaysBefore = 30,
                 Status = "Gray"

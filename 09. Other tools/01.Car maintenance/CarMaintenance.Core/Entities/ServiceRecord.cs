@@ -15,7 +15,7 @@ namespace CarMaintenance.Core.Entities
         public int CarId { get; set; }
         
         [ForeignKey("CarId")]
-        public Car Car { get; set; }
+        public Car Car { get; set; } = null!;
 
         [Required]
         public DateTime Date { get; set; }
@@ -27,10 +27,10 @@ namespace CarMaintenance.Core.Entities
         public RecordType Type { get; set; }
 
         [Required, MaxLength(50)]
-        public string Category { get; set; }
+        public string Category { get; set; } = string.Empty;
 
         [Required, MaxLength(150)]
-        public string Title { get; set; }
+        public string Title { get; set; } = string.Empty;
 
         public string? Description { get; set; }
 

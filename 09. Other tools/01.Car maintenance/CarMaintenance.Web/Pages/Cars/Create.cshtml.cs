@@ -8,13 +8,14 @@ using System.Threading.Tasks;
 using CarMaintenance.Core.Entities;
 using CarMaintenance.Core.Enums;
 using CarMaintenance.Infrastructure.Data;
+using CarMaintenance.Infrastructure.Services;
 
 namespace CarMaintenance.Web.Pages.Cars
 {
     public class CreateModel : PageModel
     {
         private readonly ApplicationDbContext _context;
-        private readonly string _uploadFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "cars");
+        private readonly string _uploadFolder = FileUploadValidator.GetUploadFolder("cars");
 
         public CreateModel(ApplicationDbContext context)
         {
@@ -43,20 +44,14 @@ namespace CarMaintenance.Web.Pages.Cars
             // Handle image upload
             if (UploadedImage != null && UploadedImage.Length > 0)
             {
-                if (!Directory.Exists(_uploadFolder))
+                var validation = FileUploadValidator.Validate(UploadedImage, FileUploadValidator.ImageExtensions, FileUploadValidator.ImageContentTypes, FileUploadValidator.MaxImageSizeBytes);
+                if (!validation.IsValid)
                 {
-                    Directory.CreateDirectory(_uploadFolder);
+                    ModelState.AddModelError(nameof(UploadedImage), validation.Error!);
+                    return Page();
                 }
 
-                var uniqueFileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(UploadedImage.FileName);
-                var filePath = Path.Combine(_uploadFolder, uniqueFileName);
-
-                using (var stream = new FileStream(filePath, FileMode.Create))
-                {
-                    await UploadedImage.CopyToAsync(stream);
-                }
-
-                Car.ImagePath = $"/uploads/cars/{uniqueFileName}";
+                Car.ImagePath = await FileUploadValidator.SaveAsync(UploadedImage, _uploadFolder, "/uploads/cars");
             }
             else
             {

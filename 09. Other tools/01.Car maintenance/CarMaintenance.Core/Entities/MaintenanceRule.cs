@@ -13,13 +13,13 @@ namespace CarMaintenance.Core.Entities
         public int CarId { get; set; }
 
         [ForeignKey("CarId")]
-        public Car Car { get; set; }
+        public Car Car { get; set; } = null!;
 
         [Required, MaxLength(100)]
-        public string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
 
         [Required, MaxLength(50)]
-        public string Category { get; set; }
+        public string Category { get; set; } = string.Empty;
 
         public int? IntervalKm { get; set; }
 
