@@ -12,10 +12,10 @@ namespace CarMaintenance.Core.Entities
         public int ServiceRecordId { get; set; }
 
         [ForeignKey("ServiceRecordId")]
-        public ServiceRecord ServiceRecord { get; set; }
+        public ServiceRecord ServiceRecord { get; set; } = null!;
 
         [Required, MaxLength(100)]
-        public string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
 
         [MaxLength(50)]
         public string? Brand { get; set; }

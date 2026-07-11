@@ -9,17 +9,21 @@ using System.Threading.Tasks;
 using CarMaintenance.Core.Entities;
 using CarMaintenance.Core.Enums;
 using CarMaintenance.Infrastructure.Data;
+using CarMaintenance.Infrastructure.Services;
+using CarMaintenance.Web.Services;
 
 namespace CarMaintenance.Web.Pages.Services
 {
     public class CreateModel : PageModel
     {
         private readonly ApplicationDbContext _context;
-        private readonly string _uploadFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "documents");
+        private readonly ActiveCarService _activeCarService;
+        private readonly string _uploadFolder = FileUploadValidator.GetUploadFolder("documents");
 
-        public CreateModel(ApplicationDbContext context)
+        public CreateModel(ApplicationDbContext context, ActiveCarService activeCarService)
         {
             _context = context;
+            _activeCarService = activeCarService;
         }
 
         [BindProperty]
@@ -30,17 +34,7 @@ namespace CarMaintenance.Web.Pages.Services
 
         public async Task<IActionResult> OnGetAsync()
         {
-            if (!Request.Cookies.TryGetValue("ActiveCarId", out string value) || !int.TryParse(value, out int carId))
-            {
-                var firstCar = await _context.Cars.FirstOrDefaultAsync();
-                if (firstCar == null)
-                {
-                    return RedirectToPage("/Cars/Index");
-                }
-                carId = firstCar.Id;
-            }
-
-            var car = await _context.Cars.FindAsync(carId);
+            var car = await _activeCarService.GetActiveCarAsync(Request, Response);
             if (car == null)
             {
                 return RedirectToPage("/Cars/Index");
@@ -48,7 +42,7 @@ namespace CarMaintenance.Web.Pages.Services
 
             ServiceRecord = new ServiceRecord
             {
-                CarId = carId,
+                CarId = car.Id,
                 Date = DateTime.Today,
                 Mileage = car.CurrentMileage,
                 Type = RecordType.Service
@@ -64,6 +58,18 @@ namespace CarMaintenance.Web.Pages.Services
                 return Page();
             }
 
+            // Validate the file upload before persisting anything, so a rejected file
+            // doesn't leave an orphaned ServiceRecord behind.
+            if (UploadedFile != null && UploadedFile.Length > 0)
+            {
+                var validation = FileUploadValidator.Validate(UploadedFile, FileUploadValidator.DocumentExtensions, FileUploadValidator.DocumentContentTypes, FileUploadValidator.MaxDocumentSizeBytes);
+                if (!validation.IsValid)
+                {
+                    ModelState.AddModelError(nameof(UploadedFile), validation.Error!);
+                    return Page();
+                }
+            }
+
             // Set computed fields
             ServiceRecord.TotalCost = ServiceRecord.PartsCost + ServiceRecord.LaborCost;
 
@@ -73,18 +79,7 @@ namespace CarMaintenance.Web.Pages.Services
             // Handle file upload
             if (UploadedFile != null && UploadedFile.Length > 0)
             {
-                if (!Directory.Exists(_uploadFolder))
-                {
-                    Directory.CreateDirectory(_uploadFolder);
-                }
-
-                var uniqueFileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(UploadedFile.FileName);
-                var filePath = Path.Combine(_uploadFolder, uniqueFileName);
-
-                using (var stream = new FileStream(filePath, FileMode.Create))
-                {
-                    await UploadedFile.CopyToAsync(stream);
-                }
+                var filePath = await FileUploadValidator.SaveAsync(UploadedFile, _uploadFolder, "/uploads/documents");
 
                 var doc = new Document
                 {
@@ -93,7 +88,7 @@ namespace CarMaintenance.Web.Pages.Services
                     Name = $"Фактура: {ServiceRecord.Title}",
                     DocumentType = "Invoice",
                     IssueDate = ServiceRecord.Date,
-                    FilePath = $"/uploads/documents/{uniqueFileName}",
+                    FilePath = filePath,
                     Notes = $"Фактура прикачена към обслужване '{ServiceRecord.Title}'"
                 };
 
@@ -104,6 +99,7 @@ namespace CarMaintenance.Web.Pages.Services
             var mileageHistory = new MileageHistory
             {
                 CarId = ServiceRecord.CarId,
+                ServiceRecordId = ServiceRecord.Id,
                 Date = ServiceRecord.Date,
                 Mileage = ServiceRecord.Mileage,
                 Source = "ServiceLog",

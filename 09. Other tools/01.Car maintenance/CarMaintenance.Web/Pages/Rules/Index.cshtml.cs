@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using CarMaintenance.Core.Entities;
 using CarMaintenance.Infrastructure.Data;
 using CarMaintenance.Infrastructure.Services;
+using CarMaintenance.Web.Services;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -13,10 +14,12 @@ namespace CarMaintenance.Web.Pages.Rules
     public class IndexModel : PageModel
     {
         private readonly ApplicationDbContext _context;
+        private readonly ActiveCarService _activeCarService;
 
-        public IndexModel(ApplicationDbContext context)
+        public IndexModel(ApplicationDbContext context, ActiveCarService activeCarService)
         {
             _context = context;
+            _activeCarService = activeCarService;
         }
 
         public Car Car { get; set; } = default!;
@@ -24,34 +27,24 @@ namespace CarMaintenance.Web.Pages.Rules
 
         public async Task<IActionResult> OnGetAsync()
         {
-            if (!Request.Cookies.TryGetValue("ActiveCarId", out string value) || !int.TryParse(value, out int carId))
-            {
-                var firstCar = await _context.Cars.FirstOrDefaultAsync();
-                if (firstCar == null)
-                {
-                    return RedirectToPage("/Cars/Index");
-                }
-                carId = firstCar.Id;
-                Response.Cookies.Append("ActiveCarId", carId.ToString());
-            }
-
-            var car = await _context.Cars.FindAsync(carId);
+            var car = await _activeCarService.GetActiveCarAsync(Request, Response);
             if (car == null)
             {
                 return RedirectToPage("/Cars/Index");
             }
             Car = car;
 
+            // Loaded untracked and never saved: this is a GET request, so rule status is
+            // computed live for display only, never persisted.
             MaintenanceRules = await _context.MaintenanceRules
-                .Where(r => r.CarId == carId)
+                .AsNoTracking()
+                .Where(r => r.CarId == car.Id)
                 .ToListAsync();
 
-            // Run status calculations
             foreach (var rule in MaintenanceRules)
             {
                 MaintenanceCalculator.CalculateNextDue(rule, Car.CurrentMileage);
             }
-            await _context.SaveChangesAsync();
 
             return Page();
         }

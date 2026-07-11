@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using System;
 using System.IO;
 using System.Linq;
@@ -9,17 +10,20 @@ using System.Threading.Tasks;
 using CarMaintenance.Core.Entities;
 using CarMaintenance.Core.Enums;
 using CarMaintenance.Infrastructure.Data;
+using CarMaintenance.Infrastructure.Services;
 
 namespace CarMaintenance.Web.Pages.Cars
 {
     public class EditModel : PageModel
     {
         private readonly ApplicationDbContext _context;
-        private readonly string _uploadFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "cars");
+        private readonly ILogger<EditModel> _logger;
+        private readonly string _uploadFolder = FileUploadValidator.GetUploadFolder("cars");
 
-        public EditModel(ApplicationDbContext context)
+        public EditModel(ApplicationDbContext context, ILogger<EditModel> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         [BindProperty]
@@ -80,18 +84,14 @@ namespace CarMaintenance.Web.Pages.Cars
             // Handle image upload if a new one was provided
             if (UploadedImage != null && UploadedImage.Length > 0)
             {
-                if (!Directory.Exists(_uploadFolder))
+                var validation = FileUploadValidator.Validate(UploadedImage, FileUploadValidator.ImageExtensions, FileUploadValidator.ImageContentTypes, FileUploadValidator.MaxImageSizeBytes);
+                if (!validation.IsValid)
                 {
-                    Directory.CreateDirectory(_uploadFolder);
+                    ModelState.AddModelError(nameof(UploadedImage), validation.Error!);
+                    return Page();
                 }
 
-                var uniqueFileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(UploadedImage.FileName);
-                var filePath = Path.Combine(_uploadFolder, uniqueFileName);
-
-                using (var stream = new FileStream(filePath, FileMode.Create))
-                {
-                    await UploadedImage.CopyToAsync(stream);
-                }
+                var newImagePath = await FileUploadValidator.SaveAsync(UploadedImage, _uploadFolder, "/uploads/cars");
 
                 // Delete old image if it wasn't the default one
                 if (!string.IsNullOrEmpty(carToUpdate.ImagePath) && carToUpdate.ImagePath != "/images/default_car.png")
@@ -99,11 +99,12 @@ namespace CarMaintenance.Web.Pages.Cars
                     var oldFilePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", carToUpdate.ImagePath.TrimStart('/'));
                     if (System.IO.File.Exists(oldFilePath))
                     {
-                        try { System.IO.File.Delete(oldFilePath); } catch {}
+                        try { System.IO.File.Delete(oldFilePath); }
+                        catch (IOException ex) { _logger.LogWarning(ex, "Could not delete old car image {FilePath}", oldFilePath); }
                     }
                 }
 
-                carToUpdate.ImagePath = $"/uploads/cars/{uniqueFileName}";
+                carToUpdate.ImagePath = newImagePath;
             }
 
             await _context.SaveChangesAsync();
