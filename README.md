@@ -10,7 +10,7 @@ The projects are logically organized by categories and technology stack:
 
 ### 1. Web Projects (01. WEB project)
 * **01. Telerik web project**: "Bug Hunters" Profile Portal — A responsive, multilingual static portal website featuring the profiles, personality index cards (with 3D card flip animations), about pages, and interactive hobby galleries for 6 team members. Developed using HTML5, Vanilla CSS, and JavaScript/jQuery.
-* **02. Personal site**: Personal Portfolio Website — An interactive, responsive personal portal detailing professional experience, dynamic skill diagrams (radial and progress bars), filterable project cards, and an integrated BGN to EUR currency converter utility. Developed using HTML5, Bootstrap v3, and JavaScript/jQuery.
+* **02. Personal site**: Personal Portfolio Website — An interactive, responsive personal portal detailing professional experience, dynamic skill diagrams (radial and progress bars), a working contact form, and a filterable project portfolio spanning QA automation, printing tools, and other personal projects. Developed using HTML5, Bootstrap v3, and JavaScript/jQuery.
 
 ### 2. UI Automation (02. UI Testing)
 * **01. Cucumber**: BDD UI Test Automation framework utilizing JBehave and JUnit 4, featuring a custom Selenium WebDriver wrapper with dynamic element visibility waits and optimized configuration caching.
