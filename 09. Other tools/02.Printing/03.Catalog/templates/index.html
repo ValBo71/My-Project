@@ -89,7 +89,7 @@
     }
 
     .app-container {
-      max-width: 1400px;
+      max-width: 1650px;
       margin: 0 auto;
       padding: 0 1.5rem;
     }
@@ -164,6 +164,63 @@
     .icon-btn:hover {
       background-color: var(--panel-bg-secondary);
       border-color: var(--text-muted);
+    }
+
+    /* User menu */
+    .user-menu {
+      position: relative;
+    }
+
+    .user-menu-btn {
+      width: auto;
+      padding: 0 0.9rem;
+      gap: 0.5rem;
+    }
+
+    .user-menu-label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      font-family: var(--font-main);
+      max-width: 140px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .user-menu-dropdown {
+      position: absolute;
+      top: calc(100% + 0.4rem);
+      right: 0;
+      background-color: var(--panel-bg);
+      border: 1px solid var(--panel-border);
+      box-shadow: var(--card-shadow);
+      min-width: 190px;
+      z-index: 50;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .user-menu-role {
+      padding: 0.6rem 0.9rem;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--panel-border);
+    }
+
+    .user-menu-dropdown a {
+      padding: 0.65rem 0.9rem;
+      color: var(--text-color);
+      text-decoration: none;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .user-menu-dropdown a:hover {
+      background-color: var(--panel-bg-secondary);
     }
 
     /* Search & Filter Section */
@@ -360,6 +417,7 @@
       transition: transform var(--transition-speed), border-color var(--transition-speed);
       border-top: 4px solid var(--primary);
       position: relative;
+      cursor: pointer;
     }
 
     .tool-card:hover {
@@ -436,6 +494,7 @@
       text-transform: uppercase;
       padding: 0.2rem 0.6rem;
       color: #ffffff;
+      white-space: nowrap;
     }
 
     .card-badge.die { background-color: var(--color-die); }
@@ -480,12 +539,14 @@
       border: 1px solid var(--panel-border);
       padding: 0.1rem 0.4rem;
       font-family: 'Consolas', Monaco, monospace;
+      white-space: nowrap;
     }
 
     .status-tag {
       font-weight: 700;
       text-transform: uppercase;
       font-size: 0.75rem;
+      white-space: nowrap;
     }
     .status-tag.active { color: var(--success); }
     .status-tag.archived { color: var(--danger); }
@@ -532,6 +593,15 @@
       width: 32px !important;
       padding-left: 0 !important;
       padding-right: 0 !important;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* Read-only role: hide every add/edit/delete/copy control */
+    body.read-only-mode .write-action {
+      display: none !important;
     }
 
     /* Modal System */
@@ -881,6 +951,10 @@
       letter-spacing: 0.5px;
     }
     
+    .tools-table tbody tr {
+      cursor: pointer;
+    }
+
     .tools-table tbody tr:hover {
       background-color: rgba(0, 0, 0, 0.015);
     }
@@ -984,6 +1058,12 @@
       body * {
         visibility: hidden;
       }
+      #label-print-target {
+        display: block !important;
+        position: absolute;
+        left: 0;
+        top: 0;
+      }
       .print-label-container, .print-label-container * {
         visibility: visible;
       }
@@ -1042,6 +1122,20 @@
           <span class="network-status-dot"></span>
           <span>Мрежов достъп: http://{{ local_ip }}:5050</span>
         </div>
+        <div class="user-menu">
+          <button id="user-menu-btn" class="icon-btn user-menu-btn" title="Профил">
+            <i class="fa-solid fa-user"></i>
+            <span class="user-menu-label">{{ username }}</span>
+          </button>
+          <div id="user-menu-dropdown" class="user-menu-dropdown hidden">
+            <div class="user-menu-role">{{ role_label }}</div>
+            {% if role == 'admin' %}
+            <a href="/admin"><i class="fa-solid fa-user-gear"></i> Админ панел</a>
+            {% endif %}
+            <a href="/account"><i class="fa-solid fa-key"></i> Смяна на парола</a>
+            <a href="/logout"><i class="fa-solid fa-right-from-bracket"></i> Изход</a>
+          </div>
+        </div>
         <button id="theme-toggle-btn" class="icon-btn" title="Смяна на темата">
           <i class="fa-solid fa-moon"></i>
         </button>
@@ -1077,7 +1171,7 @@
           </button>
         </div>
         
-        <button id="btn-open-add-modal" class="btn btn-primary">
+        <button id="btn-open-add-modal" class="btn btn-primary write-action">
           <i class="fa-solid fa-plus"></i> Нов Инструмент
         </button>
       </div>
@@ -1146,6 +1240,12 @@
         </div>
       </div>
     </main>
+
+    <!-- Footer -->
+    <footer class="app-footer" style="text-align: center; margin-top: 3rem; padding: 1.5rem 0; border-top: 1px solid var(--panel-border); font-size: 0.85rem; color: var(--text-muted); line-height: 1.6;">
+      <div>Създадено от ValBo &copy; 2026</div>
+      <div style="font-weight: 500; font-size: 0.8rem; opacity: 0.8; margin-top: 0.25rem;">версия 1.0.0</div>
+    </footer>
 
   </div>
 
@@ -1446,6 +1546,26 @@
       }
     });
 
+    // User menu dropdown
+    const userMenuBtn = document.getElementById('user-menu-btn');
+    const userMenuDropdown = document.getElementById('user-menu-dropdown');
+    userMenuBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      userMenuDropdown.classList.toggle('hidden');
+    });
+    document.addEventListener('click', (e) => {
+      if (!userMenuDropdown.contains(e.target) && e.target !== userMenuBtn) {
+        userMenuDropdown.classList.add('hidden');
+      }
+    });
+
+    // Role-based UI: read-only users cannot add/edit/delete/copy tools
+    const currentUserRole = {{ role|tojson }};
+    const canWrite = currentUserRole === 'admin' || currentUserRole === 'read_write';
+    if (!canWrite) {
+      document.body.classList.add('read-only-mode');
+    }
+
     function fetchTools(resetPage = true) {
       if (resetPage) {
         currentPage = 1;
@@ -1533,6 +1653,13 @@
         pageTools.forEach(t => {
           const card = document.createElement('article');
           card.className = `tool-card ${t.category}`;
+          card.title = "Двоен клик за бърза редакция";
+          
+          card.addEventListener('dblclick', (e) => {
+            if (!canWrite) return;
+            if (e.target.closest('.card-actions') || e.target.closest('button') || e.target.closest('img')) return;
+            openEditModal(t.id);
+          });
           
           let imgHtml = '';
           if (t.image_filename) {
@@ -1656,13 +1783,13 @@
                 <button class="btn btn-secondary" onclick="openQrcodeModal(${t.id})" title="Виж QR код за склада">
                   <i class="fa-solid fa-qrcode"></i> QR
                 </button>
-                <button class="btn btn-secondary" onclick="exportDesignFile(${t.id})" title="Копирай файл(ове) в папка">
+                <button class="btn btn-secondary write-action" onclick="exportDesignFile(${t.id})" title="Копирай файл(ове) в папка">
                   <i class="fa-solid fa-copy"></i> Копирай
                 </button>
-                <button class="btn btn-secondary" onclick="openEditModal(${t.id})">
+                <button class="btn btn-secondary write-action" onclick="openEditModal(${t.id})">
                   <i class="fa-solid fa-pen-to-square"></i> Ред.
                 </button>
-                <button class="btn btn-danger btn-sm" onclick="deleteTool(${t.id}, '${escapeHTML(t.code)}')">
+                <button class="btn btn-danger btn-sm write-action" onclick="deleteTool(${t.id}, '${escapeHTML(t.code)}')">
                   <i class="fa-solid fa-trash"></i>
                 </button>
               </div>
@@ -1676,6 +1803,13 @@
 
         pageTools.forEach(t => {
           const tr = document.createElement('tr');
+          tr.title = "Двоен клик за бърза редакция";
+          
+          tr.addEventListener('dblclick', (e) => {
+            if (!canWrite) return;
+            if (e.target.closest('td:last-child') || e.target.closest('button') || e.target.closest('img')) return;
+            openEditModal(t.id);
+          });
           
           let imgHtml = '';
           if (t.image_filename) {
@@ -1729,13 +1863,13 @@
               <button class="btn btn-secondary btn-sm" style="padding: 0.35rem 0.6rem; font-size: 0.8rem;" onclick="openQrcodeModal(${t.id})" title="QR код">
                 <i class="fa-solid fa-qrcode"></i>
               </button>
-              <button class="btn btn-secondary btn-sm" style="padding: 0.35rem 0.6rem; font-size: 0.8rem;" onclick="exportDesignFile(${t.id})" title="Копирай файлове">
+              <button class="btn btn-secondary btn-sm write-action" style="padding: 0.35rem 0.6rem; font-size: 0.8rem;" onclick="exportDesignFile(${t.id})" title="Копирай файлове">
                 <i class="fa-solid fa-copy"></i>
               </button>
-              <button class="btn btn-secondary btn-sm" style="padding: 0.35rem 0.6rem; font-size: 0.8rem;" onclick="openEditModal(${t.id})">
+              <button class="btn btn-secondary btn-sm write-action" style="padding: 0.35rem 0.6rem; font-size: 0.8rem;" onclick="openEditModal(${t.id})">
                 <i class="fa-solid fa-pen-to-square"></i>
               </button>
-              <button class="btn btn-danger btn-sm" style="padding: 0.35rem 0.5rem; font-size: 0.8rem;" onclick="deleteTool(${t.id}, '${escapeHTML(t.code)}')">
+              <button class="btn btn-danger btn-sm write-action" style="padding: 0.35rem 0.5rem; font-size: 0.8rem;" onclick="deleteTool(${t.id}, '${escapeHTML(t.code)}')">
                 <i class="fa-solid fa-trash"></i>
               </button>
             </td>
