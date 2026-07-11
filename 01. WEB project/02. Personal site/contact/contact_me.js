@@ -13,33 +13,36 @@ $(function() {
      },
      submitSuccess: function($form, event) {
       event.preventDefault(); // prevent default submit behaviour
-       // get values from FORM
-       var name = $("input#name").val();  
-       var email = $("input#email").val(); 
-       var message = $("textarea#message").val();
-        var firstName = name; // For Success/Failure Message
-           // Check for white space in name for Success/Fail message
-        if (firstName.indexOf(' ') >= 0) {
-	   firstName = name.split(' ').slice(0, -1).join(' ');
-         }        
-        var subject = "Message from " + name + " via Personal Site";
-        var body = "Hi Valentin,\n\n" + message + "\n\nRegards,\n" + name + "\nEmail: " + email;
-        var mailtoUrl = "mailto:home@bogdanovi.com?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(body);
-        
-        window.location.href = mailtoUrl;
 
-        // Success message for opening mail client
-        $('#success').html("<div class='alert alert-success'>");
-        $('#success > .alert-success').html("<button type='button' class='close' data-dismiss='alert' aria-hidden='true'>&times;")
-            .append("</button>");
-        $('#success > .alert-success')
-            .append("<strong>Opening your email client...</strong> If it doesn't open, you can email me directly at <a href='" + mailtoUrl + "'>home@bogdanovi.com</a>.");
-        $('#success > .alert-success')
-            .append('</div>');
-            
-        // clear all fields
-        $('#contactForm').trigger("reset");
-         },
+      var $submitBtn = $form.find("button[type=submit]");
+      var originalBtnText = $submitBtn.text();
+      $submitBtn.prop("disabled", true).text("Sending...");
+
+      $.ajax({
+        url: "https://api.web3forms.com/submit",
+        type: "POST",
+        dataType: "json",
+        data: $form.serialize(),
+        success: function(response) {
+          if (response.success) {
+            $('#success').html("<div class='alert alert-success'><button type='button' class='close' data-dismiss='alert' aria-hidden='true'>&times;</button><strong>Message sent!</strong> Thank you for reaching out, I'll get back to you soon.</div>");
+            $form.trigger("reset");
+          } else {
+            showSendError();
+          }
+        },
+        error: function() {
+          showSendError();
+        },
+        complete: function() {
+          $submitBtn.prop("disabled", false).text(originalBtnText);
+        }
+      });
+
+      function showSendError() {
+        $('#success').html("<div class='alert alert-danger'><button type='button' class='close' data-dismiss='alert' aria-hidden='true'>&times;</button><strong>Something went wrong.</strong> Please email me directly at <a href='mailto:home@bogdanovi.com'>home@bogdanovi.com</a>.</div>");
+      }
+     },
          filter: function() {
                    return $(this).is(":visible");
          },

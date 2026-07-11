@@ -118,7 +118,7 @@ var customScripts = {
         customScripts.bannerHeight();
     }
 }
-$('document').ready(function () {
+$(document).ready(function () {
     customScripts.init();
 	$('#diagram-id-1').diagram({ 
 			size: "190",
