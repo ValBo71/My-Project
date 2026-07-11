@@ -386,8 +386,8 @@ function renderStats() {
     row.className = 'lang-stat-row';
     row.innerHTML = `
       <div>
-        <span class="lang-badge ${lang.toLowerCase()}">${lang.toUpperCase()}</span>
-        <span>${getLanguageName(lang)}</span>
+        <span class="lang-badge ${escapeHTML(lang.toLowerCase())}">${escapeHTML(lang.toUpperCase())}</span>
+        <span>${escapeHTML(getLanguageName(lang))}</span>
       </div>
       <div><strong>${count}</strong> <span class="text-muted">(${percentage}%)</span></div>
     `;
@@ -429,8 +429,14 @@ formAddWord.addEventListener('submit', (e) => {
   let language = addLangSelect.value;
   
   if (language === 'other') {
-    language = addLangOtherInput.value.trim().toLowerCase();
-    if (!language) return;
+    // Restrict to letters/digits: language codes are short identifiers, not free text,
+    // and this keeps the value safe wherever it's later rendered.
+    language = addLangOtherInput.value.trim().toLowerCase().replace(/[^a-z0-9]/g, '');
+    if (!language) {
+      alert('Моля, въведете валиден код на езика (само букви/цифри) в полето "Име на езика".');
+      addLangOtherInput.focus();
+      return;
+    }
   }
 
   // Duplicate Check
@@ -779,7 +785,7 @@ function renderDictionary() {
   pageWords.forEach(w => {
     const tr = document.createElement('tr');
     tr.innerHTML = `
-      <td><span class="lang-badge ${w.language}">${w.language.toUpperCase()}</span></td>
+      <td><span class="lang-badge ${escapeHTML(w.language)}">${escapeHTML(w.language.toUpperCase())}</span></td>
       <td class="font-weight-bold">${escapeHTML(w.word)}</td>
       <td>${escapeHTML(w.translation)}</td>
       <td><span class="source-file-badge" title="${escapeHTML(w.sourceFile || 'Ръчно добавени')}">${escapeHTML(w.sourceFile || 'Ръчно добавени')}</span></td>
@@ -889,8 +895,10 @@ function openEditModal(id) {
   if (standardLangs.includes(wordObj.language)) {
     editLangSelect.value = wordObj.language;
   } else {
-    // If it's a custom language, dynamically add it to the select options
-    let customOption = editLangSelect.querySelector(`option[value="${wordObj.language}"]`);
+    // If it's a custom language, dynamically add it to the select options.
+    // Found via a JS comparison (not a CSS attribute-selector string) so a language value
+    // containing quotes or other special characters can't break the query.
+    let customOption = Array.from(editLangSelect.options).find(opt => opt.value === wordObj.language);
     if (!customOption) {
       customOption = document.createElement('option');
       customOption.value = wordObj.language;
@@ -1273,8 +1281,10 @@ btnProcessImport.addEventListener('click', () => {
           continue;
         }
 
-        const foreignWord = String(row[0]).trim();
-        const bulgarianTranslation = String(row[1]).trim();
+        // row[i] can be `undefined` for a blank cell (sparse array from SheetJS) - stringifying
+        // it directly would produce the literal text "undefined" instead of an empty string.
+        const foreignWord = row[0] != null ? String(row[0]).trim() : '';
+        const bulgarianTranslation = row[1] != null ? String(row[1]).trim() : '';
 
         if (!foreignWord || !bulgarianTranslation) {
           skippedCount++;
