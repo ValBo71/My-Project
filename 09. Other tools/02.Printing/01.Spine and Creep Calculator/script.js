@@ -159,8 +159,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // 2. Creep Calculation based on Signature Size (nested sheets)
+        // Only applies when pages are folded/sewn into signatures - unsewn (single-sheet) binding has no creep
         // Creep = (Signature Size / 4 - 1) * Paper Thickness
-        const creepValue = Math.max(0, (signatureSize / 4 - 1) * paperThickness);
+        const creepValue = isSewn ? Math.max(0, (signatureSize / 4 - 1) * paperThickness) : 0;
 
         // Rounding results to 2 decimal places
         const spineFormatted = spineWidth.toFixed(2);
