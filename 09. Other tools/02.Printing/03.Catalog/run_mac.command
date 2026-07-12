@@ -4,8 +4,68 @@
 
 set -e
 cd "$(dirname "$0")"
+PROJECT_DIR="$(pwd)"
 
 echo "Checking environment..."
+
+# 0. Create a Desktop shortcut with a custom icon on first run
+DESKTOP_APP="$HOME/Desktop/Printing Catalog.app"
+ICON_SRC="$PROJECT_DIR/assets/icon.png"
+if [ ! -d "$DESKTOP_APP" ] && [ -f "$ICON_SRC" ]; then
+    set +e
+    (
+        set -e
+        echo "Creating Desktop shortcut..."
+        mkdir -p "$DESKTOP_APP/Contents/MacOS" "$DESKTOP_APP/Contents/Resources"
+
+        ICONSET_DIR="$(mktemp -d)/AppIcon.iconset"
+        mkdir -p "$ICONSET_DIR"
+        for size in 16 32 128 256 512; do
+            sips -z "$size" "$size" "$ICON_SRC" --out "$ICONSET_DIR/icon_${size}x${size}.png" >/dev/null
+            double=$((size * 2))
+            sips -z "$double" "$double" "$ICON_SRC" --out "$ICONSET_DIR/icon_${size}x${size}@2x.png" >/dev/null
+        done
+        iconutil -c icns "$ICONSET_DIR" -o "$DESKTOP_APP/Contents/Resources/AppIcon.icns"
+        rm -rf "$(dirname "$ICONSET_DIR")"
+
+        cat > "$DESKTOP_APP/Contents/MacOS/launcher" <<LAUNCHER
+#!/bin/bash
+cd "$PROJECT_DIR"
+exec ./run_mac.command
+LAUNCHER
+        chmod +x "$DESKTOP_APP/Contents/MacOS/launcher"
+
+        cat > "$DESKTOP_APP/Contents/Info.plist" <<PLIST
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>CFBundleName</key>
+    <string>Printing Catalog</string>
+    <key>CFBundleDisplayName</key>
+    <string>Printing Catalog</string>
+    <key>CFBundleExecutable</key>
+    <string>launcher</string>
+    <key>CFBundleIconFile</key>
+    <string>AppIcon</string>
+    <key>CFBundleIdentifier</key>
+    <string>local.printingcatalog.launcher</string>
+    <key>CFBundlePackageType</key>
+    <string>APPL</string>
+    <key>CFBundleShortVersionString</key>
+    <string>1.0</string>
+</dict>
+</plist>
+PLIST
+        touch "$DESKTOP_APP"
+        echo "Desktop shortcut created: $DESKTOP_APP"
+    )
+    if [ $? -ne 0 ]; then
+        echo "Warning: could not create the Desktop shortcut, continuing anyway..."
+        rm -rf "$DESKTOP_APP"
+    fi
+    set -e
+fi
 
 PORTABLE_DIR="python_portable"
 PORTABLE_BIN="$PORTABLE_DIR/bin/python3"
