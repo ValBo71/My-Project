@@ -2,6 +2,14 @@
 title Printing Catalog Server
 echo Checking environment...
 
+:: 0. Create a Desktop shortcut with a custom icon on first run
+if not exist "%USERPROFILE%\Desktop\Printing Catalog.lnk" (
+    if exist "%~dp0assets\icon.ico" (
+        echo Creating Desktop shortcut...
+        powershell -NoProfile -Command "$s = (New-Object -ComObject WScript.Shell).CreateShortcut('%USERPROFILE%\Desktop\Printing Catalog.lnk'); $s.TargetPath = '%~f0'; $s.WorkingDirectory = '%~dp0'; $s.IconLocation = '%~dp0assets\icon.ico'; $s.Save()"
+    )
+)
+
 :: 1. Check if system python is available in PATH
 python --version >nul 2>&1
 if errorlevel 1 goto nopathpython
