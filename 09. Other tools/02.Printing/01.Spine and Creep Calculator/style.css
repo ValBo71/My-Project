@@ -820,3 +820,248 @@ select optgroup {
     font-size: 0.78rem;
     color: var(--text-muted);
 }
+
+/* Manage Papers Trigger Button */
+.btn-manage-papers {
+    align-self: flex-start;
+    background-color: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    border-radius: 0;
+    padding: 0.55rem 1rem;
+    color: var(--text-secondary);
+    font-size: 0.82rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+}
+
+.btn-manage-papers:hover {
+    background-color: var(--pastel-blue);
+    border-color: var(--pastel-blue-border);
+    color: var(--text-primary);
+}
+
+/* Shared modal buttons */
+.btn-primary,
+.btn-secondary {
+    font-family: inherit;
+    font-size: 0.88rem;
+    font-weight: 600;
+    padding: 0.7rem 1.2rem;
+    border-radius: 0;
+    cursor: pointer;
+    transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+    white-space: nowrap;
+}
+
+.btn-primary {
+    background-color: var(--pastel-blue);
+    border: 1px solid var(--pastel-blue-border);
+    color: var(--pastel-blue-dark);
+}
+
+.btn-primary:hover {
+    background-color: var(--pastel-blue-border);
+    color: #ffffff;
+}
+
+.btn-secondary {
+    background-color: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+}
+
+.btn-secondary:hover {
+    border-color: var(--accent-gold);
+    color: var(--accent-gold);
+}
+
+/* Paper Management Modal */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+    padding: 1.5rem;
+}
+
+.modal-overlay.hidden {
+    display: none;
+}
+
+.modal-box {
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 0;
+    box-shadow: var(--hover-shadow);
+    width: 100%;
+    max-width: 640px;
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.modal-header h3 {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 1.4rem;
+    line-height: 1;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 0.2rem 0.5rem;
+    transition: color 0.2s;
+}
+
+.modal-close:hover {
+    color: var(--accent-gold);
+}
+
+.modal-body {
+    padding: 1.5rem;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.modal-hint {
+    font-size: 0.82rem;
+    color: var(--text-secondary);
+    line-height: 1.4;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1.25rem 1.5rem;
+    border-top: 1px solid var(--border-color);
+}
+
+/* Paper list rows inside the modal */
+.paper-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    max-height: 42vh;
+    overflow-y: auto;
+    padding-right: 0.25rem;
+}
+
+.paper-list-category {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-top: 0.75rem;
+    padding-bottom: 0.25rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.paper-list-category:first-child {
+    margin-top: 0;
+}
+
+.paper-row {
+    display: grid;
+    grid-template-columns: 1.2fr 1.4fr 0.7fr auto;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.paper-row input {
+    background-color: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    border-radius: 0;
+    padding: 0.5rem 0.6rem;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    outline: none;
+    width: 100%;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.paper-row input:focus {
+    border-color: var(--pastel-blue-border);
+    box-shadow: 0 0 0 2px var(--pastel-blue-glow);
+}
+
+.paper-row-delete {
+    background: none;
+    border: 1px solid var(--border-color);
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    padding: 0.5rem 0.6rem;
+    cursor: pointer;
+    transition: color 0.2s, border-color 0.2s, background-color 0.2s;
+}
+
+.paper-row-delete:hover {
+    color: #b91c1c;
+    border-color: #b91c1c;
+    background-color: rgba(185, 28, 28, 0.06);
+}
+
+/* Add new paper form */
+.paper-add-form {
+    border-top: 1px solid var(--border-color);
+    padding-top: 1.25rem;
+}
+
+.paper-add-form h4 {
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.75rem;
+}
+
+.paper-add-grid {
+    display: grid;
+    grid-template-columns: 1.2fr 1.4fr 0.7fr auto;
+    gap: 0.5rem;
+}
+
+.paper-add-grid input {
+    background-color: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    border-radius: 0;
+    padding: 0.6rem 0.7rem;
+    font-size: 0.85rem;
+    color: var(--text-primary);
+    outline: none;
+    width: 100%;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.paper-add-grid input:focus {
+    border-color: var(--pastel-blue-border);
+    box-shadow: 0 0 0 2px var(--pastel-blue-glow);
+}
+
+@media (max-width: 640px) {
+    .paper-row,
+    .paper-add-grid {
+        grid-template-columns: 1fr;
+    }
+}
