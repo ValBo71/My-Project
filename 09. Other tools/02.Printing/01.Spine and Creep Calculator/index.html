@@ -82,41 +82,10 @@
                         </label>
                         <div class="select-wrapper">
                             <select id="paper" name="paper" required>
-                                <optgroup label="Офсетови хартии">
-                                    <option value="0.085">70 г Офсет (0.085 мм)</option>
-                                    <option value="0.095" selected>80 г Офсет (0.095 мм)</option>
-                                    <option value="0.105">90 г Офсет (0.105 мм)</option>
-                                    <option value="0.12">100 г Офсет (0.120 мм)</option>
-                                    <option value="0.132">120 г Офсет (0.132 мм)</option>
-                                    <option value="0.145">140 г Офсет (0.145 мм)</option>
-                                </optgroup>
-                                <optgroup label="Хромови хартии (Гланц)">
-                                    <option value="0.06">80 г Хром Гланц (0.060 мм)</option>
-                                    <option value="0.065">90 г Хром Гланц (0.065 мм)</option>
-                                    <option value="0.071">100 г Хром Гланц (0.071 мм)</option>
-                                    <option value="0.085">115 г Хром Гланц (0.085 мм)</option>
-                                    <option value="0.1">130 г Хром Гланц (0.100 мм)</option>
-                                    <option value="0.12">150 г Хром Гланц (0.120 мм)</option>
-                                    <option value="0.13">170 г Хром Гланц (0.130 мм)</option>
-                                    <option value="0.145">200 г Хром Гланц (0.145 мм)</option>
-                                </optgroup>
-                                <optgroup label="Хромови хартии (Мат)">
-                                    <option value="0.065">80 г Хром Мат (0.065 мм)</option>
-                                    <option value="0.072">90 г Хром Мат (0.072 мм)</option>
-                                    <option value="0.08">100 г Хром Мат (0.080 мм)</option>
-                                    <option value="0.1">115 г Хром Мат (0.100 мм)</option>
-                                    <option value="0.112">130 г Хром Мат (0.112 мм)</option>
-                                    <option value="0.125">150 г Хром Мат (0.125 мм)</option>
-                                    <option value="0.15">170 г Хром Мат (0.150 мм)</option>
-                                    <option value="0.18">200 г Хром Мат (0.180 мм)</option>
-                                </optgroup>
-                                <optgroup label="Обемни хартии">
-                                    <option value="0.095">55 г Обемна хартия (0.095 мм)</option>
-                                    <option value="0.135">70 г Обемна хартия (0.135 мм)</option>
-                                    <option value="0.155">80 г Обемна хартия (0.155 мм)</option>
-                                </optgroup>
+                                <!-- Options are rendered dynamically by script.js from custom-editable paper data -->
                             </select>
                         </div>
+                        <button type="button" id="manage-papers-btn" class="btn-manage-papers">⚙ Управление на хартии</button>
                     </div>
 
                     <!-- Signature Size Select -->
@@ -269,6 +238,35 @@
                 <p>&copy; 2026 Калкулатор за Гръбче и Избутване. Създадено за бързи и точни предпечатни изчисления.</p>
             </div>
         </footer>
+    </div>
+
+    <!-- Paper Management Modal -->
+    <div class="modal-overlay hidden" id="paper-modal-overlay">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3>Управление на хартии</h3>
+                <button type="button" class="modal-close" id="paper-modal-close" aria-label="Затвори">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p class="modal-hint">Редактирайте категорията, името или дебелината (в мм) на съществуваща хартия директно в полетата. Промените се запазват автоматично в браузъра ви.</p>
+                <div id="paper-list" class="paper-list"></div>
+
+                <div class="paper-add-form">
+                    <h4>Добави нова хартия</h4>
+                    <div class="paper-add-grid">
+                        <input type="text" id="new-paper-category" list="paper-categories-list" placeholder="Категория (напр. Офсетови хартии)">
+                        <datalist id="paper-categories-list"></datalist>
+                        <input type="text" id="new-paper-name" placeholder="Име (напр. 90 г Крафт)">
+                        <input type="number" id="new-paper-thickness" placeholder="Дебелина (мм)" step="0.001" min="0.001">
+                        <button type="button" id="add-paper-btn" class="btn-primary">+ Добави</button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="reset-papers-btn" class="btn-secondary">Възстанови по подразбиране</button>
+                <button type="button" id="paper-modal-done" class="btn-primary">Готово</button>
+            </div>
+        </div>
     </div>
 
     <!-- Script File -->
