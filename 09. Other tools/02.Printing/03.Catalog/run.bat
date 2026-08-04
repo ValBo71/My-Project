@@ -72,9 +72,17 @@ if errorlevel 1 goto piperror
 if not exist database mkdir database
 if not exist uploads mkdir uploads
 
+:: Clear any leftover exit marker from a previous crashed run
+if exist database\.exit_requested del database\.exit_requested
+
 echo Server is starting...
 start "" "http://localhost:5050"
 %PYTHON_EXE% app.py
+
+:: The app's Exit button writes this marker just before shutting itself down,
+:: so we can close the window automatically instead of pausing - a Ctrl+C or
+:: crash leaves no marker, so the pause below still shows for those cases.
+if exist database\.exit_requested goto clean_exit
 goto end
 
 :downloaderror
@@ -91,6 +99,10 @@ goto end
 echo Error: Failed to install Python dependencies!
 pause
 goto end
+
+:clean_exit
+del database\.exit_requested
+exit /b 0
 
 :end
 pause
