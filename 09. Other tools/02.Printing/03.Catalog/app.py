@@ -1,13 +1,18 @@
 import os
+import io
+import json
+import zipfile
 import sqlite3
 import socket
 import secrets
 import time
+import threading
 import logging
 from functools import wraps
-from flask import Flask, request, jsonify, render_template, send_from_directory, session, redirect, url_for
+from flask import Flask, request, jsonify, render_template, send_from_directory, session, redirect, url_for, send_file
 from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
+import fitz  # PyMuPDF - renders a raster preview from uploaded PDF drawings
 
 app = Flask(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -139,6 +144,8 @@ def init_db():
         c.execute("ALTER TABLE tools ADD COLUMN single_item_dimensions TEXT")
     if 'file_path' not in columns:
         c.execute("ALTER TABLE tools ADD COLUMN file_path TEXT")
+    if 'preview_filename' not in columns:
+        c.execute("ALTER TABLE tools ADD COLUMN preview_filename TEXT")
 
     c.execute('''
         CREATE TABLE IF NOT EXISTS users (
@@ -149,6 +156,32 @@ def init_db():
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP
         )
     ''')
+
+    # A tool can have several drawings (chertezhi) attached; each row is one
+    # uploaded file plus its optional rendered preview (for PDFs).
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS tool_drawings (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            tool_id INTEGER NOT NULL,
+            image_filename TEXT NOT NULL,
+            preview_filename TEXT,
+            position INTEGER NOT NULL DEFAULT 0,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+    conn.commit()
+
+    # One-time migration: earlier versions stored a single drawing directly on
+    # the tools row. Copy it into tool_drawings so old tools keep their drawing.
+    c.execute("SELECT id, image_filename, preview_filename FROM tools WHERE image_filename IS NOT NULL AND image_filename != ''")
+    legacy_rows = c.fetchall()
+    for legacy_tool_id, legacy_image, legacy_preview in legacy_rows:
+        c.execute("SELECT COUNT(*) FROM tool_drawings WHERE tool_id = ?", (legacy_tool_id,))
+        if c.fetchone()[0] == 0:
+            c.execute(
+                "INSERT INTO tool_drawings (tool_id, image_filename, preview_filename, position) VALUES (?, ?, ?, 0)",
+                (legacy_tool_id, legacy_image, legacy_preview)
+            )
     conn.commit()
 
     # Bootstrap a default admin account on first run.
@@ -200,6 +233,91 @@ def generate_code(category):
 def allowed_file(filename):
     """Checks if the file extension is allowed."""
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+def generate_preview_image(source_filename):
+    """Renders the first page of an uploaded PDF drawing into a PNG so it can be
+    shown as a normal <img> thumbnail (browsers can't preview PDFs inline).
+    Returns the generated filename, or None if the source isn't a PDF or rendering fails."""
+    if not source_filename or not source_filename.lower().endswith('.pdf'):
+        return None
+
+    source_path = os.path.join(app.config['UPLOAD_FOLDER'], source_filename)
+    preview_filename = f"{os.path.splitext(source_filename)[0]}_preview.png"
+    preview_path = os.path.join(app.config['UPLOAD_FOLDER'], preview_filename)
+
+    try:
+        with fitz.open(source_path) as doc:
+            page = doc.load_page(0)
+            pixmap = page.get_pixmap(matrix=fitz.Matrix(2, 2))
+            pixmap.save(preview_path)
+        return preview_filename
+    except Exception:
+        logger.warning("Could not generate PDF preview for %s", source_filename, exc_info=True)
+        return None
+
+def remove_upload(filename):
+    """Deletes a file from the uploads folder if it exists."""
+    if not filename:
+        return
+    path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+    if os.path.exists(path):
+        try:
+            os.remove(path)
+        except OSError:
+            logger.warning("Could not remove upload %s", path, exc_info=True)
+
+def sanitize_filename_component(name):
+    """Strips a free-text name down to safe filesystem characters for use in a filename."""
+    return "".join(c if c.isalnum() or c in (' ', '_', '-') else '' for c in (name or '')).strip().replace(' ', '_')
+
+def save_new_drawing_files(conn, tool_id, files, start_position):
+    """Validates and saves each uploaded file as a drawing for tool_id, generating a
+    PDF preview where needed. Returns the number of drawings actually saved."""
+    c = conn.cursor()
+    position = start_position
+    saved_count = 0
+    for index, file in enumerate(files):
+        if not file or file.filename == '' or not allowed_file(file.filename):
+            continue
+        filename = f"{int(time.time())}_{index}_{secure_filename(file.filename)}"
+        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        preview_filename = generate_preview_image(filename)
+        c.execute(
+            "INSERT INTO tool_drawings (tool_id, image_filename, preview_filename, position) VALUES (?, ?, ?, ?)",
+            (tool_id, filename, preview_filename, position)
+        )
+        position += 1
+        saved_count += 1
+    return saved_count
+
+def get_drawings_by_tool_ids(conn, tool_ids):
+    """Returns {tool_id: [drawing dicts...]} ordered by position, for the given tool ids."""
+    if not tool_ids:
+        return {}
+    conn.row_factory = sqlite3.Row
+    c = conn.cursor()
+    placeholders = ",".join("?" for _ in tool_ids)
+    c.execute(
+        f"SELECT id, tool_id, image_filename, preview_filename FROM tool_drawings WHERE tool_id IN ({placeholders}) ORDER BY tool_id, position, id",
+        list(tool_ids)
+    )
+    drawings_map = {}
+    for row in c.fetchall():
+        drawings_map.setdefault(row['tool_id'], []).append({
+            'id': row['id'],
+            'image_filename': row['image_filename'],
+            'preview_filename': row['preview_filename']
+        })
+    return drawings_map
+
+def delete_drawings_for_tool(conn, tool_id):
+    """Removes every drawing (files + rows) belonging to tool_id."""
+    c = conn.cursor()
+    c.execute("SELECT image_filename, preview_filename FROM tool_drawings WHERE tool_id = ?", (tool_id,))
+    for image_filename, preview_filename in c.fetchall():
+        remove_upload(image_filename)
+        remove_upload(preview_filename)
+    c.execute("DELETE FROM tool_drawings WHERE tool_id = ?", (tool_id,))
 
 # Serve uploaded files
 @app.route('/uploads/<filename>')
@@ -258,6 +376,28 @@ def account_page():
 @require_role(ROLE_ADMIN)
 def admin_page():
     return render_template('admin.html', username=session.get('username'), role_labels=ROLE_LABELS)
+
+# API: Shut down the server process (admin only) - used by the "Exit" button so
+# the whole app (and the terminal window running it) can be closed from the browser.
+EXIT_MARKER_FILE = os.path.join(DB_FOLDER, '.exit_requested')
+
+def delayed_exit():
+    time.sleep(0.5)  # give the response below time to reach the browser first
+    # Tells run.bat/run_mac.command this was a deliberate shutdown, so the
+    # terminal window can close itself instead of pausing like it would for a
+    # crash or a manual Ctrl+C.
+    try:
+        open(EXIT_MARKER_FILE, 'w').close()
+    except OSError:
+        pass
+    os._exit(0)
+
+@app.route('/api/shutdown', methods=['POST'])
+@require_role(ROLE_ADMIN)
+def api_shutdown():
+    threading.Thread(target=delayed_exit, daemon=True).start()
+    logger.info(f"Server shutdown requested by '{session.get('username')}' via the Exit button.")
+    return jsonify({'success': True})
 
 # API: Change my own password (any logged-in role)
 @app.route('/api/me/password', methods=['PUT'])
@@ -426,6 +566,8 @@ def get_tools():
     sql += " ORDER BY id DESC"
     c.execute(sql, params)
     rows = c.fetchall()
+
+    drawings_map = get_drawings_by_tool_ids(conn, [r['id'] for r in rows])
     conn.close()
 
     tools_list = []
@@ -438,7 +580,6 @@ def get_tools():
             'client': r['client'],
             'dimensions': r['dimensions'],
             'location': r['location'],
-            'image_filename': r['image_filename'],
             'status': r['status'],
             'notes': r['notes'],
             'created_at': r['created_at'],
@@ -447,7 +588,8 @@ def get_tools():
             'material': r['material'],
             'die_type': r['die_type'],
             'single_item_dimensions': r['single_item_dimensions'],
-            'file_path': r['file_path']
+            'file_path': r['file_path'],
+            'drawings': drawings_map.get(r['id'], [])
         })
 
     return jsonify(tools_list)
@@ -508,48 +650,21 @@ def add_tool():
     else:
         code = generate_code(category)
 
-    # Handle image upload
-    image_filename = None
-    if 'image' in request.files:
-        file = request.files['image']
-        if file and file.filename != '' and allowed_file(file.filename):
-            ext = file.filename.rsplit('.', 1)[1].lower()
-            # Unique filename with timestamp to prevent cache issues
-            filename = f"{int(time.time())}_{secure_filename(file.filename)}"
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            image_filename = filename
-
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     c.execute('''
-        INSERT INTO tools (code, category, name, client, dimensions, location, image_filename, status, notes, die_shape, ups, material, die_type, single_item_dimensions, file_path)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    ''', (code, category, name, client, dimensions, location, image_filename, status, notes, die_shape, ups, material, die_type, single_item_dimensions, file_path))
-    conn.commit()
+        INSERT INTO tools (code, category, name, client, dimensions, location, status, notes, die_shape, ups, material, die_type, single_item_dimensions, file_path)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ''', (code, category, name, client, dimensions, location, status, notes, die_shape, ups, material, die_type, single_item_dimensions, file_path))
     tool_id = c.lastrowid
+
+    # Multiple drawings can be attached at once (input field name: "images")
+    save_new_drawing_files(conn, tool_id, request.files.getlist('images'), start_position=0)
+
+    conn.commit()
     conn.close()
 
-    return jsonify({
-        'success': True,
-        'tool': {
-            'id': tool_id,
-            'code': code,
-            'category': category,
-            'name': name,
-            'client': client,
-            'dimensions': dimensions,
-            'location': location,
-            'image_filename': image_filename,
-            'status': status,
-            'notes': notes,
-            'die_shape': die_shape,
-            'ups': ups,
-            'material': material,
-            'die_type': die_type,
-            'single_item_dimensions': single_item_dimensions,
-            'file_path': file_path
-        }
-    })
+    return jsonify({'success': True, 'tool': {'id': tool_id, 'code': code}})
 
 # API: Update tool
 @app.route('/api/tools/<int:tool_id>', methods=['PUT'])
@@ -583,44 +698,30 @@ def update_tool(tool_id):
         conn.close()
         return jsonify({'error': f'Инструмент с код "{code}" вече съществува!'}), 400
 
-    # Get current image filename to delete it later if new image is uploaded
-    c.execute("SELECT image_filename FROM tools WHERE id = ?", (tool_id,))
-    row = c.fetchone()
-    current_image = row[0] if row else None
-
-    image_filename = current_image
-    # If a new image is provided
-    if 'image' in request.files:
-        file = request.files['image']
-        if file and file.filename != '' and allowed_file(file.filename):
-            # Delete old file
-            if current_image:
-                old_file_path = os.path.join(app.config['UPLOAD_FOLDER'], current_image)
-                if os.path.exists(old_file_path):
-                    try:
-                        os.remove(old_file_path)
-                    except OSError:
-                        logger.warning("Could not remove old image %s", old_file_path, exc_info=True)
-
-            filename = f"{int(time.time())}_{secure_filename(file.filename)}"
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            image_filename = filename
-    elif request.form.get('delete_image') == 'true':
-        # User requested to clear current image
-        if current_image:
-            old_file_path = os.path.join(app.config['UPLOAD_FOLDER'], current_image)
-            if os.path.exists(old_file_path):
-                try:
-                    os.remove(old_file_path)
-                except OSError:
-                    logger.warning("Could not remove image %s", old_file_path, exc_info=True)
-        image_filename = None
-
     c.execute('''
         UPDATE tools
-        SET code = ?, category = ?, name = ?, client = ?, dimensions = ?, location = ?, image_filename = ?, status = ?, notes = ?, die_shape = ?, ups = ?, material = ?, die_type = ?, single_item_dimensions = ?, file_path = ?
+        SET code = ?, category = ?, name = ?, client = ?, dimensions = ?, location = ?, status = ?, notes = ?, die_shape = ?, ups = ?, material = ?, die_type = ?, single_item_dimensions = ?, file_path = ?
         WHERE id = ?
-    ''', (code, category, name, client, dimensions, location, image_filename, status, notes, die_shape, ups, material, die_type, single_item_dimensions, file_path, tool_id))
+    ''', (code, category, name, client, dimensions, location, status, notes, die_shape, ups, material, die_type, single_item_dimensions, file_path, tool_id))
+
+    # Drawings the operator removed from the gallery in this edit
+    try:
+        delete_ids = [int(i) for i in json.loads(request.form.get('delete_drawing_ids', '[]'))]
+    except (ValueError, TypeError):
+        delete_ids = []
+    for drawing_id in delete_ids:
+        c.execute("SELECT image_filename, preview_filename FROM tool_drawings WHERE id = ? AND tool_id = ?", (drawing_id, tool_id))
+        drawing_row = c.fetchone()
+        if drawing_row:
+            remove_upload(drawing_row[0])
+            remove_upload(drawing_row[1])
+            c.execute("DELETE FROM tool_drawings WHERE id = ?", (drawing_id,))
+
+    # New drawings appended in this edit
+    c.execute("SELECT COALESCE(MAX(position), -1) FROM tool_drawings WHERE tool_id = ?", (tool_id,))
+    next_position = c.fetchone()[0] + 1
+    save_new_drawing_files(conn, tool_id, request.files.getlist('images'), start_position=next_position)
+
     conn.commit()
     conn.close()
 
@@ -644,22 +745,23 @@ def copy_tool_file(tool_id):
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     c = conn.cursor()
-    c.execute("SELECT code, name, image_filename, file_path FROM tools WHERE id = ?", (tool_id,))
+    c.execute("SELECT code, name, file_path FROM tools WHERE id = ?", (tool_id,))
     tool = c.fetchone()
+    drawings = get_drawings_by_tool_ids(conn, [tool_id]).get(tool_id, [])
     conn.close()
-    
+
     if not tool:
         return jsonify({'error': 'Инструментът не е намерен!'}), 404
-        
+
     # Ensure destination folder exists
     try:
         os.makedirs(dest_folder, exist_ok=True)
     except Exception as e:
         return jsonify({'error': f'Невалиден или недостъпен път на диска: {str(e)}'}), 400
-        
+
     copied_files = []
     errors = []
-    
+
     # 1. Copy original file_path if it exists
     original_path = tool['file_path']
     if original_path:
@@ -672,25 +774,25 @@ def copy_tool_file(tool_id):
                 errors.append(f"Грешка при копиране на оригиналния файл: {str(e)}")
         else:
             errors.append("Оригиналният файл не беше намерен на посочения път.")
-            
-    # 2. Copy drawing image if it exists
-    img_name = tool['image_filename']
-    if img_name:
+
+    # 2. Copy every attached drawing
+    safe_name = sanitize_filename_component(tool['name'])
+    for index, drawing in enumerate(drawings):
+        img_name = drawing['image_filename']
         src_img_path = os.path.join(app.config['UPLOAD_FOLDER'], img_name)
         if os.path.exists(src_img_path):
             try:
                 # Rename to include tool code for clarity (e.g. SH-0001_die_box.svg)
                 ext = img_name.rsplit('.', 1)[1].lower() if '.' in img_name else 'svg'
-                # Clean name for filename
-                safe_name = "".join([c if c.isalnum() or c in (' ', '_', '-') else '' for c in tool['name']]).strip().replace(' ', '_')
-                dest_img_name = f"{tool['code']}_{safe_name}.{ext}"
+                suffix = f"_{index + 1}" if len(drawings) > 1 else ""
+                dest_img_name = f"{tool['code']}_{safe_name}{suffix}.{ext}"
                 shutil.copy2(src_img_path, os.path.join(dest_folder, dest_img_name))
                 copied_files.append(f"чертеж ({dest_img_name})")
             except Exception as e:
                 errors.append(f"Грешка при копиране на чертежа: {str(e)}")
         else:
             errors.append("Чертежът не беше намерен в папката на сървъра.")
-            
+
     if not copied_files:
         err_msg = "Не бяха копирани файлове. " + " ".join(errors)
         return jsonify({'error': err_msg}), 400
@@ -707,25 +809,50 @@ def copy_tool_file(tool_id):
 def delete_tool(tool_id):
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
-    
-    # Get image filename to delete the file
-    c.execute("SELECT image_filename FROM tools WHERE id = ?", (tool_id,))
-    row = c.fetchone()
-    image_filename = row[0] if row else None
-    
-    if image_filename:
-        file_path = os.path.join(app.config['UPLOAD_FOLDER'], image_filename)
-        if os.path.exists(file_path):
-            try:
-                os.remove(file_path)
-            except OSError:
-                logger.warning("Could not remove image %s", file_path, exc_info=True)
+
+    delete_drawings_for_tool(conn, tool_id)
 
     c.execute("DELETE FROM tools WHERE id = ?", (tool_id,))
     conn.commit()
     conn.close()
-    
+
     return jsonify({'success': True})
+
+# API: Download every drawing attached to a tool as a single zip archive
+@app.route('/api/tools/<int:tool_id>/drawings/download')
+def download_tool_drawings(tool_id):
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    c = conn.cursor()
+    c.execute("SELECT code, name FROM tools WHERE id = ?", (tool_id,))
+    tool = c.fetchone()
+    drawings = get_drawings_by_tool_ids(conn, [tool_id]).get(tool_id, [])
+    conn.close()
+
+    if not tool:
+        return jsonify({'error': 'Инструментът не е намерен!'}), 404
+    if not drawings:
+        return jsonify({'error': 'Няма качени чертежи за този инструмент.'}), 404
+
+    safe_name = sanitize_filename_component(tool['name'])
+    mem_zip = io.BytesIO()
+    with zipfile.ZipFile(mem_zip, 'w', zipfile.ZIP_DEFLATED) as zf:
+        for index, drawing in enumerate(drawings):
+            img_name = drawing['image_filename']
+            src_path = os.path.join(app.config['UPLOAD_FOLDER'], img_name)
+            if not os.path.exists(src_path):
+                continue
+            ext = img_name.rsplit('.', 1)[1].lower() if '.' in img_name else 'bin'
+            suffix = f"_{index + 1}" if len(drawings) > 1 else ""
+            zf.write(src_path, arcname=f"{tool['code']}_{safe_name}{suffix}.{ext}")
+    mem_zip.seek(0)
+
+    return send_file(
+        mem_zip,
+        mimetype='application/zip',
+        as_attachment=True,
+        download_name=f"{tool['code']}_chertezhi.zip"
+    )
 
 if __name__ == '__main__':
     bootstrap_password = init_db()

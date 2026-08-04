@@ -166,6 +166,12 @@
       border-color: var(--text-muted);
     }
 
+    .icon-btn-danger:hover {
+      background-color: var(--danger);
+      border-color: var(--danger);
+      color: #fff;
+    }
+
     /* User menu */
     .user-menu {
       position: relative;
@@ -776,11 +782,18 @@
       color: var(--text-muted);
     }
 
+    .file-preview-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+
     .file-preview-row {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-top: 1rem;
+      gap: 0.75rem;
       background-color: var(--panel-bg-secondary);
       border: 1px solid var(--panel-border);
       padding: 0.5rem 1rem;
@@ -790,6 +803,107 @@
     .file-preview-name {
       font-weight: 600;
       color: var(--primary);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    /* Existing drawings gallery, shown while editing a tool */
+    .existing-drawings-gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+      gap: 0.6rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .existing-drawing-item {
+      position: relative;
+      height: 90px;
+      background-color: var(--panel-bg-secondary);
+      border: 1px solid var(--panel-border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .existing-drawing-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .existing-drawing-item .no-image-icon {
+      font-size: 1.6rem;
+    }
+
+    .existing-drawing-remove {
+      position: absolute;
+      top: 2px;
+      right: 2px;
+      width: 20px;
+      height: 20px;
+      line-height: 20px;
+      text-align: center;
+      background-color: var(--danger);
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 0.7rem;
+      padding: 0;
+    }
+
+    /* Numbered indicator for tools with more than one drawing */
+    .drawing-indicator {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.25rem;
+    }
+
+    .drawing-dot {
+      width: 22px;
+      height: 22px;
+      line-height: 22px;
+      text-align: center;
+      font-size: 0.75rem;
+      font-weight: 600;
+      border-radius: 50%;
+      background-color: var(--panel-bg-secondary);
+      border: 1px solid var(--panel-border);
+      color: var(--text-muted);
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .drawing-dot:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
+    .drawing-dot.active {
+      background-color: var(--primary);
+      border-color: var(--primary);
+      color: #fff;
+    }
+
+    .table-thumb-cell {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .card-image-wrapper .drawing-indicator {
+      position: absolute;
+      left: 50%;
+      bottom: 0.4rem;
+      transform: translateX(-50%);
+      background-color: rgba(0, 0, 0, 0.45);
+      padding: 0.25rem;
+      border-radius: 999px;
+    }
+
+    .card-image-wrapper .drawing-dot {
+      background-color: rgba(255, 255, 255, 0.85);
     }
 
     .modal-footer {
@@ -964,24 +1078,24 @@
     }
     
     .table-thumbnail {
-      width: 40px;
-      height: 40px;
+      width: 80px;
+      height: 80px;
       object-fit: contain;
       background-color: var(--panel-bg-secondary);
       border: 1px solid var(--panel-border);
       cursor: zoom-in;
       display: block;
     }
-    
+
     .table-no-image {
-      font-size: 1.1rem;
+      font-size: 2.2rem;
       color: var(--text-muted);
       opacity: 0.5;
       display: flex;
       align-items: center;
       justify-content: center;
-      width: 40px;
-      height: 40px;
+      width: 80px;
+      height: 80px;
       background-color: var(--panel-bg-secondary);
       border: 1px solid var(--panel-border);
     }
@@ -1139,6 +1253,11 @@
         <button id="theme-toggle-btn" class="icon-btn" title="Смяна на темата">
           <i class="fa-solid fa-moon"></i>
         </button>
+        {% if role == 'admin' %}
+        <button id="exit-app-btn" class="icon-btn icon-btn-danger" title="Спри сървъра и затвори">
+          <i class="fa-solid fa-power-off"></i>
+        </button>
+        {% endif %}
       </div>
     </header>
 
@@ -1375,19 +1494,15 @@
           </div>
 
           <div class="form-group">
-            <label>Снимка или Чертеж на инструмента</label>
+            <label>Чертежи на инструмента (може да добавите няколко)</label>
+            <div id="existing-drawings-gallery" class="existing-drawings-gallery hidden"></div>
             <div class="file-upload-zone" id="file-upload-zone">
               <i class="fa-solid fa-cloud-arrow-up upload-icon"></i>
-              <span class="upload-text">Кликнете или провлачете чертежа тук</span>
-              <span class="upload-hint">Формати: JPG, PNG, PDF, SVG. Максимум 16MB.</span>
-              <input type="file" id="file-input" accept="image/*,application/pdf" style="display: none;">
+              <span class="upload-text">Кликнете или провлачете чертежи тук (можете да изберете няколко наведнъж)</span>
+              <span class="upload-hint">Формати: JPG, PNG, PDF, SVG. Максимум 16MB на файл.</span>
+              <input type="file" id="file-input" accept="image/*,application/pdf" multiple style="display: none;">
             </div>
-            <div id="file-preview-container" class="hidden">
-              <div class="file-preview-row">
-                <span class="file-preview-name" id="file-preview-name">file.png</span>
-                <button type="button" class="btn btn-danger btn-sm" id="btn-remove-file" style="padding: 0.25rem 0.5rem;">Изтрий</button>
-              </div>
-            </div>
+            <div id="file-preview-list" class="file-preview-list"></div>
           </div>
 
           <div class="form-group" style="margin-top: 1rem;">
@@ -1443,11 +1558,12 @@
     let searchQuery = '';
     let dimQuery = '';
     let currentViewMode = 'table'; // Grid or Table
-    let selectedFile = null;
+    let selectedFiles = [];
+    let deletedDrawingIds = [];
     let isEditing = false;
-    let deleteImageOnEdit = false;
     let currentPage = 1;
     let pageSize = 10;
+    let activeDrawingIndex = {}; // tool id -> index of the drawing currently shown in its preview
 
     // DOM Elements
     const toolsGridContainer = document.getElementById('tools-grid-container');
@@ -1494,9 +1610,8 @@
     // File Upload Elements
     const fileUploadZone = document.getElementById('file-upload-zone');
     const fileInput = document.getElementById('file-input');
-    const filePreviewContainer = document.getElementById('file-preview-container');
-    const filePreviewName = document.getElementById('file-preview-name');
-    const btnRemoveFile = document.getElementById('btn-remove-file');
+    const filePreviewList = document.getElementById('file-preview-list');
+    const existingDrawingsGallery = document.getElementById('existing-drawings-gallery');
     
     // Buttons
     const btnOpenAddModal = document.getElementById('btn-open-add-modal');
@@ -1545,6 +1660,25 @@
         themeToggleBtn.innerHTML = '<i class="fa-solid fa-sun"></i>';
       }
     });
+
+    // Exit button: stops the server (closing the terminal window it runs in)
+    // and then closes this browser tab.
+    const exitAppBtn = document.getElementById('exit-app-btn');
+    if (exitAppBtn) {
+      exitAppBtn.addEventListener('click', async () => {
+        const confirmed = confirm('Сигурни ли сте, че искате да спрете сървъра? Всички потребители в мрежата ще бъдат изключени.');
+        if (!confirmed) return;
+
+        try {
+          await fetch('/api/shutdown', { method: 'POST' });
+        } catch (e) {
+          // The connection may drop as soon as the server exits - that's expected.
+        }
+
+        document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;font-size:1.2rem;text-align:center;padding:2rem;">Сървърът е спрян.<br>Можете да затворите този таб.</div>';
+        window.close();
+      });
+    }
 
     // User menu dropdown
     const userMenuBtn = document.getElementById('user-menu-btn');
@@ -1661,17 +1795,15 @@
             openEditModal(t.id);
           });
           
-          let imgHtml = '';
-          if (t.image_filename) {
-            imgHtml = `<img src="/uploads/${t.image_filename}" class="card-image" alt="${escapeHTML(t.name)}" onclick="openLightbox('/uploads/${t.image_filename}')">`;
-          } else {
-            imgHtml = `
+          const cardActiveDrawing = getActiveDrawing(t);
+          const imgHtml = cardActiveDrawing
+            ? buildDrawingImgHtml(t, cardActiveDrawing, 'card-image', 'no-image-placeholder') + buildDrawingIndicatorHtml(t)
+            : `
               <div class="no-image-placeholder">
                 <i class="fa-regular fa-image no-image-icon"></i>
                 <span style="font-size: 0.8rem;">Няма качена графика</span>
               </div>
             `;
-          }
 
           const categoryName = t.category === 'die' ? 'Щанца' : (t.category === 'embossing' ? 'Преге' : 'Топъл печат');
           const statusName = t.status === 'active' ? 'В склада' : (t.status === 'borrowed' ? 'Извън склада' : 'Бракуван');
@@ -1736,7 +1868,7 @@
           }
 
           card.innerHTML = `
-            <div class="card-image-wrapper">
+            <div class="card-image-wrapper" data-card-image-wrapper="${t.id}">
               ${imgHtml}
             </div>
             <div class="card-content">
@@ -1783,6 +1915,11 @@
                 <button class="btn btn-secondary" onclick="openQrcodeModal(${t.id})" title="Виж QR код за склада">
                   <i class="fa-solid fa-qrcode"></i> QR
                 </button>
+                ${(t.drawings && t.drawings.length > 0) ? `
+                <button class="btn btn-secondary" onclick="downloadDrawings(${t.id})" title="Свали всички чертежи като архив">
+                  <i class="fa-solid fa-download"></i> Свали
+                </button>
+                ` : ''}
                 <button class="btn btn-secondary write-action" onclick="exportDesignFile(${t.id})" title="Копирай файл(ове) в папка">
                   <i class="fa-solid fa-copy"></i> Копирай
                 </button>
@@ -1811,12 +1948,9 @@
             openEditModal(t.id);
           });
           
-          let imgHtml = '';
-          if (t.image_filename) {
-            imgHtml = `<img src="/uploads/${t.image_filename}" class="table-thumbnail" alt="${escapeHTML(t.name)}" onclick="openLightbox('/uploads/${t.image_filename}')">`;
-          } else {
-            imgHtml = `<span class="table-no-image"><i class="fa-regular fa-image"></i></span>`;
-          }
+          const tableActiveDrawing = getActiveDrawing(t);
+          const imgHtml = buildDrawingImgHtml(t, tableActiveDrawing, 'table-thumbnail', 'table-no-image')
+            + buildDrawingIndicatorHtml(t);
 
           const categoryName = t.category === 'die' ? 'Щанца' : (t.category === 'embossing' ? 'Преге' : 'Топъл печат');
           const statusName = t.status === 'active' ? 'В склада' : (t.status === 'borrowed' ? 'Извън склада' : 'Бракуван');
@@ -1846,7 +1980,7 @@
           }
 
           tr.innerHTML = `
-            <td>${imgHtml}</td>
+            <td><div class="table-thumb-cell" data-thumb-cell="${t.id}">${imgHtml}</div></td>
             <td style="font-family: monospace; font-weight: bold; font-size: 0.95rem;">${escapeHTML(t.code)}</td>
             <td><span class="card-badge ${t.category}" style="font-size: 0.7rem; padding: 0.1rem 0.4rem;">${categoryName}</span></td>
             <td style="font-weight: 600;" title="${escapeHTML(t.notes || '')}">${escapeHTML(t.name)}</td>
@@ -1863,6 +1997,11 @@
               <button class="btn btn-secondary btn-sm" style="padding: 0.35rem 0.6rem; font-size: 0.8rem;" onclick="openQrcodeModal(${t.id})" title="QR код">
                 <i class="fa-solid fa-qrcode"></i>
               </button>
+              ${(t.drawings && t.drawings.length > 0) ? `
+              <button class="btn btn-secondary btn-sm" style="padding: 0.35rem 0.6rem; font-size: 0.8rem;" onclick="downloadDrawings(${t.id})" title="Свали всички чертежи като архив">
+                <i class="fa-solid fa-download"></i>
+              </button>
+              ` : ''}
               <button class="btn btn-secondary btn-sm write-action" style="padding: 0.35rem 0.6rem; font-size: 0.8rem;" onclick="exportDesignFile(${t.id})" title="Копирай файлове">
                 <i class="fa-solid fa-copy"></i>
               </button>
@@ -2067,9 +2206,8 @@
 
       fileUploadZone.addEventListener('drop', (e) => {
         const dt = e.dataTransfer;
-        const files = dt.files;
-        if (files.length > 0) {
-          handleFile(files[0]);
+        if (dt.files.length > 0) {
+          handleFiles(dt.files);
         }
       });
 
@@ -2079,17 +2217,8 @@
 
       fileInput.addEventListener('change', () => {
         if (fileInput.files.length > 0) {
-          handleFile(fileInput.files[0]);
-        }
-      });
-
-      btnRemoveFile.addEventListener('click', () => {
-        selectedFile = null;
-        fileInput.value = '';
-        filePreviewContainer.classList.add('hidden');
-        fileUploadZone.classList.remove('hidden');
-        if (isEditing) {
-          deleteImageOnEdit = true;
+          handleFiles(fileInput.files);
+          fileInput.value = '';
         }
       });
 
@@ -2110,31 +2239,49 @@
     }
 
     // File Handling
-    function handleFile(file) {
+    function handleFiles(fileList) {
       const allowed = ['png', 'jpg', 'jpeg', 'gif', 'pdf', 'svg'];
-      const ext = file.name.split('.').pop().toLowerCase();
-      
-      if (!allowed.includes(ext)) {
-        alert('Неподдържан формат! Качете картинка (JPG, PNG, SVG) или PDF.');
-        return;
+      const rejected = [];
+
+      Array.from(fileList).forEach(file => {
+        const ext = file.name.split('.').pop().toLowerCase();
+        if (!allowed.includes(ext)) {
+          rejected.push(file.name);
+          return;
+        }
+        selectedFiles.push(file);
+      });
+
+      if (rejected.length > 0) {
+        alert(`Неподдържан формат за: ${rejected.join(', ')}. Качете картинка (JPG, PNG, SVG) или PDF.`);
       }
-      
-      selectedFile = file;
-      filePreviewName.textContent = `${file.name} (${formatBytes(file.size)})`;
-      fileUploadZone.classList.add('hidden');
-      filePreviewContainer.classList.remove('hidden');
-      deleteImageOnEdit = false;
+
+      renderFilePreviewList();
+    }
+
+    function renderFilePreviewList() {
+      filePreviewList.innerHTML = selectedFiles.map((file, idx) => `
+        <div class="file-preview-row">
+          <span class="file-preview-name" title="${escapeHTML(file.name)}">${escapeHTML(file.name)} (${formatBytes(file.size)})</span>
+          <button type="button" class="btn btn-danger btn-sm" style="padding: 0.25rem 0.5rem;" onclick="removeSelectedFile(${idx})">Изтрий</button>
+        </div>
+      `).join('');
+    }
+
+    function removeSelectedFile(idx) {
+      selectedFiles.splice(idx, 1);
+      renderFilePreviewList();
     }
 
     // Modal Actions
     function openAddModal() {
       isEditing = false;
-      deleteImageOnEdit = false;
-      selectedFile = null;
+      selectedFiles = [];
+      deletedDrawingIds = [];
       toolForm.reset();
       toolIdInput.value = '';
       fileInput.value = '';
-      
+
       // Reset specific fields
       toolDieShapeSelect.value = '';
       toolDieTypeSelect.value = '';
@@ -2143,14 +2290,15 @@
       toolFilePathInput.value = '';
       updateSingleItemSizeInputs('');
       dieSpecificFieldsDiv.classList.add('hidden');
-      
+
       toolCodeInput.placeholder = "Оставете празно за автоматичен код";
       toolCodeInput.disabled = false;
       modalTitleText.textContent = "Добавяне на Нов Инструмент";
-      
-      filePreviewContainer.classList.add('hidden');
-      fileUploadZone.classList.remove('hidden');
-      
+
+      existingDrawingsGallery.innerHTML = '';
+      existingDrawingsGallery.classList.add('hidden');
+      renderFilePreviewList();
+
       toolModal.classList.add('active');
     }
 
@@ -2159,9 +2307,9 @@
       if (!tool) return;
 
       isEditing = true;
-      deleteImageOnEdit = false;
-      selectedFile = null;
-      
+      selectedFiles = [];
+      deletedDrawingIds = [];
+
       toolIdInput.value = tool.id;
       toolCodeInput.value = tool.code;
       toolCodeInput.placeholder = "";
@@ -2173,7 +2321,7 @@
       toolLocationInput.value = tool.location;
       toolNotesInput.value = tool.notes || '';
       toolFilePathInput.value = tool.file_path || '';
-      
+
       // Populate specific fields
       if (tool.category === 'die') {
         dieSpecificFieldsDiv.classList.remove('hidden');
@@ -2190,20 +2338,42 @@
         toolMaterialSelect.value = '';
         updateSingleItemSizeInputs('');
       }
-      
+
       fileInput.value = '';
       modalTitleText.textContent = `Редактиране на инструмент: ${tool.code}`;
 
-      if (tool.image_filename) {
-        filePreviewName.textContent = `Текущ чертеж: ${tool.image_filename}`;
-        fileUploadZone.classList.add('hidden');
-        filePreviewContainer.classList.remove('hidden');
-      } else {
-        filePreviewContainer.classList.add('hidden');
-        fileUploadZone.classList.remove('hidden');
-      }
+      renderExistingDrawingsGallery(tool);
+      renderFilePreviewList();
 
       toolModal.classList.add('active');
+    }
+
+    function renderExistingDrawingsGallery(tool) {
+      const drawings = tool.drawings || [];
+      if (drawings.length === 0) {
+        existingDrawingsGallery.innerHTML = '';
+        existingDrawingsGallery.classList.add('hidden');
+        return;
+      }
+
+      existingDrawingsGallery.classList.remove('hidden');
+      existingDrawingsGallery.innerHTML = drawings.map(d => {
+        const thumbSrc = isPdfFilename(d.image_filename) ? d.preview_filename : d.image_filename;
+        const thumbHtml = thumbSrc
+          ? `<img src="/uploads/${thumbSrc}" alt="${escapeHTML(tool.name)}">`
+          : `<i class="fa-regular ${isPdfFilename(d.image_filename) ? 'fa-file-pdf' : 'fa-image'} no-image-icon"></i>`;
+        return `
+          <div class="existing-drawing-item" data-drawing-id="${d.id}">
+            ${thumbHtml}
+            <button type="button" class="existing-drawing-remove" title="Премахни чертежа" onclick="markDrawingForRemoval(${d.id}, this)">&times;</button>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function markDrawingForRemoval(drawingId, buttonEl) {
+      deletedDrawingIds.push(drawingId);
+      buttonEl.closest('.existing-drawing-item').remove();
     }
 
     function closeModal() {
@@ -2263,12 +2433,10 @@
         formData.append('single_item_dimensions', singleItemSize);
       }
       
-      if (selectedFile) {
-        formData.append('image', selectedFile);
-      }
-      
+      selectedFiles.forEach(file => formData.append('images', file));
+
       if (isEditing) {
-        formData.append('delete_image', deleteImageOnEdit ? 'true' : 'false');
+        formData.append('delete_drawing_ids', JSON.stringify(deletedDrawingIds));
       }
 
       const id = toolIdInput.value;
@@ -2507,7 +2675,7 @@
 
     function escapeHTML(str) {
       if (!str) return '';
-      return str.replace(/[&<>'"]/g, 
+      return str.replace(/[&<>'"]/g,
         tag => ({
           '&': '&amp;',
           '<': '&lt;',
@@ -2516,6 +2684,65 @@
           '"': '&quot;'
         }[tag] || tag)
       );
+    }
+
+    // PDFs can't be shown inline via <img> - browsers fall back to rendering
+    // the alt text, which is what produced the broken-looking thumbnail.
+    function isPdfFilename(filename) {
+      return !!filename && filename.toLowerCase().endsWith('.pdf');
+    }
+
+    // Multi-drawing preview helpers -----------------------------------------
+
+    function getActiveDrawing(t) {
+      const drawings = t.drawings || [];
+      if (drawings.length === 0) return null;
+      const idx = Math.min(activeDrawingIndex[t.id] || 0, drawings.length - 1);
+      return drawings[idx];
+    }
+
+    function buildDrawingImgHtml(t, drawing, imgClass, noImageClass) {
+      if (!drawing) {
+        return `<div class="${noImageClass}"><i class="fa-regular fa-image no-image-icon"></i></div>`;
+      }
+      if (isPdfFilename(drawing.image_filename)) {
+        if (drawing.preview_filename) {
+          return `<img src="/uploads/${drawing.preview_filename}" class="${imgClass}" alt="${escapeHTML(t.name)}" title="Превю от PDF чертеж - клик за отваряне на оригинала" onclick="window.open('/uploads/${drawing.image_filename}', '_blank')">`;
+        }
+        return `<div class="${noImageClass}" title="PDF чертеж - клик за отваряне" style="cursor:pointer;" onclick="window.open('/uploads/${drawing.image_filename}', '_blank')"><i class="fa-regular fa-file-pdf no-image-icon"></i></div>`;
+      }
+      return `<img src="/uploads/${drawing.image_filename}" class="${imgClass}" alt="${escapeHTML(t.name)}" onclick="openLightbox('/uploads/${drawing.image_filename}')">`;
+    }
+
+    function buildDrawingIndicatorHtml(t) {
+      const drawings = t.drawings || [];
+      if (drawings.length <= 1) return '';
+      const activeIdx = Math.min(activeDrawingIndex[t.id] || 0, drawings.length - 1);
+      const dots = drawings.map((d, idx) =>
+        `<span class="drawing-dot ${idx === activeIdx ? 'active' : ''}" onclick="event.stopPropagation(); switchDrawing(${t.id}, ${idx})">${idx + 1}</span>`
+      ).join('');
+      return `<div class="drawing-indicator">${dots}</div>`;
+    }
+
+    function switchDrawing(toolId, idx) {
+      activeDrawingIndex[toolId] = idx;
+      const t = tools.find(x => x.id === toolId);
+      if (!t) return;
+      const drawing = getActiveDrawing(t);
+
+      const thumbCell = document.querySelector(`[data-thumb-cell="${toolId}"]`);
+      if (thumbCell) {
+        thumbCell.innerHTML = buildDrawingImgHtml(t, drawing, 'table-thumbnail', 'table-no-image') + buildDrawingIndicatorHtml(t);
+      }
+
+      const cardWrapper = document.querySelector(`[data-card-image-wrapper="${toolId}"]`);
+      if (cardWrapper) {
+        cardWrapper.innerHTML = buildDrawingImgHtml(t, drawing, 'card-image', 'no-image-placeholder') + buildDrawingIndicatorHtml(t);
+      }
+    }
+
+    function downloadDrawings(id) {
+      window.open(`/api/tools/${id}/drawings/download`, '_blank');
     }
   </script>
 </body>

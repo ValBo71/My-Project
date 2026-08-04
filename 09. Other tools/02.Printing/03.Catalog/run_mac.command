@@ -152,9 +152,22 @@ echo "Installing/verifying dependencies..."
 # 6. Ensure required directories exist
 mkdir -p database uploads
 
+# Clear any leftover exit marker from a previous crashed run
+rm -f database/.exit_requested
+
 # 7. Start the server and open the browser
 echo "Server is starting on http://localhost:5050 ..."
 ( sleep 1 && open "http://localhost:5050" ) &
 "$PYTHON_BIN" app.py
+
+# The app's Exit button writes this marker just before shutting itself down, so
+# we can close the window right away instead of waiting for Enter - a Ctrl+C or
+# crash leaves no marker, so the prompt below still shows for those cases.
+# (Whether the Terminal window itself then closes depends on your Terminal.app
+# setting under Settings > Profiles > Shell > "When the shell exits".)
+if [ -f database/.exit_requested ]; then
+    rm -f database/.exit_requested
+    exit 0
+fi
 
 read -p "Server stopped. Press Enter to close..."
