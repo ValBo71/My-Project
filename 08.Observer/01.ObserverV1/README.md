@@ -80,7 +80,7 @@ Observer/
 ## Execution Instructions
 
 ### Automatic Startup (Windows)
-Double-click the **`run.bat`** file in the root directory of the project. The script will automatically configure the virtual environment, install the required packages, download Chromium for Playwright, start the server, and open the app in **Firefox**.
+Double-click the **`run.bat`** file in the root directory of the project. The script will automatically install the required Python packages (Flask, BeautifulSoup4, lxml, Playwright), download the Chromium browser Playwright needs for LinkedIn/jobs.bg scraping, start the server, and open the app in your default browser.
 
 ### Manual Startup (Cross-Platform)
 

@@ -51,9 +51,10 @@ This version (**Observer v2**) is an upgraded version of the original observer p
 ## Project Structure
 
 ```text
-11.Observer v2/
+02.ObserverV2/
 │
-├── run.bat                     # Windows startup file (sets up dependencies, runs on port 5001, opens Firefox)
+├── run.bat                     # Windows startup file (installs dependencies, runs on port 5001)
+├── run_mac.command             # macOS startup file (self-installing, same setup as run.bat)
 ├── app.py                      # Flask server, API endpoints, and web controllers
 ├── config.py                   # Global configuration settings (port 5001, defaults)
 ├── database.py                 # Database schemas, scraper_urls initialization, and CRUD operations
@@ -78,7 +79,12 @@ This version (**Observer v2**) is an upgraded version of the original observer p
 ## Execution Instructions
 
 ### Automatic Startup (Windows)
-Double-click the **`run.bat`** file in this directory. The script will configure dependencies, run the server, and open Firefox at the correct address.
+Double-click the **`run.bat`** file in this directory. The script will install the required Python packages (Flask, BeautifulSoup4, lxml, Playwright), download the Chromium browser Playwright needs for LinkedIn/jobs.bg scraping, start the server, and open the app in your default browser.
+
+### Automatic Startup (macOS)
+Double-click the **`run_mac.command`** file in Finder (or run `./run_mac.command` in Terminal). It does the same setup as `run.bat`: finds a Python 3 interpreter (or downloads a portable one if none is installed), installs the required packages and Chromium, starts the server, and opens the app in your default browser.
+
+If macOS blocks the first run ("unidentified developer"), allow it once via System Settings → Privacy & Security, or run `chmod +x run_mac.command` in Terminal first.
 
 ### Manual Startup (Cross-Platform)
 
