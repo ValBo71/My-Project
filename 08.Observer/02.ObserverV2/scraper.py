@@ -3,7 +3,7 @@ import ssl
 import logging
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from config import USER_AGENT, MAX_WORKERS
-from database import job_exists
+from database import job_exists, refresh_job_if_reposted
 
 logger = logging.getLogger(__name__)
 
@@ -39,14 +39,23 @@ def fetch_job_details(job_listings):
     Updates the list of job dictionaries in place, adding an 'html_detail' key.
     """
     new_jobs = []
+    reposted_count = 0
     for job in job_listings:
         # Check if the job URL is already in the DB.
-        # If it exists, we don't need to fetch its detail page again.
+        # If it exists, we don't need to fetch its detail page again - but the
+        # company may have reposted/renewed the same ad, so check whether the
+        # freshly-scraped publish date is newer than what we have on record
+        # and bump it if so (otherwise it stays buried under its original date).
         if job_exists(job['url']):
+            if refresh_job_if_reposted(job['url'], job.get('date_published')):
+                reposted_count += 1
             job['html_detail'] = None
         else:
             new_jobs.append(job)
-            
+
+    if reposted_count:
+        logger.info(f"Bumped publish date for {reposted_count} reposted job(s).")
+
     if not new_jobs:
         logger.info("No new job detail pages to scrape.")
         return job_listings
@@ -76,7 +85,7 @@ def fetch_job_details(job_listings):
 
     return job_listings
 
-def scrape_linkedin_jobs():
+def scrape_linkedin_jobs(url=None):
     """
     Scrapes job listings from LinkedIn using Playwright and session cookies.
     """
@@ -87,6 +96,8 @@ def scrape_linkedin_jobs():
     import time
     from config import LINKEDIN_URL, LINKEDIN_EMAIL, LINKEDIN_PASSWORD, LINKEDIN_SESSION_PATH
     from parser import extract_leave_days, extract_salary, extract_tech_stack_from_text
+    
+    target_url = url if url else LINKEDIN_URL
     
     logger.info("Starting LinkedIn scraping cycle...")
     
@@ -107,8 +118,8 @@ def scrape_linkedin_jobs():
         context = browser.new_context(**context_opts)
         page = context.new_page()
         
-        logger.info(f"Navigating to LinkedIn Search: {LINKEDIN_URL}")
-        page.goto(LINKEDIN_URL)
+        logger.info(f"Navigating to LinkedIn Search: {target_url}")
+        page.goto(target_url)
         page.wait_for_timeout(7000)
         
         current_url = page.url
@@ -134,7 +145,7 @@ def scrape_linkedin_jobs():
             if logged_in:
                 logger.info("Logged in successfully. Saving session cookies...")
                 context.storage_state(path=LINKEDIN_SESSION_PATH)
-                page.goto(LINKEDIN_URL)
+                page.goto(target_url)
                 page.wait_for_timeout(7000)
             else:
                 logger.error("Failed to log in to LinkedIn. MFA or Captcha block might be present.")
@@ -249,7 +260,7 @@ def scrape_linkedin_jobs():
     logger.info(f"LinkedIn scraping completed. Scraped {len(scraped_jobs)} new jobs.")
     return scraped_jobs
 
-def scrape_jobs_bg_jobs():
+def scrape_jobs_bg_jobs(url=None):
     """
     Scrapes job listings from jobs.bg using Playwright (in headful mode on Windows to bypass DataDome).
     """
@@ -260,6 +271,8 @@ def scrape_jobs_bg_jobs():
     import time
     from config import JOBS_BG_URL
     from parser import extract_leave_days, extract_salary, extract_tech_stack_from_text
+    
+    target_url = url if url else JOBS_BG_URL
     
     logger.info("Starting jobs.bg scraping cycle...")
     
@@ -282,7 +295,7 @@ def scrape_jobs_bg_jobs():
                 win_y = height - 320
         except Exception:
             pass
-
+ 
     with sync_playwright() as p:
         # Launch browser in headful mode but tiny and tucked away at the bottom-right corner to pass DataDome
         browser = p.chromium.launch(
@@ -308,8 +321,8 @@ def scrape_jobs_bg_jobs():
         """)
         
         try:
-            logger.info(f"Navigating to jobs.bg search page: {JOBS_BG_URL}")
-            page.goto(JOBS_BG_URL, referer="https://www.google.bg/", timeout=60000)
+            logger.info(f"Navigating to jobs.bg search page: {target_url}")
+            page.goto(target_url, referer="https://www.google.bg/", timeout=60000)
             page.wait_for_timeout(7000)
             
             html = page.content()
@@ -403,12 +416,15 @@ def scrape_jobs_bg_jobs():
             # Iterate and visit detail page for new jobs
             for job in jobs_to_process:
                 if job_exists(job['url']):
-                    logger.info(f"Skipping already scraped jobs.bg job: {job['title']} at {job['company']}")
+                    if refresh_job_if_reposted(job['url'], job.get('date_published')):
+                        logger.info(f"Repost bumped for jobs.bg job: {job['title']} at {job['company']}")
+                    else:
+                        logger.info(f"Skipping already scraped jobs.bg job: {job['title']} at {job['company']}")
                     continue
                     
                 logger.info(f"Scraping details for new jobs.bg job: {job['title']} at {job['company']}")
                 try:
-                    page.goto(job['url'], referer=JOBS_BG_URL, timeout=45000)
+                    page.goto(job['url'], referer=target_url, timeout=45000)
                     
                     # Wait for either iframe or standard template description to load
                     page.wait_for_selector('.job-view-iframe, .job-view-description-text', timeout=10000)

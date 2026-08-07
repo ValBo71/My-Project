@@ -45,7 +45,16 @@ def init_db():
             if 'flag' not in columns:
                 logger.info("Migrating database: adding 'flag' column to jobs table.")
                 conn.execute("ALTER TABLE jobs ADD COLUMN flag TEXT DEFAULT NULL")
-                
+            if 'cv_sent' not in columns:
+                logger.info("Migrating database: adding 'cv_sent' column to jobs table.")
+                conn.execute("ALTER TABLE jobs ADD COLUMN cv_sent TEXT DEFAULT NULL")
+            if 'interview_scheduled' not in columns:
+                logger.info("Migrating database: adding 'interview_scheduled' column to jobs table.")
+                conn.execute("ALTER TABLE jobs ADD COLUMN interview_scheduled TEXT DEFAULT NULL")
+            if 'offer_result' not in columns:
+                logger.info("Migrating database: adding 'offer_result' column to jobs table.")
+                conn.execute("ALTER TABLE jobs ADD COLUMN offer_result TEXT DEFAULT NULL")
+
             # Backfill published_at for existing records where it is NULL
             cursor.execute("SELECT url, date_published FROM jobs WHERE published_at IS NULL")
             rows = cursor.fetchall()
@@ -144,6 +153,28 @@ def init_db():
                 SELECT DISTINCT company FROM jobs WHERE company IS NOT NULL AND company != ''
             """)
             
+            # Create scraper_urls table if it doesn't exist
+            conn.execute("""
+                CREATE TABLE IF NOT EXISTS scraper_urls (
+                    source TEXT PRIMARY KEY,
+                    url TEXT NOT NULL
+                )
+            """)
+            
+            # Populate default URLs if the table is empty
+            cursor = conn.cursor()
+            cursor.execute("SELECT COUNT(*) FROM scraper_urls")
+            if cursor.fetchone()[0] == 0:
+                from config import DEV_BG_URL, LINKEDIN_URL, JOBS_BG_URL
+                conn.executemany("""
+                    INSERT INTO scraper_urls (source, url)
+                    VALUES (?, ?)
+                """, [
+                    ('dev.bg', DEV_BG_URL),
+                    ('jobs.bg', JOBS_BG_URL),
+                    ('LinkedIn', LINKEDIN_URL)
+                ])
+                
         logger.info("Database initialized successfully.")
     except Exception as e:
         logger.error(f"Error initializing database: {e}")
@@ -233,6 +264,9 @@ def get_all_jobs():
                 j.source,
                 j.scraped_at,
                 j.published_at,
+                j.cv_sent,
+                j.interview_scheduled,
+                j.offer_result,
                 COALESCE(
                     (SELECT p.flag FROM companies p WHERE p.id = c.parent_company_id AND p.flag IS NOT NULL AND p.flag != ''),
                     c.flag,
@@ -278,6 +312,60 @@ def job_exists(url):
     finally:
         conn.close()
 
+def refresh_job_if_reposted(url, fresh_date_published):
+    """
+    Detects whether an already-known job listing has been reposted/renewed by
+    the company (same URL, but the site now shows a newer publish date) and,
+    if so, bumps its date_published/published_at/scraped_at so it moves back
+    to the top of the recency-sorted view instead of staying buried under its
+    original scrape date.
+
+    Only the date fields are touched - user-tracking fields (flag, cv_sent,
+    interview_scheduled, offer_result) and previously scraped content
+    (description, requirements, salary) are left untouched.
+
+    Returns True if the job was bumped as a repost, False otherwise
+    (including when the job doesn't exist yet, or the fresh date isn't newer).
+    """
+    from parser import parse_date_to_timestamp
+    from datetime import datetime
+
+    conn = get_db_connection()
+    try:
+        cursor = conn.cursor()
+        cursor.execute("SELECT published_at FROM jobs WHERE url = ?", (url,))
+        row = cursor.fetchone()
+        if row is None:
+            return False  # job doesn't exist yet - not our concern here
+
+        fresh_ts = parse_date_to_timestamp(fresh_date_published)
+        if not fresh_ts:
+            return False  # couldn't determine a real date for the fresh listing
+
+        stored_published_at = row['published_at'] or ''
+        fresh_day = fresh_ts.split(' ')[0]
+        stored_day = stored_published_at.split(' ')[0]
+
+        if stored_day and fresh_day <= stored_day:
+            return False  # not newer than what we already have - nothing to do
+
+        with conn:
+            formatted_date = datetime.strptime(fresh_ts, '%Y-%m-%d %H:%M:%S').strftime('%d.%m.%Y')
+            update_cursor = conn.execute("""
+                UPDATE jobs
+                SET date_published = ?, published_at = ?, scraped_at = CURRENT_TIMESTAMP
+                WHERE url = ?
+            """, (formatted_date, fresh_ts, url))
+            if update_cursor.rowcount > 0:
+                logger.info(f"Repost detected for {url}: bumped publish date to {formatted_date}.")
+                return True
+            return False
+    except Exception as e:
+        logger.error(f"Error refreshing repost date for {url}: {e}")
+        return False
+    finally:
+        conn.close()
+
 def update_job_flag(url, flag):
     """Updates the flag/color indicator of a job listing."""
     conn = get_db_connection()
@@ -287,6 +375,27 @@ def update_job_flag(url, flag):
             return cursor.rowcount > 0
     except Exception as e:
         logger.error(f"Error updating flag for job {url}: {e}")
+        return False
+    finally:
+        conn.close()
+
+# Columns that back the tri-state application-tracking icons (CV sent / Interview / Offer).
+JOB_STATUS_FIELDS = {'cv_sent', 'interview_scheduled', 'offer_result'}
+
+def update_job_status(url, field, value):
+    """Updates one of the application-tracking status fields for a job listing.
+    'value' is one of None, 'green', 'red'."""
+    if field not in JOB_STATUS_FIELDS:
+        logger.error(f"Attempted to update invalid job status field: {field}")
+        return False
+
+    conn = get_db_connection()
+    try:
+        with conn:
+            cursor = conn.execute(f"UPDATE jobs SET {field} = ? WHERE url = ?", (value, url))
+            return cursor.rowcount > 0
+    except Exception as e:
+        logger.error(f"Error updating {field} for job {url}: {e}")
         return False
     finally:
         conn.close()
@@ -368,6 +477,53 @@ def update_company(company_id, **kwargs):
             return cursor.rowcount > 0
     except Exception as e:
         logger.error(f"Error updating company {company_id}: {e}")
+        return False
+    finally:
+        conn.close()
+
+def get_scraper_urls():
+    """Fetches all scraper search URLs from the database."""
+    conn = get_db_connection()
+    try:
+        cursor = conn.cursor()
+        cursor.execute("SELECT source, url FROM scraper_urls")
+        rows = cursor.fetchall()
+        return {row['source']: row['url'] for row in rows}
+    except Exception as e:
+        logger.error(f"Error retrieving scraper URLs: {e}")
+        return {}
+    finally:
+        conn.close()
+
+def update_scraper_url(source, url):
+    """Updates or inserts a scraper URL for a specific source."""
+    conn = get_db_connection()
+    try:
+        with conn:
+            cursor = conn.execute("""
+                INSERT OR REPLACE INTO scraper_urls (source, url)
+                VALUES (?, ?)
+            """, (source, url))
+            return cursor.rowcount > 0
+    except Exception as e:
+        logger.error(f"Error updating scraper URL for {source}: {e}")
+        return False
+    finally:
+        conn.close()
+
+def clear_jobs_and_companies():
+    """Clears all jobs and companies from the database, resetting autoincrement."""
+    conn = get_db_connection()
+    try:
+        with conn:
+            conn.execute("DELETE FROM jobs")
+            conn.execute("DELETE FROM companies")
+            # Reset SQLite autoincrement sequence
+            conn.execute("DELETE FROM sqlite_sequence WHERE name='companies'")
+        logger.info("Cleared jobs and companies database tables successfully.")
+        return True
+    except Exception as e:
+        logger.error(f"Error clearing jobs and companies database: {e}")
         return False
     finally:
         conn.close()
