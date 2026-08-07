@@ -12,7 +12,14 @@ from functools import wraps
 from flask import Flask, request, jsonify, render_template, send_from_directory, session, redirect, url_for, send_file
 from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
-import fitz  # PyMuPDF - renders a raster preview from uploaded PDF drawings
+# PyMuPDF - renders a raster preview from uploaded PDF drawings.
+# It was renamed from "fitz" to "pymupdf" in 1.24.3; the old name still works but
+# is deprecated and will eventually be dropped, so prefer the new one and fall
+# back only for older installs.
+try:
+    import pymupdf
+except ImportError:  # PyMuPDF older than 1.24.3
+    import fitz as pymupdf
 
 app = Flask(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -24,6 +31,9 @@ DB_FOLDER = 'database'
 DB_PATH = os.path.join(DB_FOLDER, 'catalog.db')
 SECRET_KEY_FILE = os.path.join(DB_FOLDER, '.flask_secret_key')
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'pdf', 'svg'}
+# Change this single value if port 5050 is already taken on this machine
+# (remember to update run.bat/run_mac.command, which open the browser at it).
+PORT = 5050
 
 ROLE_ADMIN = 'admin'
 ROLE_READ_WRITE = 'read_write'
@@ -246,9 +256,9 @@ def generate_preview_image(source_filename):
     preview_path = os.path.join(app.config['UPLOAD_FOLDER'], preview_filename)
 
     try:
-        with fitz.open(source_path) as doc:
+        with pymupdf.open(source_path) as doc:
             page = doc.load_page(0)
-            pixmap = page.get_pixmap(matrix=fitz.Matrix(2, 2))
+            pixmap = page.get_pixmap(matrix=pymupdf.Matrix(2, 2))
             pixmap.save(preview_path)
         return preview_filename
     except Exception:
@@ -859,12 +869,12 @@ if __name__ == '__main__':
     local_ip = get_local_ip()
     print("==================================================")
     print(f" Сървърът стартира успешно!")
-    print(f" Локален достъп: http://localhost:5050")
-    print(f" Достъп от мрежата: http://{local_ip}:5050")
+    print(f" Локален достъп: http://localhost:{PORT}")
+    print(f" Достъп от мрежата: http://{local_ip}:{PORT}")
     if bootstrap_password:
         print(" Създаден е първоначален администраторски акаунт:")
         print("   Потребител: admin")
         print(f"   Парола: {bootstrap_password}")
         print("   (запазете я някъде - вижда се само сега; може да я смените от /account след вход)")
     print("==================================================")
-    app.run(host='0.0.0.0', port=5050, debug=False)
+    app.run(host='0.0.0.0', port=PORT, debug=False)
