@@ -7,7 +7,7 @@ import sys
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
 from config import DEV_BG_URL, PORT, FLASK_DEBUG
-from database import init_db, save_job, get_all_jobs, update_job_flag, get_all_companies, update_company
+from database import init_db, save_job, get_all_jobs, update_job_flag, update_job_status, get_all_companies, update_company
 from scraper import fetch_html, fetch_job_details, scrape_linkedin_jobs, scrape_jobs_bg_jobs
 from parser import parse_job_listings, parse_job_detail_page
 
@@ -162,6 +162,32 @@ def api_update_flag():
         return jsonify({'success': True})
     else:
         return jsonify({'success': False, 'error': 'Failed to update flag in database.'})
+
+@app.route('/api/job/status', methods=['POST'])
+def api_update_job_status():
+    """
+    API endpoint to update one of the application-tracking icons on a job listing
+    (CV sent / Interview scheduled / Offer or rejection received).
+    Expects JSON: { "url": "...", "field": "cv_sent"|"interview_scheduled"|"offer_result", "value": "green"|"red"|null }
+    """
+    data = request.get_json()
+    if not data or 'url' not in data or 'field' not in data:
+        return jsonify({'success': False, 'error': 'Invalid request data.'}), 400
+
+    url = data['url']
+    field = data['field']
+    value = data.get('value')
+
+    if field not in ['cv_sent', 'interview_scheduled', 'offer_result']:
+        return jsonify({'success': False, 'error': 'Invalid field.'}), 400
+    if value not in [None, 'green', 'red']:
+        return jsonify({'success': False, 'error': 'Invalid status value.'}), 400
+
+    success = update_job_status(url, field, value)
+    if success:
+        return jsonify({'success': True})
+    else:
+        return jsonify({'success': False, 'error': 'Failed to update status in database.'})
 
 @app.route('/api/company/update', methods=['POST'])
 def api_update_company():

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Automation QA Jobs Tracker - dev.bg</title>
+    <title>Jobs Tracker</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon.png') }}">
 </head>
@@ -12,7 +12,7 @@
         <!-- Header -->
         <header>
             <div class="brand-section">
-                <h1>Automation QA Jobs Tracker</h1>
+                <h1>Jobs Tracker</h1>
                 <p>Проследяване на нови обяви за работа в реално време</p>
             </div>
             <div class="header-actions">
@@ -59,6 +59,7 @@
         <div class="tabs-navigation">
             <button class="tab-btn active" data-tab="jobs-tab">Обяви</button>
             <button class="tab-btn" data-tab="companies-tab">Фирми</button>
+            <button class="tab-btn" data-tab="settings-tab">Настройки</button>
         </div>
 
         <!-- Tab Panes -->
@@ -231,6 +232,7 @@
                                     <th>Заплата От</th>
                                     <th>Заплата До</th>
                                     <th style="text-align: right;">Линк / Детайли</th>
+                                    <th class="col-tracking" style="text-align: center;">Проследяване</th>
                                 </tr>
                             </thead>
                             <tbody id="jobsTableBody">
@@ -345,11 +347,35 @@
                                                 </a>
                                             </div>
                                         </td>
+                                        <td class="col-tracking">
+                                            <div class="status-icons-group">
+                                                <button type="button" class="status-icon-btn{% if job.cv_sent %} state-{{ job.cv_sent }}{% endif %}" data-state="{{ job.cv_sent if job.cv_sent else 'none' }}" onclick="toggleJobStatus(event, 'cv_sent')" title="Изпратено CV">
+                                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                        <path d="M22 2L11 13"></path>
+                                                        <path d="M22 2l-7 20-4-9-9-4 20-7z"></path>
+                                                    </svg>
+                                                </button>
+                                                <button type="button" class="status-icon-btn{% if job.interview_scheduled %} state-{{ job.interview_scheduled }}{% endif %}" data-state="{{ job.interview_scheduled if job.interview_scheduled else 'none' }}" onclick="toggleJobStatus(event, 'interview_scheduled')" title="Насрочени интервюта">
+                                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                                                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                                                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                                                    </svg>
+                                                </button>
+                                                <button type="button" class="status-icon-btn{% if job.offer_result %} state-{{ job.offer_result }}{% endif %}" data-state="{{ job.offer_result if job.offer_result else 'none' }}" onclick="toggleJobStatus(event, 'offer_result')" title="Получена оферта / отказ">
+                                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                        <circle cx="12" cy="8" r="7"></circle>
+                                                        <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline>
+                                                    </svg>
+                                                </button>
+                                            </div>
+                                        </td>
                                     </tr>
                                     {% endfor %}
                                 {% else %}
                                     <tr id="noJobsRow">
-                                        <td colspan="10">
+                                        <td colspan="11">
                                             <div class="empty-state">
                                                 <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                                                     <circle cx="12" cy="12" r="10"></circle>
@@ -363,6 +389,21 @@
                                 {% endif %}
                             </tbody>
                         </table>
+                    </div>
+
+                    <div class="pagination-bar">
+                        <div class="pagination-size">
+                            <label for="jobsPageSize">Реда на страница:</label>
+                            <select id="jobsPageSize" class="pagination-select">
+                                <option value="10">10</option>
+                                <option value="25">25</option>
+                            </select>
+                        </div>
+                        <div class="pagination-nav">
+                            <button type="button" id="jobsPrevPage" class="btn-icon pagination-btn" title="Предишна страница">&lsaquo;</button>
+                            <div class="pagination-pages" id="jobsPageNumbers"></div>
+                            <button type="button" id="jobsNextPage" class="btn-icon pagination-btn" title="Следваща страница">&rsaquo;</button>
+                        </div>
                     </div>
                 </section>
             </main>
@@ -451,6 +492,77 @@
                                     <!-- Populated dynamically via JS -->
                                 </tbody>
                             </table>
+                        </div>
+
+                        <div class="pagination-bar">
+                            <div class="pagination-size">
+                                <label for="companiesPageSize">Реда на страница:</label>
+                                <select id="companiesPageSize" class="pagination-select">
+                                    <option value="10">10</option>
+                                    <option value="25">25</option>
+                                </select>
+                            </div>
+                            <div class="pagination-nav">
+                                <button type="button" id="companiesPrevPage" class="btn-icon pagination-btn" title="Предишна страница">&lsaquo;</button>
+                                <div class="pagination-pages" id="companiesPageNumbers"></div>
+                                <button type="button" id="companiesNextPage" class="btn-icon pagination-btn" title="Следваща страница">&rsaquo;</button>
+                            </div>
+                        </div>
+                    </section>
+                </main>
+            </div>
+        </div>
+
+        <!-- Settings Tab Pane -->
+        <div id="settings-tab" class="tab-content-pane">
+            <div class="dashboard-grid" style="grid-template-columns: minmax(0, 1fr);">
+                <main>
+                    <section class="listings-card" style="padding: 2rem; max-width: 800px; margin: 0 auto; box-shadow: var(--shadow); border: 1px solid var(--border-color);">
+                        <div class="card-header" style="margin-bottom: 2rem; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem;">
+                            <h2 style="font-size: 1.4rem; font-weight: 600;">Настройки на търсенето</h2>
+                            <p style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.25rem;">Конфигурирайте адресите за скрапване на обяви</p>
+                        </div>
+                        
+                        <form id="settingsForm" onsubmit="saveSettings(event)">
+                            <div class="filter-group" style="margin-bottom: 1.5rem;">
+                                <label for="devBgUrlInput" style="font-weight: 600; margin-bottom: 0.5rem; display: block; font-size: 0.9rem;">Линк за dev.bg</label>
+                                <input type="url" id="devBgUrlInput" class="input-control" style="width: 100%; padding: 0.75rem; border: 1px solid var(--border-color); font-family: inherit;" value="{{ scraper_urls.get('dev.bg', '') }}">
+                            </div>
+                            
+                            <div class="filter-group" style="margin-bottom: 1.5rem;">
+                                <label for="jobsBgUrlInput" style="font-weight: 600; margin-bottom: 0.5rem; display: block; font-size: 0.9rem;">Линк за Jobs.bg</label>
+                                <input type="url" id="jobsBgUrlInput" class="input-control" style="width: 100%; padding: 0.75rem; border: 1px solid var(--border-color); font-family: inherit;" value="{{ scraper_urls.get('jobs.bg', '') }}">
+                            </div>
+                            
+                            <div class="filter-group" style="margin-bottom: 2rem;">
+                                <label for="linkedinUrlInput" style="font-weight: 600; margin-bottom: 0.5rem; display: block; font-size: 0.9rem;">Линк за LinkedIn</label>
+                                <input type="url" id="linkedinUrlInput" class="input-control" style="width: 100%; padding: 0.75rem; border: 1px solid var(--border-color); font-family: inherit;" value="{{ scraper_urls.get('LinkedIn', '') }}">
+                            </div>
+                            
+                            <div style="display: flex; gap: 1rem; margin-bottom: 3rem;">
+                                <button type="submit" class="btn btn-primary" id="saveSettingsBtn">
+                                    <span>Запази настройките</span>
+                                </button>
+                                <button type="button" class="btn" style="background-color: #f1f5f9; color: var(--text-primary); border: 1px solid var(--border-color);" onclick="resetSettingsForm()">
+                                    <span>Отказ</span>
+                                </button>
+                            </div>
+                        </form>
+                        
+                        <div style="border-top: 1px solid var(--border-color); padding-top: 2rem; margin-top: 2rem;">
+                            <h3 style="color: var(--error); margin-bottom: 0.5rem; font-weight: 600; font-size: 1.2rem;">Опасна зона</h3>
+                            <p style="color: var(--text-secondary); margin-bottom: 1.5rem; font-size: 0.85rem; line-height: 1.4;">
+                                Изчистването на базата данни ще изтрие всички записани обяви и регистрирани фирми. Настройките за линковете ще бъдат запазени.
+                            </p>
+                            <button type="button" class="btn" style="background-color: var(--error); color: white; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);" onclick="clearDatabase()">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.25rem; vertical-align: middle;">
+                                    <polyline points="3 6 5 6 21 6"></polyline>
+                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                    <line x1="10" y1="11" x2="10" y2="17"></line>
+                                    <line x1="14" y1="11" x2="14" y2="17"></line>
+                                </svg>
+                                <span>Изчисти базата данни</span>
+                            </button>
                         </div>
                     </section>
                 </main>
@@ -576,6 +688,105 @@
         // Store all jobs and companies in JavaScript array for dynamic updates
         let jobsData = {{ jobs|tojson|safe }};
         let companiesData = {{ companies|tojson|safe }};
+        
+        // Settings & Database functions
+        const initialUrls = {
+            'dev.bg': "{{ scraper_urls.get('dev.bg', '') }}",
+            'jobs.bg': "{{ scraper_urls.get('jobs.bg', '') }}",
+            'LinkedIn': "{{ scraper_urls.get('LinkedIn', '') }}"
+        };
+
+        function resetSettingsForm() {
+            document.getElementById('devBgUrlInput').value = initialUrls['dev.bg'];
+            document.getElementById('jobsBgUrlInput').value = initialUrls['jobs.bg'];
+            document.getElementById('linkedinUrlInput').value = initialUrls['LinkedIn'];
+        }
+
+        async function saveSettings(event) {
+            event.preventDefault();
+            const saveBtn = document.getElementById('saveSettingsBtn');
+            const originalText = saveBtn.innerHTML;
+            saveBtn.disabled = true;
+            saveBtn.innerHTML = 'Запазване...';
+            
+            const sources = [
+                { name: 'dev.bg', id: 'devBgUrlInput' },
+                { name: 'jobs.bg', id: 'jobsBgUrlInput' },
+                { name: 'LinkedIn', id: 'linkedinUrlInput' }
+            ];
+            
+            let successCount = 0;
+            let lastError = null;
+            
+            for (const src of sources) {
+                const urlVal = document.getElementById(src.id).value.trim();
+                try {
+                    const response = await fetch('/api/settings/update', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ source: src.name, url: urlVal })
+                    });
+                    const data = await response.json();
+                    if (data.success) {
+                        successCount++;
+                        initialUrls[src.name] = urlVal; // update reset state
+                    } else {
+                        lastError = data.error;
+                    }
+                } catch (err) {
+                    lastError = 'Мрежова грешка при връзка със сървъра.';
+                }
+            }
+            
+            saveBtn.disabled = false;
+            saveBtn.innerHTML = originalText;
+            
+            if (successCount === sources.length) {
+                showToastBanner(true, 'Настройките са запазени успешно!');
+            } else {
+                showToastBanner(false, `Грешка при запазване: ${lastError || 'Някои линкове не бяха обновени.'}`);
+            }
+        }
+
+        async function clearDatabase() {
+            if (!confirm('Наистина ли искате да изчистите базата данни? Всички обяви и фирми ще бъдат изтрити завинаги!')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/database/clear', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    // Update local cache
+                    jobsData = data.jobs;
+                    companiesData = data.companies;
+                    
+                    // Re-render views
+                    updateTable(jobsData);
+                    
+                    // Update metrics
+                    document.getElementById('totalJobsMetric').innerText = '0';
+                    document.getElementById('salaryJobsMetric').innerText = '0';
+                    document.getElementById('leaveJobsMetric').innerText = '0';
+                    document.getElementById('totalCount').innerText = '0';
+                    
+                    showToastBanner(true, 'Базата данни беше изчистена успешно!');
+                } else {
+                    showToastBanner(false, `Грешка при изчистване на базата данни: ${data.error}`);
+                }
+            } catch (err) {
+                console.error(err);
+                showToastBanner(false, 'Мрежова грешка при опит за изчистване на базата.');
+            }
+        }
         
         // Modal functions
         function openJobDetails(job) {
@@ -807,8 +1018,8 @@
             const onlyLeave = leaveFilter.checked;
             
             const rows = document.querySelectorAll('.job-row');
-            let visibleCount = 0;
-            
+            const matchingRows = [];
+
             rows.forEach(row => {
                 const url = row.getAttribute('data-url');
                 const job = jobsData.find(j => j.url === url);
@@ -872,25 +1083,122 @@
                 const matchesFlag = selectedFlag === 'all' || flag === selectedFlag;
                 
                 if (matchesText && matchesLocation && matchesCompany && matchesSalary && matchesLeave && matchesSource && matchesDate && matchesFlag) {
-                    row.style.display = '';
-                    visibleCount++;
+                    matchingRows.push(row);
                 } else {
                     row.style.display = 'none';
                 }
             });
-            
-            document.getElementById('visibleCount').innerText = visibleCount;
+
+            // Pagination: only show the rows belonging to the current page
+            const totalPages = Math.max(1, Math.ceil(matchingRows.length / jobsPageSize));
+            if (jobsCurrentPage > totalPages) jobsCurrentPage = totalPages;
+            if (jobsCurrentPage < 1) jobsCurrentPage = 1;
+
+            const startIdx = (jobsCurrentPage - 1) * jobsPageSize;
+            const endIdx = startIdx + jobsPageSize;
+
+            matchingRows.forEach((row, idx) => {
+                row.style.display = (idx >= startIdx && idx < endIdx) ? '' : 'none';
+            });
+
+            document.getElementById('visibleCount').innerText = matchingRows.length;
+            updateJobsPaginationUI(totalPages);
         }
-        
+
+        // Renders a Google-style page number list (first, last, a sliding window around
+        // the current page, with ellipses for gaps) into the given container element.
+        function renderPageNumbers(containerEl, currentPage, totalPages, onPageClick) {
+            containerEl.innerHTML = '';
+
+            const half = 2;
+            let start = currentPage - half;
+            let end = currentPage + half;
+            if (start < 1) {
+                end += (1 - start);
+                start = 1;
+            }
+            if (end > totalPages) {
+                start -= (end - totalPages);
+                end = totalPages;
+            }
+            start = Math.max(1, start);
+            end = Math.min(totalPages, end);
+
+            const addPageBtn = (pageNum) => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'pagination-page-btn' + (pageNum === currentPage ? ' active' : '');
+                btn.innerText = pageNum;
+                btn.addEventListener('click', () => onPageClick(pageNum));
+                containerEl.appendChild(btn);
+            };
+            const addEllipsis = () => {
+                const span = document.createElement('span');
+                span.className = 'pagination-ellipsis';
+                span.innerText = '...';
+                containerEl.appendChild(span);
+            };
+
+            if (start > 1) {
+                addPageBtn(1);
+                if (start > 2) addEllipsis();
+            }
+            for (let p = start; p <= end; p++) {
+                addPageBtn(p);
+            }
+            if (end < totalPages) {
+                if (end < totalPages - 1) addEllipsis();
+                addPageBtn(totalPages);
+            }
+        }
+
+        // Jobs pagination state & controls
+        let jobsPageSize = 10;
+        let jobsCurrentPage = 1;
+        const jobsPageSizeSelect = document.getElementById('jobsPageSize');
+        const jobsPrevPageBtn = document.getElementById('jobsPrevPage');
+        const jobsNextPageBtn = document.getElementById('jobsNextPage');
+        const jobsPageNumbersEl = document.getElementById('jobsPageNumbers');
+
+        function updateJobsPaginationUI(totalPages) {
+            renderPageNumbers(jobsPageNumbersEl, jobsCurrentPage, totalPages, (p) => {
+                jobsCurrentPage = p;
+                applyFilters();
+            });
+            jobsPrevPageBtn.disabled = jobsCurrentPage <= 1;
+            jobsNextPageBtn.disabled = jobsCurrentPage >= totalPages;
+        }
+
+        function resetJobsPageAndApplyFilters() {
+            jobsCurrentPage = 1;
+            applyFilters();
+        }
+
+        jobsPageSizeSelect.addEventListener('change', function() {
+            jobsPageSize = parseInt(this.value, 10);
+            jobsCurrentPage = 1;
+            applyFilters();
+        });
+        jobsPrevPageBtn.addEventListener('click', function() {
+            if (jobsCurrentPage > 1) {
+                jobsCurrentPage--;
+                applyFilters();
+            }
+        });
+        jobsNextPageBtn.addEventListener('click', function() {
+            jobsCurrentPage++;
+            applyFilters();
+        });
+
         // Add event listeners to controls
-        searchInput.addEventListener('input', applyFilters);
-        companySelect.addEventListener('change', applyFilters);
-        locationFilters.forEach(radio => radio.addEventListener('change', applyFilters));
-        sourceFilters.forEach(radio => radio.addEventListener('change', applyFilters));
-        dateFilters.forEach(radio => radio.addEventListener('change', applyFilters));
-        flagFilters.forEach(radio => radio.addEventListener('change', applyFilters));
-        salaryFilter.addEventListener('change', applyFilters);
-        leaveFilter.addEventListener('change', applyFilters);
+        searchInput.addEventListener('input', resetJobsPageAndApplyFilters);
+        companySelect.addEventListener('change', resetJobsPageAndApplyFilters);
+        locationFilters.forEach(radio => radio.addEventListener('change', resetJobsPageAndApplyFilters));
+        sourceFilters.forEach(radio => radio.addEventListener('change', resetJobsPageAndApplyFilters));
+        dateFilters.forEach(radio => radio.addEventListener('change', resetJobsPageAndApplyFilters));
+        flagFilters.forEach(radio => radio.addEventListener('change', resetJobsPageAndApplyFilters));
+        salaryFilter.addEventListener('change', resetJobsPageAndApplyFilters);
+        leaveFilter.addEventListener('change', resetJobsPageAndApplyFilters);
 
         // AJAX Refresh logic
         const refreshBtn = document.getElementById('refreshBtn');
@@ -995,11 +1303,12 @@
         function updateTable(jobs) {
             const tbody = document.getElementById('jobsTableBody');
             tbody.innerHTML = '';
-            
+            jobsCurrentPage = 1;
+
             if (!jobs || jobs.length === 0) {
                 tbody.innerHTML = `
                     <tr id="noJobsRow">
-                        <td colspan="10">
+                        <td colspan="11">
                             <div class="empty-state">
                                 <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                                     <circle cx="12" cy="12" r="10"></circle>
@@ -1137,8 +1446,32 @@
                             </a>
                         </div>
                     </td>
+                    <td class="col-tracking">
+                        <div class="status-icons-group">
+                            <button type="button" class="status-icon-btn${job.cv_sent ? ' state-' + job.cv_sent : ''}" data-state="${job.cv_sent || 'none'}" onclick="toggleJobStatus(event, 'cv_sent')" title="Изпратено CV">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M22 2L11 13"></path>
+                                    <path d="M22 2l-7 20-4-9-9-4 20-7z"></path>
+                                </svg>
+                            </button>
+                            <button type="button" class="status-icon-btn${job.interview_scheduled ? ' state-' + job.interview_scheduled : ''}" data-state="${job.interview_scheduled || 'none'}" onclick="toggleJobStatus(event, 'interview_scheduled')" title="Насрочени интервюта">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                                </svg>
+                            </button>
+                            <button type="button" class="status-icon-btn${job.offer_result ? ' state-' + job.offer_result : ''}" data-state="${job.offer_result || 'none'}" onclick="toggleJobStatus(event, 'offer_result')" title="Получена оферта / отказ">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="8" r="7"></circle>
+                                    <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline>
+                                </svg>
+                            </button>
+                        </div>
+                    </td>
                 `;
-                
+
                 tbody.appendChild(tr);
             });
             
@@ -1258,7 +1591,7 @@
             
             document.getElementById('visibleCompaniesCount').innerText = filtered.length;
             document.getElementById('totalCompaniesCount').innerText = companiesData.length;
-            
+
             if (filtered.length === 0) {
                 tbody.innerHTML = `
                     <tr>
@@ -1267,13 +1600,22 @@
                         </td>
                     </tr>
                 `;
+                updateCompaniesPaginationUI(1);
                 return;
             }
-            
+
+            // Pagination: only render the rows belonging to the current page
+            const totalPages = Math.max(1, Math.ceil(filtered.length / companiesPageSize));
+            if (companiesCurrentPage > totalPages) companiesCurrentPage = totalPages;
+            if (companiesCurrentPage < 1) companiesCurrentPage = 1;
+            const startIdx = (companiesCurrentPage - 1) * companiesPageSize;
+            const pageItems = filtered.slice(startIdx, startIdx + companiesPageSize);
+            updateCompaniesPaginationUI(totalPages);
+
             // List of primary companies for parent select (only those with parent_company_id === null)
             const primaryCompanies = companiesData.filter(c => c.parent_company_id === null);
-            
-            filtered.forEach(company => {
+
+            pageItems.forEach(company => {
                 const tr = document.createElement('tr');
                 
                 // Flag cell
@@ -1396,10 +1738,48 @@
             }
         }
         
+        // Companies pagination state & controls
+        let companiesPageSize = 10;
+        let companiesCurrentPage = 1;
+        const companiesPageSizeSelect = document.getElementById('companiesPageSize');
+        const companiesPrevPageBtn = document.getElementById('companiesPrevPage');
+        const companiesNextPageBtn = document.getElementById('companiesNextPage');
+        const companiesPageNumbersEl = document.getElementById('companiesPageNumbers');
+
+        function updateCompaniesPaginationUI(totalPages) {
+            renderPageNumbers(companiesPageNumbersEl, companiesCurrentPage, totalPages, (p) => {
+                companiesCurrentPage = p;
+                renderCompaniesTable();
+            });
+            companiesPrevPageBtn.disabled = companiesCurrentPage <= 1;
+            companiesNextPageBtn.disabled = companiesCurrentPage >= totalPages;
+        }
+
+        function resetCompaniesPageAndRender() {
+            companiesCurrentPage = 1;
+            renderCompaniesTable();
+        }
+
+        companiesPageSizeSelect.addEventListener('change', function() {
+            companiesPageSize = parseInt(this.value, 10);
+            companiesCurrentPage = 1;
+            renderCompaniesTable();
+        });
+        companiesPrevPageBtn.addEventListener('click', function() {
+            if (companiesCurrentPage > 1) {
+                companiesCurrentPage--;
+                renderCompaniesTable();
+            }
+        });
+        companiesNextPageBtn.addEventListener('click', function() {
+            companiesCurrentPage++;
+            renderCompaniesTable();
+        });
+
         // Handle filter inputs for companies
-        companySearchInput.addEventListener('input', renderCompaniesTable);
-        companyFlagFilters.forEach(r => r.addEventListener('change', renderCompaniesTable));
-        companyTypeFilters.forEach(r => r.addEventListener('change', renderCompaniesTable));
+        companySearchInput.addEventListener('input', resetCompaniesPageAndRender);
+        companyFlagFilters.forEach(r => r.addEventListener('change', resetCompaniesPageAndRender));
+        companyTypeFilters.forEach(r => r.addEventListener('change', resetCompaniesPageAndRender));
 
         function toggleFlagDropdown(event) {
             event.stopPropagation();
@@ -1469,6 +1849,54 @@
                 alert('Възникна мрежова грешка при опит за промяна на флага.');
             }
         }
+
+        // Cycles a tracking icon (CV sent / Interview / Offer) through: none -> green -> red -> none
+        async function toggleJobStatus(event, field) {
+            event.stopPropagation();
+
+            const btn = event.currentTarget;
+            const rowEl = btn.closest('.job-row');
+            const url = rowEl.getAttribute('data-url');
+
+            const current = btn.getAttribute('data-state') || 'none';
+            let next;
+            if (current === 'none') next = 'green';
+            else if (current === 'green') next = 'red';
+            else next = null;
+
+            try {
+                const response = await fetch('/api/job/status', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ url: url, field: field, value: next })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    btn.classList.remove('state-green', 'state-red');
+                    if (next) {
+                        btn.classList.add(`state-${next}`);
+                    }
+                    btn.setAttribute('data-state', next || 'none');
+
+                    // Update local cache so it stays consistent until the next refresh
+                    const jobIndex = jobsData.findIndex(j => j.url === url);
+                    if (jobIndex !== -1) {
+                        jobsData[jobIndex][field] = next;
+                    }
+                } else {
+                    alert('Грешка при запис на статуса: ' + data.error);
+                }
+            } catch (error) {
+                console.error('Error setting job status:', error);
+                alert('Възникна мрежова грешка при опит за промяна на статуса.');
+            }
+        }
+
+        // Apply initial pagination to the server-rendered jobs table on page load
+        applyFilters();
     </script>
 </body>
 </html>

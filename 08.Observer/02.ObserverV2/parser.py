@@ -372,8 +372,14 @@ def parse_date_to_timestamp(date_str):
     if match:
         day = int(match.group(1))
         month_name = match.group(2)
-        if month_name in months_bg:
-            month = months_bg[month_name]
+        # dev.bg sometimes abbreviates the month ("авг" for "август") - match by prefix
+        month = months_bg.get(month_name)
+        if month is None:
+            for full_name, num in months_bg.items():
+                if full_name.startswith(month_name):
+                    month = num
+                    break
+        if month:
             year = now.year
             # In case we parse an older year or transition over New Year:
             if month > now.month and now.month == 1:
