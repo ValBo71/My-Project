@@ -171,6 +171,31 @@
                     </div>
                 </div>
 
+                <!-- Application tracking selector -->
+                <div class="filter-group">
+                    <label>Проследяване</label>
+                    <div class="checkbox-group">
+                        <label class="checkbox-label">
+                            <input type="radio" name="trackingFilter" value="all" checked> Всички
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="radio" name="trackingFilter" value="none"> Без проследяване
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="radio" name="trackingFilter" value="cv_sent"> Изпратено CV
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="radio" name="trackingFilter" value="interview_scheduled"> Насрочено интервю
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="radio" name="trackingFilter" value="offer"> Получена оферта
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="radio" name="trackingFilter" value="rejected"> Получен отказ
+                        </label>
+                    </div>
+                </div>
+
                 <!-- Disclosed metrics selectors -->
                 <div class="filter-group">
                     <label>Допълнителни</label>
@@ -247,6 +272,9 @@
                                         data-source="{{ job.source|lower if job.source else 'dev.bg' }}"
                                         data-url="{{ job.url }}"
                                         data-flag="{{ job.flag if job.flag else 'none' }}"
+                                        data-cv-sent="{{ job.cv_sent if job.cv_sent else '' }}"
+                                        data-interview-scheduled="{{ job.interview_scheduled if job.interview_scheduled else '' }}"
+                                        data-offer-result="{{ job.offer_result if job.offer_result else '' }}"
                                         data-date-timestamp="{{ job.published_at if job.published_at else job.scraped_at }}">
                                         
                                         <td class="col-flag">
@@ -793,6 +821,7 @@
         const sourceFilters = document.getElementsByName('sourceFilter');
         const dateFilters = document.getElementsByName('dateFilter');
         const flagFilters = document.getElementsByName('flagFilter');
+        const trackingFilters = document.getElementsByName('trackingFilter');
         const salaryFilter = document.getElementById('salaryFilter');
         const leaveFilter = document.getElementById('leaveFilter');
         
@@ -857,6 +886,14 @@
             for (const radio of dateFilters) {
                 if (radio.checked) {
                     selectedDateRange = radio.value;
+                    break;
+                }
+            }
+
+            let selectedTracking = 'all';
+            for (const radio of trackingFilters) {
+                if (radio.checked) {
+                    selectedTracking = radio.value;
                     break;
                 }
             }
@@ -928,8 +965,28 @@
                 
                 const flag = row.getAttribute('data-flag') || 'none';
                 const matchesFlag = selectedFlag === 'all' || flag === selectedFlag;
+
+                // Application-tracking match (Проследяване column).
+                // Falls back to the row's data-* attributes when the job is not in the local cache.
+                const cvSent = job ? job.cv_sent : (row.getAttribute('data-cv-sent') || null);
+                const interviewScheduled = job ? job.interview_scheduled : (row.getAttribute('data-interview-scheduled') || null);
+                const offerResult = job ? job.offer_result : (row.getAttribute('data-offer-result') || null);
+                const norm = v => (v && v !== 'none') ? v : null;
+
+                let matchesTracking = true;
+                if (selectedTracking === 'none') {
+                    matchesTracking = !norm(cvSent) && !norm(interviewScheduled) && !norm(offerResult);
+                } else if (selectedTracking === 'cv_sent') {
+                    matchesTracking = norm(cvSent) !== null;
+                } else if (selectedTracking === 'interview_scheduled') {
+                    matchesTracking = norm(interviewScheduled) !== null;
+                } else if (selectedTracking === 'offer') {
+                    matchesTracking = norm(offerResult) === 'green';
+                } else if (selectedTracking === 'rejected') {
+                    matchesTracking = norm(offerResult) === 'red';
+                }
                 
-                if (matchesText && matchesLocation && matchesCompany && matchesSalary && matchesLeave && matchesSource && matchesDate && matchesFlag) {
+                if (matchesText && matchesLocation && matchesCompany && matchesSalary && matchesLeave && matchesSource && matchesDate && matchesFlag && matchesTracking) {
                     filteredRows.push(row);
                 } else {
                     row.style.display = 'none';
@@ -1079,6 +1136,7 @@
         sourceFilters.forEach(radio => radio.addEventListener('change', () => applyFilters(true)));
         dateFilters.forEach(radio => radio.addEventListener('change', () => applyFilters(true)));
         flagFilters.forEach(radio => radio.addEventListener('change', () => applyFilters(true)));
+        trackingFilters.forEach(radio => radio.addEventListener('change', () => applyFilters(true)));
         salaryFilter.addEventListener('change', () => applyFilters(true));
         leaveFilter.addEventListener('change', () => applyFilters(true));
         
@@ -1242,6 +1300,9 @@
                 tr.setAttribute('data-has-leave', job.leave_days ? 'true' : 'false');
                 tr.setAttribute('data-url', job.url);
                 tr.setAttribute('data-flag', job.flag || 'none');
+                tr.setAttribute('data-cv-sent', job.cv_sent || '');
+                tr.setAttribute('data-interview-scheduled', job.interview_scheduled || '');
+                tr.setAttribute('data-offer-result', job.offer_result || '');
                 tr.setAttribute('data-date-timestamp', job.published_at || job.scraped_at);
                 
                 // Build Tech tags
@@ -1860,6 +1921,28 @@
                     const jobIndex = jobsData.findIndex(j => j.url === url);
                     if (jobIndex !== -1) {
                         jobsData[jobIndex][field] = next;
+                    }
+
+                    // Keep the row's data-* attributes in sync so the "Проследяване"
+                    // filter stays correct without needing a refresh.
+                    const attrMap = {
+                        cv_sent: 'data-cv-sent',
+                        interview_scheduled: 'data-interview-scheduled',
+                        offer_result: 'data-offer-result'
+                    };
+                    rowEl.setAttribute(attrMap[field], next || '');
+
+                    // Re-apply filters so the row disappears/appears if it no longer
+                    // matches the active tracking filter. Keep the current page.
+                    let activeTracking = 'all';
+                    for (const radio of trackingFilters) {
+                        if (radio.checked) {
+                            activeTracking = radio.value;
+                            break;
+                        }
+                    }
+                    if (activeTracking !== 'all') {
+                        applyFilters(false);
                     }
                 } else {
                     alert('Грешка при запис на статуса: ' + data.error);
