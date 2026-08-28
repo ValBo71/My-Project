@@ -41,7 +41,12 @@ This version (**Observer v2**) is an upgraded version of the original observer p
   * Clean layout optimized for widescreen displays with zero horizontal scrollbars.
   * Interactive modal displaying company statistics (total listings and duplicate counts).
 * **Smart Filtering & Real-time Search:**
-  * Search by company, title, or tech stack. Filter by platform, date, location (Remote/Hybrid/Sofia), salary/leave availability, and flag status.
+  * Search by company, title, or tech stack. Filter by platform, date, location (Remote/Hybrid/Sofia), salary/leave availability, flag status, and application-tracking stage.
+* **Application Tracking (Проследяване Column):**
+  * Three per-listing icons record application progress - **CV sent**, **Interview scheduled**, and **Offer / rejection received** - each cycling neutral → green → red and persisted in SQLite (`cv_sent`, `interview_scheduled`, `offer_result`).
+  * On the result icon, green marks a received **offer** and red a **rejection**.
+  * The sidebar "Проследяване" filter narrows the table to a single stage: *All*, *Not tracked*, *CV sent*, *Interview scheduled*, *Offer received*, or *Rejected*. Offer and rejection are separate options because they are opposite outcomes of the same icon.
+  * Composes with all other filters, and re-applies immediately when an icon is toggled, so rows leave or enter the current view without a refresh.
 * **Categorization Flags & Aliases:**
   * Assign color flags (green, yellow, red) to listings and companies.
   * Link aliases/spelling variations of companies under a single resolved company to consolidate views and statistics.

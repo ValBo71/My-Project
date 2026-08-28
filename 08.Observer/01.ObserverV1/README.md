@@ -31,6 +31,7 @@ This is a web application developed in **Python (Flask)** and **SQLite** that au
    * Filtering by publication date (Today / Last 3 Days / Last 7 Days).
    * Filtering by location (Remote / Hybrid / Sofia) and indicators (Only showing listings with salary / leave details).
    * Filtering by color/flag status (All / No Flag / Green / Yellow / Red).
+   * Filtering by application-tracking stage (All / Not tracked / CV sent / Interview scheduled / Offer received / Rejected).
 
 6. **Duplicate Prevention & Performance:**
    * Unique URLs are used as primary keys in SQLite to prevent duplicate entries.
@@ -41,7 +42,15 @@ This is a web application developed in **Python (Flask)** and **SQLite** that au
    * Persistence of flags in SQLite database.
    * Row backgrounds highlighted dynamically using premium, subtle pastel tints to preserve design aesthetics and hover feedback, avoiding bright "screaming" colors.
 
-8. **Companies Tab, Alias Grouping & Flag Inheritance:**
+8. **Application Tracking (Проследяване Column):**
+   * Three per-listing icons record how far an application has progressed: **CV sent**, **Interview scheduled**, and **Offer / rejection received**.
+   * Each icon cycles through three states on click - neutral, green, then red - and is persisted in SQLite (`cv_sent`, `interview_scheduled`, `offer_result`).
+   * On the result icon, green marks a received **offer** and red a **rejection**, so both outcomes are tracked on a single control.
+   * **Filtering by stage**: the sidebar "Проследяване" group narrows the table to a single stage - *All*, *Not tracked*, *CV sent*, *Interview scheduled*, *Offer received*, or *Rejected*. Offer and rejection are separate options because they are opposite outcomes of the same icon.
+   * The filter composes with every other filter (search, company, flag, source, location, date), so combinations such as "CV sent + Remote + last 7 days" work as expected.
+   * Changing an icon while a tracking filter is active re-applies the filter immediately, so a row leaves or enters the current view without waiting for a refresh.
+
+9. **Companies Tab, Alias Grouping & Flag Inheritance:**
    * **Dedicated Tab**: Switch to the "Фирми" (Companies) tab to manage all registered companies in a single place.
    * **Spelling Aliases & Connections**: Link spelling variations of the same company (e.g. "DraftKings Bulgaria" and "Draft Kings" under "DraftKings") to group them under a single resolved name on the main dashboard. Enforces a flat hierarchy to prevent circular dependencies.
    * **Custom Display Names**: Assign a custom display name override (e.g. "DraftKings Inc.") for primary companies.
