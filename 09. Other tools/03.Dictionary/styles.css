@@ -1209,3 +1209,26 @@ body.dark-theme .page-btn:hover {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+
+/* Browser speech recognition practice */
+.speech-practice {
+  margin: 1rem 0;
+  padding: 1rem;
+  background: var(--panel-bg-secondary);
+  border: 1px solid var(--panel-border);
+  text-align: center;
+}
+#speech-practice-feedback {
+  margin-top: 0.75rem;
+  overflow-wrap: anywhere;
+}
+.speech-practice-note {
+  margin-top: 0.5rem;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+#btn-practice-word[aria-pressed="true"] { background: var(--danger-hover); }
+#speech-practice-feedback[data-state="match"] { font-weight: 700; }
+#speech-practice-feedback[data-state="mismatch"],
+#speech-practice-feedback[data-state="error"] { font-weight: 600; }
