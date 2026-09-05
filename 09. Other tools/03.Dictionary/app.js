@@ -13,6 +13,7 @@ let allWords = [];
 let filteredWords = [];
 let currentPage = 1;
 let selectedImportFile = null;
+let studyAutoplayTimer = null;
 
 // Session State
 let sessionState = {
@@ -55,6 +56,26 @@ const btnQuitSession = document.getElementById('btn-quit-session');
 const studyTtsVoiceSelect = document.getElementById('study-tts-voice-select');
 const studyTtsAutoplay = document.getElementById('study-tts-autoplay');
 const btnSpeakWord = document.getElementById('btn-speak-word');
+
+const speechPractice = createSpeechPractice({
+  button: document.getElementById('btn-practice-word'),
+  feedback: document.getElementById('speech-practice-feedback'),
+  getTarget: () => {
+    if (!sessionState.isActive) return null;
+    const word = sessionState.words[sessionState.currentIndex];
+    return word ? { word: word.word, language: word.language, locale: studyTtsVoiceSelect.value } : null;
+  },
+  beforeStart: () => {
+    clearTimeout(studyAutoplayTimer);
+    window.speechSynthesis?.cancel();
+  }
+});
+navTabs.forEach(tab => tab.addEventListener('click', () => {
+  clearTimeout(studyAutoplayTimer);
+  speechPractice.cancel();
+  window.speechSynthesis?.cancel();
+}));
+
 
 const currentCardNumSpan = document.getElementById('current-card-num');
 const totalCardsNumSpan = document.getElementById('total-cards-num');
@@ -1022,6 +1043,8 @@ btnStartStudy.addEventListener('click', () => {
 });
 
 function loadCard(index) {
+  clearTimeout(studyAutoplayTimer);
+  speechPractice.cancel();
   const currentWord = sessionState.words[index];
   sessionState.isFlipped = false;
   sessionState.currentIndex = index;
@@ -1046,7 +1069,7 @@ function loadCard(index) {
 
   // Autoplay voice if checked and not set to off
   if (studyTtsAutoplay.checked && studyTtsVoiceSelect.value !== 'off') {
-    setTimeout(() => {
+    studyAutoplayTimer = setTimeout(() => {
       speakCurrentWord();
     }, 200);
   }
@@ -1086,6 +1109,8 @@ btnActionIncorrect.addEventListener('click', (e) => {
 });
 
 function processAnswer(isCorrect) {
+  clearTimeout(studyAutoplayTimer);
+  speechPractice.cancel();
   const currentWord = sessionState.words[sessionState.currentIndex];
 
   // Update Stats in memory & Database
@@ -1127,6 +1152,8 @@ function processAnswer(isCorrect) {
 }
 
 function showResults() {
+  clearTimeout(studyAutoplayTimer);
+  speechPractice.cancel();
   sessionState.isActive = false;
   
   // Cancel active speech
@@ -1155,6 +1182,8 @@ function showResults() {
 btnQuitSession.addEventListener('click', () => {
   if (confirm('Сигурни ли сте, че искате да прекратите тази сесия? Прогресът за вече отговорените думи ще бъде запазен.')) {
     sessionState.isActive = false;
+    clearTimeout(studyAutoplayTimer);
+    speechPractice.cancel();
     // Cancel active speech
     if ('speechSynthesis' in window) {
       window.speechSynthesis.cancel();
@@ -1656,6 +1685,7 @@ function populateTtsOptions() {
 
 // Pronounce the current flashcard word
 function speakCurrentWord() {
+  speechPractice.cancel();
   if (!('speechSynthesis' in window)) return;
 
   const currentIdx = sessionState.currentIndex;

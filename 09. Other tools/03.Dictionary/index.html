@@ -158,6 +158,19 @@
             </div>
           </div>
 
+          <section class="speech-practice" aria-label="Упражнение с говор">
+            <button id="btn-practice-word" type="button" class="btn btn-primary" aria-pressed="false" aria-describedby="speech-practice-note">
+              Кажи думата
+            </button>
+            <p id="speech-practice-feedback" role="status" aria-live="polite" aria-atomic="true"></p>
+            <p id="speech-practice-note" class="speech-practice-note">
+              Проверява дали браузърът разпознава думата, а не точността на произношението.
+              При няколко варианта, разделени с /, запетая или ;, кажете един от тях без поясненията в скоби.
+              Аудиото може да се изпраща към услугата на браузъра; обикновено е нужен интернет.
+              Приложението не съхранява записи.
+            </p>
+          </section>
+
           <!-- Action Buttons -->
           <div class="session-actions hidden" id="session-actions-container">
             <button id="btn-action-incorrect" class="btn btn-danger btn-lg flex-1">
@@ -659,6 +672,7 @@
   <!-- SheetJS Library for local Excel parsing -->
   <script src="lib/xlsx.full.min.js"></script>
   <!-- Application JS logic -->
+  <script src="speech-practice.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
