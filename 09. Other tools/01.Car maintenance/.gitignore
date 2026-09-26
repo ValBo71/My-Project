@@ -17,3 +17,6 @@ CarMaintenance.Web/wwwroot/uploads/
 Thumbs.db
 ehthumbs.db
 Desktop.ini
+
+## Installer build output (installer/build.py)
+dist/
