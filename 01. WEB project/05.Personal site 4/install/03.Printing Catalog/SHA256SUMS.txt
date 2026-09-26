@@ -1,0 +1,2 @@
+1aa2440a02cfb26322781ddb186e62362100825180652a9b0ba056802a9951c1  PrintingCatalog-Windows-Setup.exe
+1dbca193f2af7789f19ee8bb00e3b1afa5027e11795e6fd5f760eb5ee900f4dd  PrintingCatalog-macOS-Install.zip

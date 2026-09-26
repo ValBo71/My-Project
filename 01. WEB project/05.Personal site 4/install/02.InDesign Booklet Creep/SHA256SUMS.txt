@@ -1,0 +1,2 @@
+117071ec52b7d00277713d0ea80624cfc177b65a9fb10112a49afcdbee9b789d  InDesignBookletCreep-Windows-Setup.exe
+9cb3cee5909da2c4fdc2d090243d7eda68294c0070803548c549384c3c733efc  InDesignBookletCreep-macOS-Install.zip

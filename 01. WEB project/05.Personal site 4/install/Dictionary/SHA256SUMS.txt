@@ -1,0 +1,2 @@
+7d68031373ad3fc8dcfae46b6d3174f07205bfc2a7281895e21e0d900a756907  Dictionary-Windows-Setup.exe
+81d57ed917de51b1c7b8a1e59f1f006641a62bed0ed5051fb9cf1ef2ef383289  Dictionary-macOS-Install.zip

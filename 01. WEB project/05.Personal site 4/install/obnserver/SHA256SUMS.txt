@@ -1,0 +1,2 @@
+06d890b2eefab0f38df76a3d11fa84e12b4fb079ee0b7ca8487c11917b9adab0  ObserverV2-Windows-Setup.exe
+1f0c469b2cad2a0c5cbcd84f807762244bb7cb1b15ee0c9dedcdaacdf722c611  ObserverV2-macOS-Install.zip
