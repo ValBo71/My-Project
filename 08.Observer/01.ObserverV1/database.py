@@ -246,9 +246,9 @@ def get_all_jobs():
                 j.interview_scheduled,
                 j.offer_result,
                 COALESCE(
+                    NULLIF(j.flag, ''),
                     (SELECT p.flag FROM companies p WHERE p.id = c.parent_company_id AND p.flag IS NOT NULL AND p.flag != ''),
-                    c.flag,
-                    j.flag
+                    NULLIF(c.flag, '')
                 ) AS flag,
                 c.id AS company_id,
                 COALESCE(
@@ -319,6 +319,8 @@ def refresh_job_if_reposted(url, fresh_date_published):
         fresh_ts = parse_date_to_timestamp(fresh_date_published)
         if not fresh_ts:
             return False  # couldn't determine a real date for the fresh listing
+        if fresh_ts > datetime.now().strftime('%Y-%m-%d %H:%M:%S'):
+            return False  # a future date is a parsing mistake, not a repost
 
         stored_published_at = row['published_at'] or ''
         fresh_day = fresh_ts.split(' ')[0]

@@ -2,6 +2,7 @@ from flask import Flask, render_template, jsonify, request
 import logging
 import os
 import sys
+import threading
 
 # Add current directory to python path to avoid import issues
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
@@ -27,11 +28,34 @@ app = Flask(__name__)
 # Initialize database schema
 init_db()
 
+# Only one scraping cycle may run at a time: parallel cycles would launch several
+# browsers, log in to LinkedIn repeatedly and race on linkedin_session.json.
+refresh_lock = threading.Lock()
+
+class RefreshInProgress(Exception):
+    pass
+
 def perform_refresh_cycle():
+    """
+    Runs one refresh cycle, refusing to start while another one is running.
+    Returns:
+        tuple: (success_boolean, error_message_string, new_jobs_count)
+    Raises:
+        RefreshInProgress: if another cycle is already running.
+    """
+    if not refresh_lock.acquire(blocking=False):
+        raise RefreshInProgress()
+    try:
+        return _run_refresh_cycle()
+    finally:
+        refresh_lock.release()
+
+def _run_refresh_cycle():
     """
     Coordinates the scraping, parsing, and DB saving workflow.
     Returns:
         tuple: (success_boolean, error_message_string, new_jobs_count)
+        success is True when at least one source worked; error_message lists the failed ones.
     """
     new_jobs_saved = 0
     errors = []
@@ -88,7 +112,8 @@ def perform_refresh_cycle():
         logger.error(f"Error during jobs.bg scrape: {e}")
         errors.append(f"jobs.bg error: {e}")
         
-    # Success is True if at least one source worked or if no errors occurred
+    # Success is True if at least one source worked; partial failures are still
+    # reported through error_msg and shown as a warning in the UI.
     success = len(errors) < 3
     error_msg = "; ".join(errors) if errors else ""
     
@@ -99,32 +124,35 @@ def perform_refresh_cycle():
 def index():
     """
     Main dashboard route.
-    Performs an automatic refresh cycle. If the refresh fails, 
-    displays an error notification but still loads the existing database jobs.
+    Renders the jobs already stored in the database right away; the page then
+    starts the refresh cycle in the background via /api/refresh.
     """
-    # 1. Run the refresh cycle
-    success, error_msg, new_count = perform_refresh_cycle()
-    
-    # 2. Retrieve all jobs from the database (both old and newly scraped)
     jobs = get_all_jobs()
     companies = get_all_companies()
-    
+
     return render_template(
         'index.html',
         jobs=jobs,
         companies=companies,
-        refresh_success=success,
-        refresh_error=error_msg,
-        new_jobs_count=new_count
+        refresh_success=True,
+        refresh_error="",
+        new_jobs_count=0
     )
 
 @app.route('/api/refresh', methods=['POST'])
 def api_refresh():
     """
-    API endpoint to trigger a manual refresh from the UI.
-    Returns status and statistics in JSON format.
+    API endpoint to trigger a refresh from the UI (automatically on page load or manually).
+    Returns status and statistics in JSON format, or 409 if a refresh is already running.
     """
-    success, error_msg, new_count = perform_refresh_cycle()
+    try:
+        success, error_msg, new_count = perform_refresh_cycle()
+    except RefreshInProgress:
+        return jsonify({
+            'success': False,
+            'in_progress': True,
+            'error': 'Вече тече обновяване. Изчакайте да приключи.'
+        }), 409
     jobs = get_all_jobs()
     
     return jsonify({

@@ -53,7 +53,10 @@
                     <polyline points="22 4 12 14.01 9 11.01"></polyline>
                 </svg>
                 <span>Намерени и добавени <strong>{{ new_jobs_count }}</strong> нови обяви!</span>
-               {% endif %}
+            </div>
+            <button class="notification-close" onclick="document.getElementById('statusBanner').remove()">×</button>
+        </div>
+        {% endif %}
 
         <!-- Tab Navigation -->
         <div class="tabs-navigation">
@@ -659,7 +662,24 @@
         let itemsPerPage = 25;
         let currentCompanyPage = 1;
         let companiesPerPage = 25;
-        
+
+        // Scraped data (titles, company names, labels) comes from third-party sites and
+        // must never be inserted into innerHTML unescaped.
+        function escapeHtml(value) {
+            if (value === null || value === undefined) return '';
+            return String(value)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        // Only allow http(s) links so a scraped "javascript:" URL cannot run on click
+        function safeUrl(url) {
+            return /^https?:\/\//i.test(url || '') ? url : '#';
+        }
+
         // Modal functions
         function openJobDetails(job) {
             document.getElementById('modalJobTitle').innerText = job.title;
@@ -686,7 +706,7 @@
             
             // Set External link & text
             const source = job.source || 'dev.bg';
-            document.getElementById('modalExternalLink').href = job.url;
+            document.getElementById('modalExternalLink').href = safeUrl(job.url);
             document.getElementById('modalExternalLinkText').innerText = `Отвори в ${source}`;
             
             document.getElementById('detailsModal').classList.add('show');
@@ -771,7 +791,7 @@
                         itemEl.className = 'stats-repeat-item';
                         itemEl.title = `${item.title} (публикувана ${item.count} пъти)`;
                         itemEl.innerHTML = `
-                            <span class="title">${item.title}</span>
+                            <span class="title">${escapeHtml(item.title)}</span>
                             <span class="count">${item.count} обяви</span>
                         `;
                         listEl.appendChild(itemEl);
@@ -825,28 +845,37 @@
         const salaryFilter = document.getElementById('salaryFilter');
         const leaveFilter = document.getElementById('leaveFilter');
         
-        function getAssociatedCompanyNamesForJob(job) {
+        // Lookup tables for the company hierarchy, built once per applyFilters() call so
+        // filtering stays O(rows) instead of scanning all companies for every row.
+        function buildCompanyIndex() {
+            const byId = new Map();
+            const byName = new Map();
+            const namesByRoot = new Map();
+            companiesData.forEach(c => {
+                byId.set(c.id, c);
+                if (c.name && !byName.has(c.name.toLowerCase())) byName.set(c.name.toLowerCase(), c);
+                const rootId = c.parent_company_id !== null ? c.parent_company_id : c.id;
+                if (!namesByRoot.has(rootId)) namesByRoot.set(rootId, new Set());
+                const names = namesByRoot.get(rootId);
+                if (c.name) names.add(c.name.toLowerCase());
+                if (c.display_name) names.add(c.display_name.toLowerCase());
+                if (c.resolved_name) names.add(c.resolved_name.toLowerCase());
+            });
+            return { byId, byName, namesByRoot };
+        }
+
+        function getAssociatedCompanyNamesForJob(job, companyIndex) {
             if (!job) return [];
             const names = new Set();
-            
+
             if (job.company) names.add(job.company.toLowerCase());
             if (job.resolved_company) names.add(job.resolved_company.toLowerCase());
-            
-            const comp = companiesData.find(c => {
-                if (c.id === job.company_id) return true;
-                if (c.name && job.company && c.name.toLowerCase() === job.company.toLowerCase()) return true;
-                return false;
-            });
+
+            const comp = companyIndex.byId.get(job.company_id) ||
+                (job.company ? companyIndex.byName.get(job.company.toLowerCase()) : undefined);
             if (comp) {
                 const rootId = comp.parent_company_id !== null ? comp.parent_company_id : comp.id;
-                companiesData.forEach(c => {
-                    const cRootId = c.parent_company_id !== null ? c.parent_company_id : c.id;
-                    if (cRootId === rootId) {
-                        if (c.name) names.add(c.name.toLowerCase());
-                        if (c.display_name) names.add(c.display_name.toLowerCase());
-                        if (c.resolved_name) names.add(c.resolved_name.toLowerCase());
-                    }
-                });
+                (companyIndex.namesByRoot.get(rootId) || []).forEach(n => names.add(n));
             }
             return Array.from(names);
         }
@@ -903,10 +932,13 @@
             
             const rows = document.querySelectorAll('.job-row');
             let filteredRows = [];
-            
+
+            const jobsByUrl = new Map(jobsData.map(j => [j.url, j]));
+            const companyIndex = buildCompanyIndex();
+
             rows.forEach(row => {
                 const url = row.getAttribute('data-url');
-                const job = jobsData.find(j => j.url === url);
+                const job = jobsByUrl.get(url);
 
                 const title = job ? job.title.toLowerCase() : row.getAttribute('data-title');
                 const reqs = job ? (job.requirements || '').toLowerCase() : row.getAttribute('data-reqs');
@@ -917,7 +949,7 @@
                 const timestampStr = job ? (job.published_at || job.scraped_at) : row.getAttribute('data-date-timestamp');
                 
                 // Associated company names (lower case)
-                const assocNames = getAssociatedCompanyNamesForJob(job || { company: row.getAttribute('data-company') });
+                const assocNames = getAssociatedCompanyNamesForJob(job || { company: row.getAttribute('data-company') }, companyIndex);
 
                 // Text search match
                 const matchesText = title.includes(query) || reqs.includes(query) || assocNames.some(name => name.includes(query));
@@ -1152,7 +1184,9 @@
         const refreshIcon = document.getElementById('refreshIcon');
         const refreshBtnText = document.getElementById('refreshBtnText');
         
-        refreshBtn.addEventListener('click', async function() {
+        // Runs a refresh cycle. Called by the button and once automatically after the page
+        // has rendered the cached jobs, so loading the page never blocks on scraping.
+        async function runRefresh() {
             // Disable button and show spinner
             refreshBtn.disabled = true;
             refreshSpinner.style.display = 'inline-block';
@@ -1189,8 +1223,14 @@
                     document.getElementById('leaveJobsMetric').innerText = data.jobs.filter(j => j.leave_days !== null).length;
                     document.getElementById('totalCount').innerText = data.total_jobs_count;
                     
-                    // Show a custom success banner
-                    showToastBanner(true, `Обновяването приключи успешно! Добавени са ${data.new_jobs_count} нови обяви.`);
+                    if (data.error) {
+                        // At least one source worked, but others failed - say so instead of a green banner
+                        showToastBanner(false, `Частично обновяване: добавени са ${data.new_jobs_count} нови обяви, но някои източници не отговориха: ${data.error}`);
+                    } else {
+                        showToastBanner(true, `Обновяването приключи успешно! Добавени са ${data.new_jobs_count} нови обяви.`);
+                    }
+                } else if (data.in_progress) {
+                    showToastBanner(false, data.error);
                 } else {
                     showToastBanner(false, `Възникна грешка: ${data.error}`);
                 }
@@ -1204,8 +1244,10 @@
                 refreshIcon.style.display = 'inline-block';
                 refreshBtnText.innerText = 'Обнови обявите';
             }
-        });
-        
+        }
+
+        refreshBtn.addEventListener('click', runRefresh);
+
         function showToastBanner(isSuccess, message) {
             // Remove existing status banner if any
             const existingBanner = document.getElementById('statusBanner');
@@ -1229,7 +1271,7 @@
             banner.innerHTML = `
                 <div class="notification-message">
                     ${iconSvg}
-                    <span>${message}</span>
+                    <span>${escapeHtml(message)}</span>
                 </div>
                 <button class="notification-close" onclick="document.getElementById('statusBanner').remove()">×</button>
             `;
@@ -1308,7 +1350,7 @@
                 // Build Tech tags
                 let techHtml = '<span class="badge-na">N/A</span>';
                 if (job.requirements && job.requirements !== 'N/A') {
-                    const tags = job.requirements.split(', ').map(t => `<span class="tech-tag">${t}</span>`).join('');
+                    const tags = job.requirements.split(', ').map(t => `<span class="tech-tag">${escapeHtml(t)}</span>`).join('');
                     techHtml = `<div class="tech-tags-container">${tags}</div>`;
                 }
                 
@@ -1329,11 +1371,12 @@
                 // Build Source badge
                 const sourceDisplay = job.source || 'dev.bg';
                 const sourceClass = sourceDisplay.toLowerCase() === 'linkedin' ? 'linkedin' : (sourceDisplay.toLowerCase() === 'jobs.bg' ? 'jobsbg' : 'devbg');
-                const sourceBadgeHtml = `<span class="badge-source ${sourceClass}">${sourceDisplay}</span>`;
-                
-                // Escape job object data to safely pass to openJobDetails in onclick
-                const jobEscaped = JSON.stringify(job).replace(/"/g, '&quot;');
-                const companyEscaped = JSON.stringify(job.company).replace(/"/g, '&quot;');
+                const sourceBadgeHtml = `<span class="badge-source ${sourceClass}">${escapeHtml(sourceDisplay)}</span>`;
+
+                // Escape job object data to safely pass to openJobDetails in onclick.
+                // escapeHtml also encodes '&', so a scraped "&quot;" cannot close the attribute.
+                const jobEscaped = escapeHtml(JSON.stringify(job));
+                const companyEscaped = escapeHtml(JSON.stringify(job.company));
                 
                 let flagDotClass = 'flag-dot empty';
                 if (job.flag === 'green') flagDotClass = 'flag-dot green';
@@ -1366,13 +1409,13 @@
                     <td class="col-flag">${flagHtml}</td>
                     <td class="col-source">${sourceBadgeHtml}</td>
                     <td class="col-company" onclick="openCompanyStats(${companyEscaped})" title="Виж статистика за фирмата">
-                        ${job.company}
-                        ${job.resolved_company && job.resolved_company.toLowerCase() !== job.company.toLowerCase() ? `<span class="company-alias-hint" style="font-size: 0.75rem; color: var(--text-muted); display: block; font-weight: normal; margin-top: 2px;">(${job.resolved_company})</span>` : ''}
-                        ${job.company_flag ? `<span class="flag-dot ${job.company_flag}" style="width: 8px; height: 8px; display: inline-block; margin-left: 6px; vertical-align: middle;" title="Флаг на фирмата"></span>` : ''}
-                        ${job.company_label ? `<span class="tech-tag" style="background-color: #f8fafc; border-color: #cbd5e1; font-size: 0.7rem; margin-left: 6px; padding: 0.1rem 0.3rem;" title="Етикет на фирмата">${job.company_label}</span>` : ''}
+                        ${escapeHtml(job.company)}
+                        ${job.resolved_company && job.resolved_company.toLowerCase() !== job.company.toLowerCase() ? `<span class="company-alias-hint" style="font-size: 0.75rem; color: var(--text-muted); display: block; font-weight: normal; margin-top: 2px;">(${escapeHtml(job.resolved_company)})</span>` : ''}
+                        ${job.company_flag ? `<span class="flag-dot ${escapeHtml(job.company_flag)}" style="width: 8px; height: 8px; display: inline-block; margin-left: 6px; vertical-align: middle;" title="Флаг на фирмата"></span>` : ''}
+                        ${job.company_label ? `<span class="tech-tag" style="background-color: #f8fafc; border-color: #cbd5e1; font-size: 0.7rem; margin-left: 6px; padding: 0.1rem 0.3rem;" title="Етикет на фирмата">${escapeHtml(job.company_label)}</span>` : ''}
                     </td>
-                    <td class="col-position">${job.title}</td>
-                    <td class="col-date">${job.date_published || 'N/A'}</td>
+                    <td class="col-position">${escapeHtml(job.title)}</td>
+                    <td class="col-date">${escapeHtml(job.date_published || 'N/A')}</td>
                     <td>${techHtml}</td>
                     <td>${leaveHtml}</td>
                     <td>${salaryFromHtml}</td>
@@ -1385,7 +1428,7 @@
                                     <circle cx="12" cy="12" r="3"></circle>
                                 </svg>
                             </button>
-                            <a href="${job.url}" target="_blank" class="btn-icon link-btn" title="Отвори оригиналната обява">
+                            <a href="${escapeHtml(safeUrl(job.url))}" target="_blank" rel="noopener noreferrer" class="btn-icon link-btn" title="Отвори оригиналната обява">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
                                     <polyline points="15 3 21 3 21 9"></polyline>
@@ -1615,7 +1658,7 @@
                 // Label input
                 const labelHtml = `
                     <input type="text" class="company-label-input" 
-                        value="${company.label || ''}" 
+                        value="${escapeHtml(company.label || '')}"
                         placeholder="Добави етикет..." 
                         onblur="setCompanyField(${company.id}, 'label', this.value)"
                         onkeydown="if(event.key === 'Enter') { this.blur(); }">
@@ -1626,7 +1669,7 @@
                 primaryCompanies.forEach(p => {
                     if (p.id !== company.id) {
                         const isSelected = company.parent_company_id === p.id ? 'selected' : '';
-                        parentOptions += `<option value="${p.id}" ${isSelected}>${p.name}</option>`;
+                        parentOptions += `<option value="${p.id}" ${isSelected}>${escapeHtml(p.name)}</option>`;
                     }
                 });
                 const parentHtml = `
@@ -1640,8 +1683,8 @@
                 const displayNameVal = isAlias ? (company.resolved_name || company.name) : (company.display_name || '');
                 const displayHtml = `
                     <input type="text" class="company-display-name-input" 
-                        value="${displayNameVal}" 
-                        placeholder="${company.name}" 
+                        value="${escapeHtml(displayNameVal)}"
+                        placeholder="${escapeHtml(company.name)}"
                         ${isAlias ? 'disabled' : ''}
                         onblur="setCompanyField(${company.id}, 'display_name', this.value)"
                         onkeydown="if(event.key === 'Enter') { this.blur(); }">
@@ -1649,7 +1692,7 @@
                 
                 tr.innerHTML = `
                     <td class="col-flag">${flagHtml}</td>
-                    <td style="font-weight: 600; color: var(--text-primary);">${company.name}</td>
+                    <td style="font-weight: 600; color: var(--text-primary);">${escapeHtml(company.name)}</td>
                     <td>${labelHtml}</td>
                     <td>${parentHtml}</td>
                     <td>${displayHtml}</td>
@@ -1816,6 +1859,9 @@
 
         // Initialize jobs page with pagination on page load
         applyFilters(true);
+
+        // Fetch new listings in the background; the cached ones are already shown
+        runRefresh();
 
         function toggleFlagDropdown(event) {
             event.stopPropagation();
