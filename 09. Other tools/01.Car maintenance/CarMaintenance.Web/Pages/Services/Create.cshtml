@@ -91,6 +91,7 @@
                     <div class="mb-3">
                         <label asp-for="UploadedFile" class="form-label">Прикачи документ / фактура (PDF / Изображение)</label>
                         <input asp-for="UploadedFile" type="file" class="form-control" accept="image/*,application/pdf" />
+                        <span asp-validation-for="UploadedFile" class="text-danger"></span>
                     </div>
 
                     <div class="mb-4">

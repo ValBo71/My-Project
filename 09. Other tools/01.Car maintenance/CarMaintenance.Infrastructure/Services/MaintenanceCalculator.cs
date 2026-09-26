@@ -7,16 +7,11 @@ namespace CarMaintenance.Infrastructure.Services
     {
         public static void CalculateNextDue(MaintenanceRule rule, int currentMileage)
         {
-            if (!rule.LastDoneDate.HasValue || !rule.LastDoneMileage.HasValue)
-            {
-                rule.NextDueDate = null;
-                rule.NextDueMileage = null;
-                rule.Status = "Gray"; // No data
-                return;
-            }
+            // Each interval is evaluated on its own, so a km-only rule needs only the last
+            // mileage and a months-only rule only the last date. With neither -> Gray.
 
             // Calculation by mileage
-            if (rule.IntervalKm.HasValue)
+            if (rule.IntervalKm.HasValue && rule.LastDoneMileage.HasValue)
             {
                 rule.NextDueMileage = rule.LastDoneMileage.Value + rule.IntervalKm.Value;
             }
@@ -26,7 +21,7 @@ namespace CarMaintenance.Infrastructure.Services
             }
 
             // Calculation by months
-            if (rule.IntervalMonths.HasValue)
+            if (rule.IntervalMonths.HasValue && rule.LastDoneDate.HasValue)
             {
                 rule.NextDueDate = rule.LastDoneDate.Value.AddMonths(rule.IntervalMonths.Value);
             }

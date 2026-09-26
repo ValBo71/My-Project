@@ -101,17 +101,38 @@
                                     <div>
                                         <h6 class="m-0 font-weight-bold text-danger">@rule.Name</h6>
                                         <small class="text-muted">Категория: @rule.Category</small>
+                                        @* A rule is overdue when either limit is reached, so each line says
+                                           which one actually is - the other may still be in the future. *@
                                         @if (rule.NextDueMileage.HasValue)
                                         {
-                                            <div class="text-danger font-weight-bold" style="font-size: 0.85rem;">
-                                                Просрочено с @(Model.Car.CurrentMileage - rule.NextDueMileage.Value) км
-                                            </div>
+                                            var kmOver = Model.Car.CurrentMileage - rule.NextDueMileage.Value;
+                                            if (kmOver >= 0)
+                                            {
+                                                <div class="text-danger font-weight-bold" style="font-size: 0.85rem;">
+                                                    Просрочено с @kmOver.ToString("N0") км
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="text-dark" style="font-size: 0.85rem;">
+                                                    Остават: @((-kmOver).ToString("N0")) км
+                                                </div>
+                                            }
                                         }
                                         @if (rule.NextDueDate.HasValue)
                                         {
-                                            <small class="text-danger d-block">
-                                                Изтекло на: @rule.NextDueDate.Value.ToString("dd.MM.yyyy г.")
-                                            </small>
+                                            if (rule.NextDueDate.Value.Date <= DateTime.Today)
+                                            {
+                                                <small class="text-danger d-block">
+                                                    Изтекло на: @rule.NextDueDate.Value.ToString("dd.MM.yyyy г.")
+                                                </small>
+                                            }
+                                            else
+                                            {
+                                                <small class="text-muted d-block">
+                                                    Срок до: @rule.NextDueDate.Value.ToString("dd.MM.yyyy г.")
+                                                </small>
+                                            }
                                         }
                                     </div>
                                     <span class="status-badge red">Просрочено</span>
@@ -126,7 +147,7 @@
                                         @if (rule.NextDueMileage.HasValue)
                                         {
                                             <div class="text-dark" style="font-size: 0.85rem;">
-                                                Остават: @(rule.NextDueMileage.Value - Model.Car.CurrentMileage) км
+                                                Остават: @((rule.NextDueMileage.Value - Model.Car.CurrentMileage).ToString("N0")) км
                                             </div>
                                         }
                                         @if (rule.NextDueDate.HasValue)

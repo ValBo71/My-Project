@@ -7,6 +7,7 @@ using CarMaintenance.Infrastructure.Data;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace CarMaintenance.Web.Pages.Cars
@@ -28,8 +29,11 @@ namespace CarMaintenance.Web.Pages.Cars
         public async Task OnGetAsync()
         {
             Cars = await _context.Cars.ToListAsync();
-            
-            if (Request.Cookies.TryGetValue("ActiveCarId", out string? value) && int.TryParse(value, out int activeId))
+
+            // Same fallback as ActiveCarService: a cookie pointing at a deleted car (or a
+            // malformed one) selects the first car, so the list agrees with the other pages.
+            if (Request.Cookies.TryGetValue("ActiveCarId", out string? value) && int.TryParse(value, out int activeId)
+                && Cars.Any(c => c.Id == activeId))
             {
                 ActiveCarId = activeId;
             }
@@ -38,10 +42,19 @@ namespace CarMaintenance.Web.Pages.Cars
                 ActiveCarId = Cars[0].Id;
                 Response.Cookies.Append("ActiveCarId", ActiveCarId.Value.ToString());
             }
+            else
+            {
+                Response.Cookies.Delete("ActiveCarId");
+            }
         }
 
-        public IActionResult OnPostSetActive(int id)
+        public async Task<IActionResult> OnPostSetActiveAsync(int id)
         {
+            if (!await _context.Cars.AnyAsync(c => c.Id == id))
+            {
+                return RedirectToPage();
+            }
+
             Response.Cookies.Append("ActiveCarId", id.ToString());
             return RedirectToPage("/Index");
         }

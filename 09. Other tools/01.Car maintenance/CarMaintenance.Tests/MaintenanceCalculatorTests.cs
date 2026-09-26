@@ -113,5 +113,44 @@ namespace CarMaintenance.Tests
             Assert.Null(rule.NextDueDate);
             Assert.Equal("Gray", rule.Status);
         }
+
+        [Fact]
+        public void MileageOnlyRule_WithoutLastDoneDate_IsStillCalculated()
+        {
+            // The form allows leaving the date empty for a km-only rule.
+            var rule = NewRule(intervalKm: 10000, lastDoneMileage: 90000);
+
+            MaintenanceCalculator.CalculateNextDue(rule, currentMileage: 100500);
+
+            Assert.Equal(100000, rule.NextDueMileage);
+            Assert.Null(rule.NextDueDate);
+            Assert.Equal("Red", rule.Status);
+        }
+
+        [Fact]
+        public void DateOnlyRule_WithoutLastDoneMileage_IsStillCalculated()
+        {
+            var lastDone = DateTime.Today.AddMonths(-6);
+            var rule = NewRule(intervalMonths: 12, lastDoneDate: lastDone);
+
+            MaintenanceCalculator.CalculateNextDue(rule, currentMileage: 100000);
+
+            Assert.Null(rule.NextDueMileage);
+            Assert.Equal(lastDone.AddMonths(12), rule.NextDueDate);
+            Assert.Equal("Green", rule.Status);
+        }
+
+        [Fact]
+        public void KmIntervalButOnlyLastDoneDate_ResultsInGray()
+        {
+            // The only configured interval has no matching "last done" value to count from.
+            var rule = NewRule(intervalKm: 10000, lastDoneDate: DateTime.Today.AddMonths(-1));
+
+            MaintenanceCalculator.CalculateNextDue(rule, currentMileage: 100000);
+
+            Assert.Null(rule.NextDueMileage);
+            Assert.Null(rule.NextDueDate);
+            Assert.Equal("Gray", rule.Status);
+        }
     }
 }
