@@ -71,8 +71,16 @@ PORTABLE_DIR="python_portable"
 PORTABLE_BIN="$PORTABLE_DIR/bin/python3"
 USE_VENV=1
 
-# 1. Prefer a system Python 3 interpreter
-if command -v python3 >/dev/null 2>&1; then
+# Returns success only if a real, working Python >= 3.8 runs. `command -v python3` alone
+# is not enough: on a clean Mac /usr/bin/python3 is just the Xcode Command Line Tools stub,
+# which pops up an install dialog and exits non-zero (and set -e would then abort silently).
+system_python_works() {
+    command -v python3 >/dev/null 2>&1 && \
+        python3 -c 'import sys, venv; sys.exit(0 if sys.version_info >= (3, 8) else 1)' >/dev/null 2>&1
+}
+
+# 1. Prefer a working system Python 3 interpreter
+if system_python_works; then
     PYTHON_BIN=python3
     echo "System Python found. Using system Python..."
 elif [ -x "$PORTABLE_BIN" ]; then
@@ -158,7 +166,9 @@ rm -f database/.exit_requested
 # 7. Start the server and open the browser
 echo "Server is starting on http://localhost:5050 ..."
 ( sleep 1 && open "http://localhost:5050" ) &
-"$PYTHON_BIN" app.py
+# "|| ..." keeps set -e from closing the window when the app crashes, so the
+# error stays readable and the prompt below is still shown.
+"$PYTHON_BIN" app.py || echo "The server stopped with an error (exit code $?). See the messages above."
 
 # The app's Exit button writes this marker just before shutting itself down, so
 # we can close the window right away instead of waiting for Enter - a Ctrl+C or

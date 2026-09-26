@@ -1633,6 +1633,12 @@
     // Page Load
     document.addEventListener('DOMContentLoaded', () => {
       initTheme();
+      // QR codes on labels open /?q=<code>: start with that search already applied
+      const initialQuery = new URLSearchParams(window.location.search).get('q');
+      if (initialQuery) {
+        searchQuery = initialQuery.trim();
+        searchInput.value = searchQuery;
+      }
       fetchTools();
       setupEventListeners();
     });
@@ -1786,7 +1792,7 @@
         
         pageTools.forEach(t => {
           const card = document.createElement('article');
-          card.className = `tool-card ${t.category}`;
+          card.className = `tool-card ${cssToken(t.category)}`;
           card.title = "Двоен клик за бърза редакция";
           
           card.addEventListener('dblclick', (e) => {
@@ -1874,7 +1880,7 @@
             <div class="card-content">
               <div class="card-header-row">
                 <span class="card-code">${escapeHTML(t.code)}</span>
-                <span class="card-badge ${t.category}">${categoryName}</span>
+                <span class="card-badge ${cssToken(t.category)}">${categoryName}</span>
               </div>
               <h3 class="card-title" title="${escapeHTML(t.name)}">${escapeHTML(t.name)}</h3>
               <div class="card-details" style="${t.category === 'die' ? 'margin-bottom: 0; border-bottom: none;' : ''}">
@@ -1894,7 +1900,7 @@
                 </div>
                 <div class="detail-item">
                   <span class="detail-label">Статус:</span>
-                  <span class="detail-val status-tag ${t.status}">${statusName}</span>
+                  <span class="detail-val status-tag ${cssToken(t.status)}">${statusName}</span>
                 </div>
                 ${t.file_path ? `
                 <div class="detail-item" style="grid-column: span 2; font-size: 0.75rem; border-top: 1px dashed var(--panel-border); padding-top: 0.25rem; margin-top: 0.25rem;">
@@ -1926,7 +1932,7 @@
                 <button class="btn btn-secondary write-action" onclick="openEditModal(${t.id})">
                   <i class="fa-solid fa-pen-to-square"></i> Ред.
                 </button>
-                <button class="btn btn-danger btn-sm write-action" onclick="deleteTool(${t.id}, '${escapeHTML(t.code)}')">
+                <button class="btn btn-danger btn-sm write-action" onclick="deleteTool(${t.id}, ${escapeHTML(JSON.stringify(t.code))})">
                   <i class="fa-solid fa-trash"></i>
                 </button>
               </div>
@@ -1982,14 +1988,14 @@
           tr.innerHTML = `
             <td><div class="table-thumb-cell" data-thumb-cell="${t.id}">${imgHtml}</div></td>
             <td style="font-family: monospace; font-weight: bold; font-size: 0.95rem;">${escapeHTML(t.code)}</td>
-            <td><span class="card-badge ${t.category}" style="font-size: 0.7rem; padding: 0.1rem 0.4rem;">${categoryName}</span></td>
+            <td><span class="card-badge ${cssToken(t.category)}" style="font-size: 0.7rem; padding: 0.1rem 0.4rem;">${categoryName}</span></td>
             <td style="font-weight: 600;" title="${escapeHTML(t.notes || '')}">${escapeHTML(t.name)}</td>
             <td>${escapeHTML(t.client || '–')}</td>
             <td style="${t.category === 'die' ? 'color: var(--primary); font-weight: bold;' : ''}">${escapeHTML(displayDimensions)}</td>
             <td style="font-weight: bold; text-align: center;">${escapeHTML(displayUps)}</td>
             <td style="font-size: 0.85rem; color: var(--text-muted); font-style: italic;">${escapeHTML(specText)}</td>
             <td><span class="location-tag" style="font-size: 0.85rem;">${escapeHTML(t.location)}</span></td>
-            <td><span class="status-tag ${t.status}" style="font-size: 0.8rem;">${statusName}</span></td>
+            <td><span class="status-tag ${cssToken(t.status)}" style="font-size: 0.8rem;">${statusName}</span></td>
             <td style="text-align: center;">
               <button class="btn btn-secondary btn-sm" style="padding: 0.35rem 0.6rem; font-size: 0.8rem;" onclick="printLabel(${t.id})" title="Етикет">
                 <i class="fa-solid fa-print"></i>
@@ -2008,7 +2014,7 @@
               <button class="btn btn-secondary btn-sm write-action" style="padding: 0.35rem 0.6rem; font-size: 0.8rem;" onclick="openEditModal(${t.id})">
                 <i class="fa-solid fa-pen-to-square"></i>
               </button>
-              <button class="btn btn-danger btn-sm write-action" style="padding: 0.35rem 0.5rem; font-size: 0.8rem;" onclick="deleteTool(${t.id}, '${escapeHTML(t.code)}')">
+              <button class="btn btn-danger btn-sm write-action" style="padding: 0.35rem 0.5rem; font-size: 0.8rem;" onclick="deleteTool(${t.id}, ${escapeHTML(JSON.stringify(t.code))})">
                 <i class="fa-solid fa-trash"></i>
               </button>
             </td>
@@ -2625,7 +2631,8 @@
       if (!tool) return;
       
       const defaultPath = "D:\\Чертежи";
-      const destFolder = prompt(`Въведете път до папка на компютъра, където да се копират файловете за ${tool.code}:\n(Ако папката не съществува, ще бъде създадена)`, defaultPath);
+      // The copy runs on the SERVER machine (e.g. into a shared network folder), not on this computer
+      const destFolder = prompt(`Въведете пълен път до папка на СЪРВЪРА (компютъра, на който работи каталогът), където да се копират файловете за ${tool.code}:\n(Ако папката не съществува, ще бъде създадена. За да ги получите на този компютър, използвайте „Свали чертежите“.)`, defaultPath);
       
       if (destFolder === null) return; // User clicked Cancel
       
@@ -2673,9 +2680,14 @@
       return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
     }
 
+    // Only letters, digits, '-' and '_' may end up in a class attribute
+    function cssToken(value) {
+      return String(value == null ? '' : value).replace(/[^a-z0-9_-]/gi, '');
+    }
+
     function escapeHTML(str) {
-      if (!str) return '';
-      return str.replace(/[&<>'"]/g,
+      if (str === null || str === undefined || str === '') return '';
+      return String(str).replace(/[&<>'"]/g,
         tag => ({
           '&': '&amp;',
           '<': '&lt;',
