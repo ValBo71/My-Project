@@ -126,6 +126,8 @@ const editWordIdInput = document.getElementById('edit-word-id');
 const editWordInput = document.getElementById('edit-word-input');
 const editTranslationInput = document.getElementById('edit-translation-input');
 const editLangSelect = document.getElementById('edit-lang-select');
+const editOtherLangContainer = document.getElementById('edit-other-lang-container');
+const editLangOtherInput = document.getElementById('edit-lang-other-input');
 const btnCloseModal = document.getElementById('btn-close-modal');
 const btnCancelEdit = document.getElementById('btn-cancel-edit');
 
@@ -343,6 +345,29 @@ function updateWordInDB(wordObj) {
     
     request.onsuccess = () => resolve(request.result);
     request.onerror = () => reject(request.error);
+  });
+}
+
+// Saves only the learning progress of a word. Reads the current record first, so a
+// session holding an old copy of the word cannot resurrect a word deleted meanwhile
+// or overwrite an edit made in the Dictionary tab. Resolves to false if the word is gone.
+function updateWordProgressInDB(id, correctStreak, status) {
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction(['words'], 'readwrite');
+    const store = transaction.objectStore('words');
+    const getRequest = store.get(id);
+
+    getRequest.onsuccess = () => {
+      const current = getRequest.result;
+      if (!current) {
+        resolve(false);
+        return;
+      }
+      const putRequest = store.put({ ...current, correctStreak, status });
+      putRequest.onsuccess = () => resolve(true);
+      putRequest.onerror = () => reject(putRequest.error);
+    };
+    getRequest.onerror = () => reject(getRequest.error);
   });
 }
 
@@ -814,7 +839,7 @@ function renderDictionary() {
         ${w.correctStreak > 0 ? `<span class="streak-badge"><i class="fa-solid fa-fire"></i> ${w.correctStreak}</span>` : '<span class="text-muted">–</span>'}
       </td>
       <td class="text-center">
-        <span class="status-badge ${w.status}">
+        <span class="status-badge ${w.status === 'mastered' ? 'mastered' : 'learning'}">
           ${w.status === 'mastered' ? 'Научена' : 'За учене'}
         </span>
       </td>
@@ -928,9 +953,23 @@ function openEditModal(id) {
     }
     editLangSelect.value = wordObj.language;
   }
+  toggleEditOtherLang();
 
   editWordModal.classList.add('active');
 }
+
+// Shows the language-code field when "Друг" is chosen in the edit modal
+function toggleEditOtherLang() {
+  const isOther = editLangSelect.value === 'other';
+  editOtherLangContainer.classList.toggle('hidden', !isOther);
+  if (isOther) {
+    editLangOtherInput.setAttribute('required', 'true');
+  } else {
+    editLangOtherInput.removeAttribute('required');
+    editLangOtherInput.value = '';
+  }
+}
+editLangSelect.addEventListener('change', toggleEditOtherLang);
 
 function closeEditModal() {
   editWordModal.classList.remove('active');
@@ -949,11 +988,22 @@ formEditWord.addEventListener('submit', (e) => {
   const oldWord = allWords.find(w => w.id === id);
   if (!oldWord) return;
 
+  // "Друг" needs a real language code (same rules as the add form), never the literal 'other'
+  let language = editLangSelect.value;
+  if (language === 'other') {
+    language = editLangOtherInput.value.trim().toLowerCase().replace(/[^a-z0-9]/g, '');
+    if (!language) {
+      alert('Моля, въведете валиден код на езика (само букви/цифри) в полето "Име на езика".');
+      editLangOtherInput.focus();
+      return;
+    }
+  }
+
   const updatedWord = {
     ...oldWord,
     word: editWordInput.value.trim(),
     translation: editTranslationInput.value.trim(),
-    language: editLangSelect.value
+    language
   };
 
   updateWordInDB(updatedWord)
@@ -1013,9 +1063,20 @@ btnStartStudy.addEventListener('click', () => {
     } else if (sessionType === 'newest') {
       chosenWords = [...wordsForLangAndFiles].sort((a, b) => b.addedAt - a.addedAt).slice(0, 20);
     } else if (sessionType === 'difficult') {
-      chosenWords = [...wordsForLangAndFiles].sort((a, b) => a.correctStreak - b.correctStreak).slice(0, 20);
+      // Shuffle first: the sort is stable, so without it equal streaks (e.g. all 0)
+      // would always yield the same 20 words.
+      chosenWords = shuffleArray([...wordsForLangAndFiles]).sort((a, b) => a.correctStreak - b.correctStreak).slice(0, 20);
     } else { // all-sequential
-      chosenWords = [...wordsForLangAndFiles].sort((a, b) => a.word.localeCompare(b.word)).slice(0, 20);
+      // Continue where the previous sequential session for this language/sources stopped,
+      // wrapping around at the end, instead of always showing the first 20 words.
+      const sorted = [...wordsForLangAndFiles].sort((a, b) => a.word.localeCompare(b.word));
+      const offsetKey = `flashcards-seq-offset-${selectedLang}-${[...selectedFiles].sort().join('|')}`;
+      let offset = 0;
+      try { offset = parseInt(localStorage.getItem(offsetKey), 10) || 0; } catch (e) { /* storage unavailable */ }
+      if (offset >= sorted.length) offset = 0;
+      chosenWords = sorted.slice(offset, offset + 20);
+      if (chosenWords.length < 20) chosenWords = chosenWords.concat(sorted.slice(0, 20 - chosenWords.length));
+      try { localStorage.setItem(offsetKey, String((offset + 20) % sorted.length)); } catch (e) { /* storage unavailable */ }
     }
   }
 
@@ -1126,8 +1187,9 @@ function processAnswer(isCorrect) {
     currentWord.status = 'learning';
   }
 
-  // Update DB entry in background
-  updateWordInDB(currentWord).catch(err => console.error('Грешка при запис на прогрес:', err));
+  // Update DB entry in background (progress fields only - see updateWordProgressInDB)
+  updateWordProgressInDB(currentWord.id, currentWord.correctStreak, currentWord.status)
+    .catch(err => console.error('Грешка при запис на прогрес:', err));
 
   // Proceed to next card or finish
   const nextIdx = sessionState.currentIndex + 1;
@@ -1337,6 +1399,7 @@ btnProcessImport.addEventListener('click', () => {
         };
 
         wordsToInsert.push(newWord);
+        existingWordPairs.add(uniqueKey); // also skip repeats inside the same file
         importedCount++;
       }
 
@@ -1420,21 +1483,34 @@ jsonFileSelector.addEventListener('change', (e) => {
         return;
       }
 
-      // Validate objects roughly and insert
+      // Validate objects and insert. Words already in the dictionary (same language, word
+      // and translation) are skipped, so restoring over a non-empty dictionary does not
+      // duplicate everything.
       let importCount = 0;
+      let duplicateCount = 0;
       const wordsToRestore = [];
-      
+      const pairKey = (lang, word, translation) =>
+        `${lang}::${word.toLowerCase().trim()}::${translation.toLowerCase().trim()}`;
+      const existingKeys = new Set(allWords.map(w => pairKey(w.language, w.word, w.translation)));
+
       importedData.forEach(item => {
-        if (item.word && item.translation && item.language) {
+        if (item && item.word && item.translation && item.language) {
           const newObj = {
             word: String(item.word).trim(),
             translation: String(item.translation).trim(),
             language: String(item.language).trim().toLowerCase(),
-            sourceFile: item.sourceFile || "Ръчно добавени",
-            addedAt: item.addedAt || Date.now(),
-            status: item.status || 'learning',
-            correctStreak: typeof item.correctStreak === 'number' ? item.correctStreak : 0
+            sourceFile: item.sourceFile ? String(item.sourceFile) : "Ръчно добавени",
+            addedAt: typeof item.addedAt === 'number' ? item.addedAt : Date.now(),
+            // Only known values: status is used as a CSS class when rendering the table
+            status: item.status === 'mastered' ? 'mastered' : 'learning',
+            correctStreak: Number.isFinite(item.correctStreak) && item.correctStreak >= 0 ? Math.floor(item.correctStreak) : 0
           };
+          const key = pairKey(newObj.language, newObj.word, newObj.translation);
+          if (existingKeys.has(key)) {
+            duplicateCount++;
+            return;
+          }
+          existingKeys.add(key);
           wordsToRestore.push(newObj);
           importCount++;
         }
@@ -1443,7 +1519,8 @@ jsonFileSelector.addEventListener('change', (e) => {
       if (wordsToRestore.length > 0) {
         addWordsBatchToDB(wordsToRestore)
           .then(() => {
-            alert(`Успешно възстановени ${importCount} думи!`);
+            const skippedNote = duplicateCount > 0 ? ` Пропуснати ${duplicateCount} вече съществуващи.` : '';
+            alert(`Успешно възстановени ${importCount} думи!${skippedNote}`);
             jsonFileSelector.value = '';
             refreshData();
           })
@@ -1451,6 +1528,9 @@ jsonFileSelector.addEventListener('change', (e) => {
             console.error(err);
             alert('Грешка при записване в базата данни.');
           });
+      } else if (duplicateCount > 0) {
+        alert(`Всички ${duplicateCount} думи от файла вече са в речника.`);
+        jsonFileSelector.value = '';
       } else {
         alert('Не бяха намерени валидни думи в файла.');
       }
@@ -1523,13 +1603,14 @@ function formatBytes(bytes, decimals = 2) {
   if (bytes === 0) return '0 Bytes';
   const k = 1024;
   const dm = decimals < 0 ? 0 : decimals;
-  const sizes = ['Bytes', 'KB', 'MB'];
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+  const i = Math.min(Math.floor(Math.log(bytes) / Math.log(k)), sizes.length - 1);
   return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
 }
 
 function escapeHTML(str) {
-  return str.replace(/[&<>'"]/g, 
+  // String(): values restored from a JSON backup may not be strings
+  return String(str ?? '').replace(/[&<>'"]/g,
     tag => ({
       '&': '&amp;',
       '<': '&lt;',
@@ -1609,6 +1690,15 @@ function initTtsSettings() {
     localStorage.setItem('flashcards-tts-autoplay', studyTtsAutoplay.checked);
   });
 
+  // Attached once (not on every populateTtsOptions call): reads the language at the
+  // moment of the change, so a choice for one language never overwrites another's.
+  if (studyTtsVoiceSelect && studyLangSelect) {
+    studyTtsVoiceSelect.addEventListener('change', () => {
+      const lang = studyLangSelect.value;
+      if (lang) localStorage.setItem(`flashcards-tts-voice-${lang}`, studyTtsVoiceSelect.value);
+    });
+  }
+
   // Listen to voice loading (SpeechSynthesis is asynchronous on some browsers)
   if ('speechSynthesis' in window) {
     window.speechSynthesis.onvoiceschanged = () => {
@@ -1651,17 +1741,7 @@ function populateTtsOptions() {
   } else {
     // Other languages get one native option
     const optNative = document.createElement('option');
-    let locale = selectedLang;
-    
-    // Map code to standard speech synthesis locales
-    const lowerLang = selectedLang.toLowerCase();
-    if (lowerLang === 'de') locale = 'de-DE';
-    else if (lowerLang === 'es') locale = 'es-ES';
-    else if (lowerLang === 'fr') locale = 'fr-FR';
-    else if (lowerLang === 'ru') locale = 'ru-RU';
-    else if (lowerLang === 'it') locale = 'it-IT';
-
-    optNative.value = locale;
+    optNative.value = getDefaultTtsLocale(selectedLang);
     optNative.textContent = `${getLanguageName(selectedLang)} (${selectedLang.toUpperCase()}) - Оригинален`;
     studyTtsVoiceSelect.appendChild(optNative);
     optNative.selected = true;
@@ -1676,11 +1756,14 @@ function populateTtsOptions() {
   if (savedTtsPref === 'off') {
     optOff.selected = true;
   }
+  // The change listener that saves the preference is attached once in initTtsSettings().
+}
 
-  // Event listener to save voice preference
-  studyTtsVoiceSelect.addEventListener('change', () => {
-    localStorage.setItem(`flashcards-tts-voice-${selectedLang}`, studyTtsVoiceSelect.value);
-  });
+// Maps a language code to a speech synthesis locale (e.g. 'de' -> 'de-DE')
+function getDefaultTtsLocale(langCode) {
+  const lowerLang = (langCode || '').toLowerCase();
+  const locales = { en: 'en-US', de: 'de-DE', es: 'es-ES', fr: 'fr-FR', ru: 'ru-RU', it: 'it-IT' };
+  return locales[lowerLang] || langCode;
 }
 
 // Pronounce the current flashcard word
@@ -1838,6 +1921,12 @@ function loadExamQuestion(index) {
   // Load texts
   examPromptText.textContent = currentQuestion.prompt;
   
+  // The speak button reads the foreign word, so it is only offered when that word is
+  // the question; in the other direction it would give the answer away.
+  if (btnSpeakExamWord) {
+    btnSpeakExamWord.classList.toggle('hidden', currentQuestion.direction !== 'foreign-to-bg');
+  }
+
   if (currentQuestion.direction === 'foreign-to-bg') {
     examDirectionBadge.textContent = `Преведете на български`;
     examDirectionBadge.className = `card-lang-tag bg-to-bg`; // default light style
@@ -1875,25 +1964,17 @@ function speakExamWord() {
   if (!examState.isActive || examState.questions.length === 0) return;
 
   const currentQuestion = examState.questions[examState.currentIndex];
+  // In "Български ➔ Чужд език" the foreign word IS the answer - never read it out
+  if (currentQuestion.direction !== 'foreign-to-bg') return;
   // We can only speak the foreign word.
   // The foreign word is either in the prompt or in the correctAnswer.
   const foreignWord = currentQuestion.wordObj.word;
   const langCode = currentQuestion.wordObj.language;
 
-  // Get matching TTS settings/voices
-  const savedTtsPref = localStorage.getItem(`flashcards-tts-voice-${langCode}`) || 'en-US';
-  let ttsSetting = savedTtsPref;
-  
-  if (ttsSetting === 'off') {
-    // If preference is off, fallback to default locale
-    if (langCode.toLowerCase() === 'en') ttsSetting = 'en-US';
-    else if (langCode.toLowerCase() === 'de') ttsSetting = 'de-DE';
-    else if (langCode.toLowerCase() === 'es') ttsSetting = 'es-ES';
-    else if (langCode.toLowerCase() === 'fr') ttsSetting = 'fr-FR';
-    else if (langCode.toLowerCase() === 'ru') ttsSetting = 'ru-RU';
-    else if (langCode.toLowerCase() === 'it') ttsSetting = 'it-IT';
-    else ttsSetting = langCode;
-  }
+  // Get matching TTS settings/voices. Without a saved preference (or with 'off', since
+  // the button was pressed explicitly) use the word's own language, never a fixed 'en-US'.
+  const savedTtsPref = localStorage.getItem(`flashcards-tts-voice-${langCode}`);
+  const ttsSetting = (!savedTtsPref || savedTtsPref === 'off') ? getDefaultTtsLocale(langCode) : savedTtsPref;
 
   // Cancel any active speech synthesis
   window.speechSynthesis.cancel();
@@ -1964,8 +2045,9 @@ if (formExamAnswer) {
       });
     }
 
-    // Save progress to IndexedDB
-    updateWordInDB(wordObj).catch(err => console.error('Грешка при запис на прогрес от изпит:', err));
+    // Save progress to IndexedDB (progress fields only - see updateWordProgressInDB)
+    updateWordProgressInDB(wordObj.id, wordObj.correctStreak, wordObj.status)
+      .catch(err => console.error('Грешка при запис на прогрес от изпит:', err));
 
     // Show feedback
     examFeedbackContainer.classList.remove('hidden');
@@ -1988,21 +2070,29 @@ if (formExamAnswer) {
 }
 
 function checkExamAnswer(userInput, correctAnswer) {
-  const clean = str => {
-    return str
-      .toLowerCase()
-      .replace(/\([^)]*\)/g, "") // remove text in parentheses e.g. (мъжки кон)
-      .replace(/\s+/g, " ")       // normalize multiple spaces to a single space
-      .trim();
-  };
+  // Same normalization as speech-practice.js: case, apostrophes and punctuation are
+  // ignored, so "wie geht es dir" matches "Wie geht es dir?".
+  const clean = str => String(str).normalize('NFC').toLowerCase()
+    .replace(/[’‘ʼ]/gu, "'")
+    .replace(/'/gu, '')
+    .replace(/[^\p{L}\p{M}\p{N}\s]/gu, ' ')
+    .replace(/\s+/gu, ' ')
+    .trim();
 
   const userClean = clean(userInput);
-  
-  // Split by common delimiters in translations
-  const synonyms = correctAnswer.split(/[/,;]/).map(s => clean(s));
-  
-  // Match if the user's cleaned input matches any cleaned synonym
-  return synonyms.some(syn => syn === userClean);
+  if (!userClean) return false;
+
+  // Remove explanations in parentheses BEFORE splitting into synonyms: a comma inside
+  // "(връзка, разговор)" must not split the answer and break the parentheses.
+  const synonyms = String(correctAnswer).replace(/\([^)]*\)/gu, '')
+    .split(/[/,;]/u)
+    .map(clean)
+    .filter(Boolean);
+
+  // An answer made only of a parenthesised text still has to be answerable
+  if (synonyms.length === 0) synonyms.push(clean(correctAnswer));
+
+  return synonyms.includes(userClean);
 }
 
 if (btnNextExamQuestion) {
