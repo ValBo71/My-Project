@@ -341,15 +341,22 @@ def generate_preview_image(source_filename):
         return None
 
 def remove_upload(filename):
-    """Deletes a file from the uploads folder if it exists."""
+    """Deletes a file from the uploads folder (and its cached thumbnail) if it exists."""
     if not filename:
         return
-    path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-    if os.path.exists(path):
-        try:
-            os.remove(path)
-        except OSError:
-            logger.warning("Could not remove upload %s", path, exc_info=True)
+    for path in (os.path.join(app.config['UPLOAD_FOLDER'], filename), thumbnail_path(filename)):
+        if os.path.exists(path):
+            try:
+                os.remove(path)
+            except OSError:
+                logger.warning("Could not remove upload %s", path, exc_info=True)
+
+THUMB_FOLDER = os.path.join(UPLOAD_FOLDER, 'thumbs')
+THUMB_MAX_WIDTH = 480  # 80px thumbnails at up to 6x density, grid previews at 2x
+RASTER_THUMB_EXTENSIONS = ('.png', '.jpg', '.jpeg')
+
+def thumbnail_path(filename):
+    return os.path.join(THUMB_FOLDER, f"{filename}.png")
 
 def sanitize_filename_component(name):
     """Strips a free-text name down to safe filesystem characters for use in a filename."""
@@ -425,6 +432,32 @@ def uploaded_file(filename):
         # <img src> thumbnails keep working. (PDFs are excluded: Chrome refuses to
         # show a PDF in a sandboxed document.)
         response.headers['Content-Security-Policy'] = "default-src 'none'; img-src 'self' data:; style-src 'unsafe-inline'; sandbox"
+    return response
+
+# Small cached preview of an uploaded raster drawing (the table and cards show them at
+# 80-300px, the originals are often >1000px). SVG/GIF/others fall back to the original.
+@app.route('/thumbs/<filename>')
+def thumbnail_file(filename):
+    if filename != os.path.basename(filename) or not filename.lower().endswith(RASTER_THUMB_EXTENSIONS):
+        return uploaded_file(filename)
+    source = os.path.join(os.path.abspath(app.config['UPLOAD_FOLDER']), filename)
+    if not os.path.isfile(source):
+        return uploaded_file(filename)  # same 404 as a missing upload
+    target = thumbnail_path(filename)
+    try:
+        if not os.path.exists(target) or os.path.getmtime(target) < os.path.getmtime(source):
+            os.makedirs(THUMB_FOLDER, exist_ok=True)
+            pix = pymupdf.Pixmap(source)
+            if pix.n - pix.alpha > 3:  # CMYK JPEGs from prepress -> RGB for PNG
+                pix = pymupdf.Pixmap(pymupdf.csRGB, pix)
+            while pix.width > THUMB_MAX_WIDTH * 2:
+                pix.shrink(1)  # halves both sides, keeps the aspect ratio
+            pix.save(target)
+    except Exception:
+        logger.warning("Could not create thumbnail for %s", filename, exc_info=True)
+        return uploaded_file(filename)
+    response = send_from_directory(os.path.abspath(THUMB_FOLDER), os.path.basename(target))
+    response.headers['X-Content-Type-Options'] = 'nosniff'
     return response
 
 # Home page
