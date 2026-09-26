@@ -28,18 +28,31 @@
       --panel-bg-secondary: #f8fafc;
       --panel-border: rgba(0, 0, 0, 0.08);
       --text-color: #0f172a;
-      --text-muted: #64748b;
-      
+      --text-muted: #5b6b80;     /* 4.97:1 on the page background (AA) */
+
       --primary: #2563eb;
       --primary-hover: #1d4ed8;
-      
+      /* Filled buttons: white text needs >= 4.5:1 in both themes */
+      --primary-fill: #2563eb;
+      --primary-fill-hover: #1d4ed8;
+
       --color-die: #2563eb;      /* Blue for dies */
-      --color-emboss: #059669;   /* Green for prege */
-      --color-foil: #d97706;     /* Gold for foil */
-      
-      --success: #10b981;
-      --danger: #ef4444;
+      --color-emboss: #047857;   /* Green for prege */
+      --color-foil: #b45309;     /* Gold for foil */
+      --badge-text-die: #ffffff;
+      --badge-text-emboss: #ffffff;
+      --badge-text-foil: #ffffff;
+
+      --success: #10b981;        /* decorative (status dot) only - too light for text */
+      --danger: #dc2626;
       --warning: #f59e0b;
+      /* Status text colours, all >= 4.5:1 on panels */
+      --status-active: #047857;
+      --status-borrowed: #b45309;
+      --status-archived: #b91c1c;
+
+      --focus-ring: 0 0 0 3px rgb(37 99 235 / 0.4);
+      --selection-bg: rgb(37 99 235 / 0.2);
       
       --card-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
       --transition-speed: 0.2s;
@@ -58,10 +71,23 @@
       
       --primary: #3b82f6;
       --primary-hover: #60a5fa;
-      
-      --color-die: #3b82f6;
+      --primary-fill: #2563eb;
+      --primary-fill-hover: #1d4ed8;
+
+      --color-die: #2563eb;
       --color-emboss: #10b981;
       --color-foil: #fbbf24;
+      /* Light badges get dark text in the dark theme (white on amber was 1.67:1) */
+      --badge-text-die: #ffffff;
+      --badge-text-emboss: #052e16;
+      --badge-text-foil: #1c1917;
+
+      --status-active: #34d399;
+      --status-borrowed: #fbbf24;
+      --status-archived: #f87171;
+
+      --focus-ring: 0 0 0 3px rgb(96 165 250 / 0.5);
+      --selection-bg: rgb(96 165 250 / 0.3);
       
       --card-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
     }
@@ -137,7 +163,6 @@
       height: 8px;
       background-color: var(--success);
       display: inline-block;
-      box-shadow: 0 0 8px var(--success);
     }
 
     .header-actions {
@@ -158,7 +183,7 @@
       align-items: center;
       justify-content: center;
       background-color: var(--panel-bg);
-      transition: all var(--transition-speed);
+      transition: background-color var(--transition-speed), border-color var(--transition-speed), color var(--transition-speed), box-shadow var(--transition-speed), transform var(--transition-speed);
     }
 
     .icon-btn:hover {
@@ -270,7 +295,7 @@
       outline: none;
       font-family: var(--font-main);
       font-size: 0.95rem;
-      transition: all var(--transition-speed);
+      transition: background-color var(--transition-speed), border-color var(--transition-speed), color var(--transition-speed), box-shadow var(--transition-speed), transform var(--transition-speed);
     }
 
     .search-input:focus {
@@ -318,7 +343,7 @@
       font-weight: 600;
       font-size: 0.95rem;
       cursor: pointer;
-      transition: all var(--transition-speed);
+      transition: background-color var(--transition-speed), border-color var(--transition-speed), color var(--transition-speed), box-shadow var(--transition-speed), transform var(--transition-speed);
       border-right: 1px solid var(--panel-border);
       display: flex;
       align-items: center;
@@ -339,7 +364,7 @@
     }
 
     .tab-btn.active[data-category="all"] {
-      background-color: var(--primary);
+      background-color: var(--primary-fill);
       color: #ffffff;
     }
     .tab-btn.active[data-category="die"] {
@@ -366,17 +391,17 @@
       font-family: var(--font-main);
       border: none;
       cursor: pointer;
-      transition: all var(--transition-speed);
+      transition: background-color var(--transition-speed), border-color var(--transition-speed), color var(--transition-speed), box-shadow var(--transition-speed), transform var(--transition-speed);
       text-decoration: none;
     }
 
     .btn-primary {
-      background-color: var(--primary);
+      background-color: var(--primary-fill);
       color: #ffffff;
     }
 
     .btn-primary:hover {
-      background-color: var(--primary-hover);
+      background-color: var(--primary-fill-hover);
       transform: translateY(-1px);
     }
 
@@ -400,7 +425,7 @@
     }
 
     .btn-danger:hover {
-      background-color: #dc2626;
+      background-color: #b91c1c;
     }
 
     .btn-block {
@@ -503,9 +528,9 @@
       white-space: nowrap;
     }
 
-    .card-badge.die { background-color: var(--color-die); }
-    .card-badge.embossing { background-color: var(--color-emboss); }
-    .card-badge.foil { background-color: var(--color-foil); }
+    .card-badge.die { background-color: var(--color-die); color: var(--badge-text-die); }
+    .card-badge.embossing { background-color: var(--color-emboss); color: var(--badge-text-emboss); }
+    .card-badge.foil { background-color: var(--color-foil); color: var(--badge-text-foil); }
 
     .card-title {
       font-size: 1.15rem;
@@ -554,9 +579,9 @@
       font-size: 0.75rem;
       white-space: nowrap;
     }
-    .status-tag.active { color: var(--success); }
-    .status-tag.archived { color: var(--danger); }
-    .status-tag.borrowed { color: var(--warning); }
+    .status-tag.active { color: var(--status-active); }
+    .status-tag.archived { color: var(--status-archived); }
+    .status-tag.borrowed { color: var(--status-borrowed); }
 
     .card-notes {
       font-size: 0.85rem;
@@ -725,7 +750,7 @@
       color: var(--text-color);
       font-family: var(--font-main);
       outline: none;
-      transition: all var(--transition-speed);
+      transition: background-color var(--transition-speed), border-color var(--transition-speed), color var(--transition-speed), box-shadow var(--transition-speed), transform var(--transition-speed);
     }
 
     .form-control:focus {
@@ -759,7 +784,7 @@
       flex-direction: column;
       align-items: center;
       gap: 0.5rem;
-      transition: all var(--transition-speed);
+      transition: background-color var(--transition-speed), border-color var(--transition-speed), color var(--transition-speed), box-shadow var(--transition-speed), transform var(--transition-speed);
     }
 
     .file-upload-zone:hover, .file-upload-zone.dragover {
@@ -881,7 +906,7 @@
     }
 
     .drawing-dot.active {
-      background-color: var(--primary);
+      background-color: var(--primary-fill);
       border-color: var(--primary);
       color: #fff;
     }
@@ -1012,7 +1037,7 @@
       color: var(--text-muted);
       background: transparent;
       cursor: pointer;
-      transition: all var(--transition-speed);
+      transition: background-color var(--transition-speed), border-color var(--transition-speed), color var(--transition-speed), box-shadow var(--transition-speed), transform var(--transition-speed);
     }
     
     .view-toggle-container .icon-btn:last-child {
@@ -1029,7 +1054,7 @@
     }
     
     .view-toggle-container .icon-btn.active {
-      background-color: var(--primary);
+      background-color: var(--primary-fill);
       color: #ffffff;
     }
 
@@ -1131,7 +1156,7 @@
       font-size: 0.85rem;
       font-weight: 600;
       cursor: pointer;
-      transition: all var(--transition-speed);
+      transition: background-color var(--transition-speed), border-color var(--transition-speed), color var(--transition-speed), box-shadow var(--transition-speed), transform var(--transition-speed);
       display: inline-flex;
       align-items: center;
       justify-content: center;
@@ -1149,7 +1174,7 @@
     }
 
     .pagination-btn.active {
-      background-color: var(--primary) !important;
+      background-color: var(--primary-fill) !important;
       color: #ffffff !important;
       border-color: var(--primary) !important;
     }
@@ -1214,6 +1239,87 @@
         margin-top: 2mm;
       }
     }
+  
+    /* ===== Accessibility, responsive and browser-surface fixes (Impeccable audit) ===== */
+    .sr-only {
+      position: absolute !important;
+      width: 1px; height: 1px;
+      padding: 0; margin: -1px;
+      overflow: hidden; clip: rect(0, 0, 0, 0);
+      white-space: nowrap; border: 0;
+    }
+
+    /* Browser surfaces follow the palette */
+    ::selection { background: var(--selection-bg); color: var(--text-color); }
+    html { accent-color: var(--primary); }
+    input, textarea { caret-color: var(--primary); }
+    .tools-table td, .pagination-info, #qrcode-modal-code { font-variant-numeric: tabular-nums; }
+
+    /* Same letterforms in headings and body text: with lang="bg" Manrope switches to
+       its Bulgarian cursive-style forms (д, л, т...), Inter does not. */
+    h1, h2, h3, h4, h5, h6, .logo-text, .tab-btn, .modal-title { font-feature-settings: "locl" 0; }
+
+    /* Visible keyboard focus everywhere (inputs used to remove their outline) */
+    :where(button, a, select, [role="button"], [tabindex]):focus-visible {
+      outline: 2px solid var(--primary);
+      outline-offset: 2px;
+    }
+    .search-input:focus-visible, .filter-select:focus-visible, .form-control:focus-visible {
+      border-color: var(--primary);
+      box-shadow: var(--focus-ring);
+    }
+
+    /* Hidden modals must not be reachable with Tab */
+    .modal, .lightbox { visibility: hidden; transition: opacity 0.25s ease, visibility 0s linear 0.25s; }
+    .modal.active, .lightbox.active { visibility: visible; transition: opacity 0.25s ease, visibility 0s linear 0s; }
+
+    /* Clickable thumbnails and drawing dots are keyboard buttons now */
+    img[role="button"], div[role="button"], .drawing-dot { cursor: pointer; }
+
+    /* Tablet: header wraps instead of pushing controls off screen */
+    @media (max-width: 1000px) {
+      .app-header { flex-wrap: wrap; gap: 1rem; }
+      .header-actions { flex-wrap: wrap; justify-content: flex-end; margin-left: auto; }
+    }
+
+    /* Phone */
+    @media (max-width: 640px) {
+      .app-header { padding: 1rem 0; margin-bottom: 1.25rem; }
+      .header-logo { flex: 1 1 100%; }
+      .logo-icon { font-size: 1.6rem; }
+      .logo-text { font-size: 1.2rem; line-height: 1.25; }
+      .header-actions { width: 100%; justify-content: flex-start; gap: 0.5rem; margin-left: 0; }
+      .network-badge { order: 3; flex: 1 1 100%; font-size: 0.8rem; padding: 0.4rem 0.75rem; }
+      .network-badge-url { overflow-wrap: anywhere; }
+      .user-menu { margin-right: auto; }
+
+      /* Four categories as a 2x2 grid instead of a clipped row */
+      .category-tabs { flex-wrap: wrap; align-self: stretch; }
+      .tab-btn { flex: 1 1 50%; justify-content: center; padding: 0.75rem 0.5rem; border-bottom: 1px solid var(--panel-border); }
+      .tab-btn:nth-child(2n) { border-right: none; }
+      .tab-btn:nth-last-child(-n+2) { border-bottom: none; }
+    }
+
+    /* Touch screens: 44px minimum targets (WCAG 2.5.5 / platform guidance) */
+    @media (pointer: coarse) {
+      .icon-btn { width: 44px; height: 44px; }
+      .user-menu-btn { width: auto; min-width: 44px; }
+      .btn, .btn-sm, .pagination-btn { min-height: 44px; }
+      .tools-table .btn-sm, .card-actions .btn-danger { min-width: 44px !important; min-height: 44px; flex-basis: 44px !important; }
+      .drawing-dot { width: 32px; height: 32px; line-height: 32px; }
+      .view-toggle-container .icon-btn { width: 44px; height: 44px; }
+      .search-input, .filter-select, .tab-btn, .form-control { min-height: 44px; }
+      .pagination-btn { min-width: 44px; }
+      .close-btn, .lightbox-close { min-width: 44px; min-height: 44px; }
+    }
+
+    /* Reduced motion: keep the fades that show state changes, drop movement */
+    @media (prefers-reduced-motion: reduce) {
+      .modal-content { animation: modalFade 0.15s ease-out; }
+      .btn-primary:hover, .btn:hover, .tool-card:hover { transform: none !important; }
+      html { scroll-behavior: auto; }
+    }
+    @keyframes modalFade { from { opacity: 0; } to { opacity: 1; } }
   </style>
 </head>
 <body>
@@ -1233,11 +1339,11 @@
       </div>
       <div class="header-actions">
         <div class="network-badge" title="Сървърът е активен в локалната мрежа">
-          <span class="network-status-dot"></span>
-          <span>Мрежов достъп: http://{{ local_ip }}:5050</span>
+          <span class="network-status-dot" aria-hidden="true"></span>
+          <span class="network-badge-url">Мрежов достъп: http://{{ local_ip }}:5050</span>
         </div>
         <div class="user-menu">
-          <button id="user-menu-btn" class="icon-btn user-menu-btn" title="Профил">
+          <button id="user-menu-btn" class="icon-btn user-menu-btn" title="Профил" aria-label="Профил: {{ username }}" aria-haspopup="true" aria-expanded="false" aria-controls="user-menu-dropdown">
             <i class="fa-solid fa-user"></i>
             <span class="user-menu-label">{{ username }}</span>
           </button>
@@ -1250,11 +1356,11 @@
             <a href="/logout"><i class="fa-solid fa-right-from-bracket"></i> Изход</a>
           </div>
         </div>
-        <button id="theme-toggle-btn" class="icon-btn" title="Смяна на темата">
+        <button id="theme-toggle-btn" class="icon-btn" title="Смяна на темата" aria-label="Смяна на темата">
           <i class="fa-solid fa-moon"></i>
         </button>
         {% if role == 'admin' %}
-        <button id="exit-app-btn" class="icon-btn icon-btn-danger" title="Спри сървъра и затвори">
+        <button id="exit-app-btn" class="icon-btn icon-btn-danger" title="Спри сървъра и затвори" aria-label="Спри сървъра и затвори">
           <i class="fa-solid fa-power-off"></i>
         </button>
         {% endif %}
@@ -1265,15 +1371,18 @@
     <section class="controls-panel">
       <div class="controls-row-top">
         <div class="search-box-container">
-          <i class="fa-solid fa-magnifying-glass search-icon"></i>
-          <input type="text" id="search-input" class="search-input" placeholder="Търсене по код, име, клиент, склад...">
+          <label for="search-input" class="sr-only">Търсене в каталога</label>
+          <i class="fa-solid fa-magnifying-glass search-icon" aria-hidden="true"></i>
+          <input type="search" id="search-input"class="search-input" placeholder="Търсене по код, име, клиент, склад...">
         </div>
 
         <div class="search-box-container" style="max-width: 220px; min-width: 150px;">
-          <i class="fa-solid fa-ruler-combined search-icon"></i>
-          <input type="text" id="dim-filter" class="search-input" placeholder="Размер (напр. 150)">
+          <label for="dim-filter" class="sr-only">Филтър по размер</label>
+          <i class="fa-solid fa-ruler-combined search-icon" aria-hidden="true"></i>
+          <input type="text" id="dim-filter"class="search-input" placeholder="Размер (напр. 150)">
         </div>
         
+        <label for="status-filter" class="sr-only">Статус</label>
         <select id="status-filter" class="filter-select">
           <option value="all">Всички статуси</option>
           <option value="active">В склада</option>
@@ -1282,10 +1391,10 @@
         </select>
 
         <div class="view-toggle-container">
-          <button id="btn-view-grid" class="icon-btn" title="Преглед като карти">
+          <button id="btn-view-grid" class="icon-btn" title="Преглед като карти" aria-label="Преглед като карти" aria-pressed="false">
             <i class="fa-solid fa-grip"></i>
           </button>
-          <button id="btn-view-table" class="icon-btn active" title="Преглед като таблица">
+          <button id="btn-view-table" class="icon-btn active" title="Преглед като таблица" aria-label="Преглед като таблица" aria-pressed="true">
             <i class="fa-solid fa-table-list"></i>
           </button>
         </div>
@@ -1295,7 +1404,7 @@
         </button>
       </div>
       
-      <div class="category-tabs" id="category-tabs-container">
+      <div class="category-tabs" id="category-tabs-container" role="group" aria-label="Категория">
         <button class="tab-btn active" data-category="all">
           <i class="fa-solid fa-list"></i> Всички
         </button>
@@ -1313,6 +1422,7 @@
 
     <!-- Tools Containers (Grid / Table) -->
     <main style="margin-top: 1rem;">
+      <h2 class="sr-only">Инструменти</h2>
       <!-- Grid View Container -->
       <div id="tools-grid-container" class="tools-grid hidden">
         <!-- Cards will load dynamically -->
@@ -1351,8 +1461,8 @@
           <!-- Page numbers will load dynamically -->
         </div>
         <div class="pagination-limit">
-          <span>Редове на страница:</span>
-          <select id="pagination-size" class="filter-select" style="width: auto; padding: 0.25rem 0.5rem; font-size: 0.85rem;">
+          <label for="pagination-size">Редове на страница:</label>
+          <select id="pagination-size"class="filter-select" style="width: auto; padding: 0.25rem 0.5rem; font-size: 0.85rem;">
             <option value="10">10</option>
             <option value="25">25</option>
           </select>
@@ -1369,11 +1479,11 @@
   </div>
 
   <!-- ADD / EDIT MODAL -->
-  <div class="modal" id="tool-modal">
+  <div class="modal" id="tool-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title-text">
     <div class="modal-content">
       <div class="modal-header">
-        <h3 class="modal-title" id="modal-title-text">Добавяне на Нов Инструмент</h3>
-        <button class="close-btn" id="btn-close-modal">&times;</button>
+        <h2 class="modal-title" id="modal-title-text">Добавяне на Нов Инструмент</h2>
+        <button class="close-btn" id="btn-close-modal" aria-label="Затвори">&times;</button>
       </div>
       <form id="tool-form" autocomplete="off">
         <div class="modal-body">
@@ -1403,7 +1513,7 @@
 
           <!-- Specific Fields for Dies only -->
           <div id="die-specific-fields" class="hidden" style="border: 1px solid var(--panel-border); background-color: var(--panel-bg-secondary); padding: 1rem; margin-bottom: 1.25rem;">
-            <h4 style="margin-bottom: 0.75rem; font-size: 0.95rem; font-weight: 700; border-bottom: 1px solid var(--panel-border); padding-bottom: 0.25rem; color: var(--primary);"><i class="fa-solid fa-gears"></i> Спецификации на щанцата</h4>
+            <h3 style="margin-bottom: 0.75rem; font-size: 0.95rem;font-weight: 700; border-bottom: 1px solid var(--panel-border); padding-bottom: 0.25rem; color: var(--primary);"><i class="fa-solid fa-gears"></i> Спецификации на щанцата</h3>
             
             <div class="form-row">
               <div class="form-group">
@@ -1525,17 +1635,17 @@
   </div>
 
   <!-- LIGHTBOX -->
-  <div class="lightbox" id="lightbox">
-    <button class="lightbox-close" id="btn-close-lightbox">&times;</button>
-    <img src="" alt="Детайлен чертеж" class="lightbox-image" id="lightbox-img">
+  <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Чертеж">
+    <button class="lightbox-close" id="btn-close-lightbox" aria-label="Затвори">&times;</button>
+    <img alt="Детайлен чертеж" class="lightbox-image" id="lightbox-img">
   </div>
 
   <!-- QR CODE MODAL -->
-  <div class="modal" id="qrcode-modal">
+  <div class="modal" id="qrcode-modal" role="dialog" aria-modal="true" aria-labelledby="qrcode-modal-title">
     <div class="modal-content" style="max-width: 400px; text-align: center; border-radius: 4px; overflow: hidden;">
       <div class="modal-header">
-        <h3 class="modal-title" style="font-weight: 700; font-family: var(--font-headers);">QR Код за Склад</h3>
-        <button class="close-btn" id="btn-close-qrcode-modal">&times;</button>
+        <h2 class="modal-title" id="qrcode-modal-title" style="font-weight: 700; font-family: var(--font-headers);">QR Код за Склад</h2>
+        <button class="close-btn" id="btn-close-qrcode-modal" aria-label="Затвори">&times;</button>
       </div>
       <div class="modal-body" style="padding: 2rem; display: flex; flex-direction: column; align-items: center; gap: 1.25rem;">
         <div id="qrcode-modal-target" style="padding: 12px; background: #ffffff; border: 1px solid var(--panel-border); border-radius: 4px; display: inline-block;"></div>
@@ -1932,8 +2042,8 @@
                 <button class="btn btn-secondary write-action" onclick="openEditModal(${t.id})">
                   <i class="fa-solid fa-pen-to-square"></i> Ред.
                 </button>
-                <button class="btn btn-danger btn-sm write-action" onclick="deleteTool(${t.id}, ${escapeHTML(JSON.stringify(t.code))})">
-                  <i class="fa-solid fa-trash"></i>
+                <button class="btn btn-danger btn-sm write-action" onclick="deleteTool(${t.id}, ${escapeHTML(JSON.stringify(t.code))})" title="Изтрий" aria-label="Изтрий ${escapeHTML(t.code)}">
+                  <i class="fa-solid fa-trash" aria-hidden="true"></i>
                 </button>
               </div>
             </div>
@@ -2011,11 +2121,11 @@
               <button class="btn btn-secondary btn-sm write-action" style="padding: 0.35rem 0.6rem; font-size: 0.8rem;" onclick="exportDesignFile(${t.id})" title="Копирай файлове">
                 <i class="fa-solid fa-copy"></i>
               </button>
-              <button class="btn btn-secondary btn-sm write-action" style="padding: 0.35rem 0.6rem; font-size: 0.8rem;" onclick="openEditModal(${t.id})">
-                <i class="fa-solid fa-pen-to-square"></i>
+              <button class="btn btn-secondary btn-sm write-action" style="padding: 0.35rem 0.6rem; font-size: 0.8rem;" onclick="openEditModal(${t.id})" title="Редактирай" aria-label="Редактирай ${escapeHTML(t.code)}">
+                <i class="fa-solid fa-pen-to-square" aria-hidden="true"></i>
               </button>
-              <button class="btn btn-danger btn-sm write-action" style="padding: 0.35rem 0.5rem; font-size: 0.8rem;" onclick="deleteTool(${t.id}, ${escapeHTML(JSON.stringify(t.code))})">
-                <i class="fa-solid fa-trash"></i>
+              <button class="btn btn-danger btn-sm write-action" style="padding: 0.35rem 0.5rem; font-size: 0.8rem;" onclick="deleteTool(${t.id}, ${escapeHTML(JSON.stringify(t.code))})" title="Изтрий" aria-label="Изтрий ${escapeHTML(t.code)}">
+                <i class="fa-solid fa-trash" aria-hidden="true"></i>
               </button>
             </td>
           `;
@@ -2030,6 +2140,7 @@
       // Previous Button
       const prevBtn = document.createElement('button');
       prevBtn.className = 'pagination-btn';
+      prevBtn.setAttribute('aria-label', 'Предишна страница');
       prevBtn.innerHTML = '<i class="fa-solid fa-angle-left"></i>';
       prevBtn.disabled = currentPage === 1;
       prevBtn.addEventListener('click', () => {
@@ -2053,6 +2164,7 @@
       // Next Button
       const nextBtn = document.createElement('button');
       nextBtn.className = 'pagination-btn';
+      nextBtn.setAttribute('aria-label', 'Следваща страница');
       nextBtn.innerHTML = '<i class="fa-solid fa-angle-right"></i>';
       nextBtn.disabled = currentPage === totalPages;
       nextBtn.addEventListener('click', () => {
@@ -2719,11 +2831,11 @@
       }
       if (isPdfFilename(drawing.image_filename)) {
         if (drawing.preview_filename) {
-          return `<img src="/uploads/${drawing.preview_filename}" class="${imgClass}" alt="${escapeHTML(t.name)}" title="Превю от PDF чертеж - клик за отваряне на оригинала" onclick="window.open('/uploads/${drawing.image_filename}', '_blank')">`;
+          return `<img src="/thumbs/${drawing.preview_filename}" loading="lazy" decoding="async" class="${imgClass}" alt="${escapeHTML(t.name)}" title="Превю от PDF чертеж - клик за отваряне на оригинала" role="button" tabindex="0" onclick="window.open('/uploads/${drawing.image_filename}', '_blank')">`;
         }
-        return `<div class="${noImageClass}" title="PDF чертеж - клик за отваряне" style="cursor:pointer;" onclick="window.open('/uploads/${drawing.image_filename}', '_blank')"><i class="fa-regular fa-file-pdf no-image-icon"></i></div>`;
+        return `<div class="${noImageClass}" title="PDF чертеж - клик за отваряне" aria-label="Отвори PDF чертежа на ${escapeHTML(t.name)}" role="button" tabindex="0" style="cursor:pointer;" onclick="window.open('/uploads/${drawing.image_filename}', '_blank')"><i class="fa-regular fa-file-pdf no-image-icon"></i></div>`;
       }
-      return `<img src="/uploads/${drawing.image_filename}" class="${imgClass}" alt="${escapeHTML(t.name)}" onclick="openLightbox('/uploads/${drawing.image_filename}')">`;
+      return `<img src="/thumbs/${drawing.image_filename}" loading="lazy" decoding="async" class="${imgClass}" alt="${escapeHTML(t.name)}" role="button" tabindex="0" onclick="openLightbox('/uploads/${drawing.image_filename}')">`;
     }
 
     function buildDrawingIndicatorHtml(t) {
@@ -2731,7 +2843,7 @@
       if (drawings.length <= 1) return '';
       const activeIdx = Math.min(activeDrawingIndex[t.id] || 0, drawings.length - 1);
       const dots = drawings.map((d, idx) =>
-        `<span class="drawing-dot ${idx === activeIdx ? 'active' : ''}" onclick="event.stopPropagation(); switchDrawing(${t.id}, ${idx})">${idx + 1}</span>`
+        `<span class="drawing-dot ${idx === activeIdx ? 'active' : ''}" role="button" tabindex="0" aria-label="Чертеж ${idx + 1}" aria-pressed="${idx === activeIdx}" onclick="event.stopPropagation(); switchDrawing(${t.id}, ${idx})">${idx + 1}</span>`
       ).join('');
       return `<div class="drawing-indicator">${dots}</div>`;
     }
@@ -2756,6 +2868,89 @@
     function downloadDrawings(id) {
       window.open(`/api/tools/${id}/drawings/download`, '_blank');
     }
+  
+    // ===== Accessibility behaviour (Impeccable audit) =====
+    (function () {
+      const appRoot = document.querySelector('.app-container');
+      const dialogs = [...document.querySelectorAll('.modal, .lightbox')];
+      const closeButtons = { 'tool-modal': 'btn-close-modal', 'qrcode-modal': 'btn-close-qrcode-modal', 'lightbox': 'btn-close-lightbox' };
+      const FOCUSABLE = 'button:not([disabled]), [href], input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+      let returnFocusTo = null;
+
+      function openDialog() { return dialogs.find(d => d.classList.contains('active')); }
+
+      // When a dialog opens: remember the opener, make the page behind inert and move
+      // focus inside. When it closes: undo that and return focus to the opener.
+      const observer = new MutationObserver(() => {
+        const active = openDialog();
+        if (active && !appRoot.inert) {
+          returnFocusTo = document.activeElement;
+          appRoot.inert = true;
+          const first = active.querySelector('input:not([type="hidden"]):not([disabled]), select, textarea') || active.querySelector(FOCUSABLE);
+          setTimeout(() => first && first.focus(), 50);
+        } else if (!active && appRoot.inert) {
+          appRoot.inert = false;
+          if (returnFocusTo && document.contains(returnFocusTo)) returnFocusTo.focus();
+          returnFocusTo = null;
+        }
+      });
+      dialogs.forEach(d => observer.observe(d, { attributes: true, attributeFilter: ['class'] }));
+
+      document.addEventListener('keydown', (e) => {
+        const active = openDialog();
+        if (e.key === 'Escape' && active) {
+          const btn = document.getElementById(closeButtons[active.id]);
+          if (btn) { e.preventDefault(); btn.click(); }
+          return;
+        }
+        // Keep Tab inside the open dialog
+        if (e.key === 'Tab' && active) {
+          const items = [...active.querySelectorAll(FOCUSABLE)].filter(el => el.offsetParent !== null);
+          if (!items.length) return;
+          const first = items[0], last = items[items.length - 1];
+          if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+          else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+          return;
+        }
+        // Enter / Space activate non-button elements that act as buttons
+        const target = e.target;
+        if ((e.key === 'Enter' || e.key === ' ') && target.getAttribute && target.getAttribute('role') === 'button' && target.tagName !== 'BUTTON') {
+          e.preventDefault();
+          target.click();
+        }
+      });
+
+      // Icon-only buttons rendered without a name get their tooltip as accessible name
+      function nameIconButtons(root) {
+        root.querySelectorAll('button').forEach(b => {
+          if (!b.getAttribute('aria-label') && !b.textContent.trim() && b.title) b.setAttribute('aria-label', b.title);
+        });
+      }
+      nameIconButtons(document);
+      ['tools-table-body', 'tools-grid-container'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) new MutationObserver(() => nameIconButtons(el)).observe(el, { childList: true, subtree: true });
+      });
+
+      // Expose menu / toggle states to assistive technology
+      const menuBtn = document.getElementById('user-menu-btn');
+      const menu = document.getElementById('user-menu-dropdown');
+      if (menuBtn && menu) {
+        new MutationObserver(() => menuBtn.setAttribute('aria-expanded', String(!menu.classList.contains('hidden'))))
+          .observe(menu, { attributes: true, attributeFilter: ['class'] });
+      }
+      ['btn-view-grid', 'btn-view-table'].forEach(id => {
+        const btn = document.getElementById(id);
+        if (btn) new MutationObserver(() => btn.setAttribute('aria-pressed', String(btn.classList.contains('active'))))
+          .observe(btn, { attributes: true, attributeFilter: ['class'] });
+      });
+      const tabs = document.getElementById('category-tabs-container');
+      if (tabs) {
+        const syncTabs = () => tabs.querySelectorAll('.tab-btn').forEach(t => t.setAttribute('aria-pressed', String(t.classList.contains('active'))));
+        syncTabs();
+        new MutationObserver(syncTabs).observe(tabs, { attributes: true, subtree: true, attributeFilter: ['class'] });
+      }
+    })();
   </script>
 </body>
 </html>
