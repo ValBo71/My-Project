@@ -31,8 +31,8 @@ if errorlevel 1 (
 
 echo [3/3] Starting the server...
 echo Your browser will open automatically in a few seconds.
-echo NOTE: the first page load takes a bit longer, since the app
-echo refreshes listings from dev.bg/LinkedIn/jobs.bg live.
+echo NOTE: the page shows the saved listings right away and then
+echo refreshes dev.bg/LinkedIn/jobs.bg in the background.
 echo To stop the server, close this window or press CTRL+C.
 echo -------------------------------------------------------------------
 start "" cmd /c "timeout /t 4 /nobreak > nul & start http://127.0.0.1:5000"

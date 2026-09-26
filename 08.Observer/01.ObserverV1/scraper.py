@@ -129,7 +129,8 @@ def scrape_linkedin_jobs():
             page.fill("input[type='email'] >> visible=true", LINKEDIN_EMAIL)
             page.fill("input[type='password'] >> visible=true", LINKEDIN_PASSWORD)
             
-            page.click("button.e83ce89f >> visible=true")
+            # Submit via the form's submit button - LinkedIn's hashed CSS classes change on every deploy
+            page.click("button[type='submit'] >> visible=true")
             page.wait_for_timeout(5000)
             
             logged_in = False
@@ -148,19 +149,25 @@ def scrape_linkedin_jobs():
             else:
                 logger.error("Failed to log in to LinkedIn. MFA or Captcha block might be present.")
                 browser.close()
-                return []
-                
+                # Raise instead of returning [] so the refresh cycle reports LinkedIn as failed
+                raise RuntimeError("login failed (MFA/Captcha?)")
+
         try:
             page.wait_for_selector('[data-testid="lazy-column"]', timeout=15000)
             logger.info("LinkedIn job listings loaded.")
         except Exception as e:
             logger.error("Could not find LinkedIn job list lazy-column.")
             browser.close()
-            return []
-            
+            raise RuntimeError("job list not found (page layout changed?)")
+
         cards = page.locator('[data-testid="lazy-column"] [role="button"]').all()
         logger.info(f"Found {len(cards)} job cards on the page.")
-        
+
+        # URL / description of the previously opened card, used to detect when the
+        # detail panel has actually switched to the newly clicked card.
+        prev_url = page.url
+        prev_description = None
+
         for idx, card in enumerate(cards):
             try:
                 card_html = card.inner_html()
@@ -184,7 +191,9 @@ def scrape_linkedin_jobs():
                 else:
                     title = title_tag.get_text(strip=True)
                 
-                if title.startswith("Selected, "):
+                # The pre-selected card is already open, so clicking it does not change the URL
+                was_selected = title.startswith("Selected, ")
+                if was_selected:
                     title = title[len("Selected, "):].strip()
                     
                 date_published = "N/A"
@@ -205,9 +214,17 @@ def scrape_linkedin_jobs():
 
                 # Click the card to get the Job ID and URL
                 card.click()
-                page.wait_for_timeout(1000)
-                
+                if was_selected:
+                    page.wait_for_timeout(1000)
+                else:
+                    try:
+                        page.wait_for_url(lambda u: u != prev_url, timeout=8000)
+                    except Exception:
+                        logger.warning(f"LinkedIn URL did not change after clicking card {idx} ({title}); skipping it.")
+                        continue
+
                 job_url = page.url
+                prev_url = job_url
                 job_id_match = re.search(r'currentJobId=(\d+)', job_url)
                 if not job_id_match:
                     job_id_match = re.search(r'/jobs/view/(\d+)', job_url)
@@ -224,14 +241,25 @@ def scrape_linkedin_jobs():
                     continue
                     
                 logger.info(f"Scraping details for new LinkedIn job: {title} at {company}")
-                page.wait_for_timeout(2000)
-                
+
+                # Wait until the "About the job" panel shows text different from the previous
+                # card's, otherwise the new job would be saved with the old description.
                 description = "N/A"
-                h2_elements = page.locator('h2:text("About the job")').all()
-                if h2_elements:
-                    parent_parent = h2_elements[0].locator('xpath=../..')
-                    description = parent_parent.inner_text()
-                    
+                deadline = time.time() + 10
+                while time.time() < deadline:
+                    h2_elements = page.locator('h2:text("About the job")').all()
+                    if h2_elements:
+                        text = h2_elements[0].locator('xpath=../..').inner_text()
+                        if text and text != prev_description:
+                            description = text
+                            break
+                    page.wait_for_timeout(500)
+
+                if description == "N/A":
+                    logger.warning(f"LinkedIn description panel did not update for: {title} at {company}; skipping it.")
+                    continue
+                prev_description = description
+
                 requirements = extract_tech_stack_from_text(description)
                 leave_days = extract_leave_days(description)
                 salary_from, salary_to = extract_salary(description, BeautifulSoup(description, "lxml"))
@@ -274,23 +302,10 @@ def scrape_jobs_bg_jobs():
     
     scraped_jobs = []
     
-    # Dynamically calculate window position to place it in the bottom-right corner of the screen
+    # Fixed window position; scraping always runs outside the main thread, so the screen size
+    # cannot be queried via tkinter here.
     win_x = 1000
     win_y = 600
-    import threading
-    if threading.current_thread() is threading.main_thread():
-        try:
-            import tkinter as tk
-            root = tk.Tk()
-            root.withdraw()
-            width = root.winfo_screenwidth()
-            height = root.winfo_screenheight()
-            root.destroy()
-            if width > 500 and height > 400:
-                win_x = width - 420
-                win_y = height - 320
-        except Exception:
-            pass
 
     with sync_playwright() as p:
         # Launch browser in headful mode but tiny and tucked away at the bottom-right corner to pass DataDome
@@ -326,7 +341,10 @@ def scrape_jobs_bg_jobs():
             
             grids = soup.find_all(class_="mdc-layout-grid__inner")
             logger.info(f"Found {len(grids)} potential grid containers on jobs.bg.")
-            
+            if not grids:
+                # An empty search page almost always means DataDome blocked us
+                raise RuntimeError("no listings on the search page (blocked by DataDome?)")
+
             # Map of jobs to check/visit
             jobs_to_process = []
             
@@ -394,7 +412,9 @@ def scrape_jobs_bg_jobs():
                 company = company.replace("\xa0", " ").strip()
                 
                 # Extract Date
-                date_published = "днес"
+                # No card date -> "N/A", not "днес": "днес" would make refresh_job_if_reposted
+                # treat an old listing as reposted on every single refresh.
+                date_published = "N/A"
                 card_date_div = grid.find(class_="card-date")
                 if card_date_div:
                     raw_date = card_date_div.get_text()
@@ -456,6 +476,8 @@ def scrape_jobs_bg_jobs():
                     
         except Exception as ex:
             logger.error(f"Error scraping jobs.bg: {ex}")
+            # Propagate so the refresh cycle reports jobs.bg as failed
+            raise
         finally:
             browser.close()
             
