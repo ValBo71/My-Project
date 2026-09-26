@@ -96,6 +96,7 @@
                         </label>
                         <div class="select-wrapper">
                             <select id="signature-size" name="signature_size" required>
+                                <option value="2">Единични листове (без коли, без избутване)</option>
                                 <option value="4">4 страници (1 сгъвка)</option>
                                 <option value="8">8 страници (2 сгъвки)</option>
                                 <option value="16" selected>16 страници (3 сгъвки - стандартно)</option>
@@ -170,7 +171,7 @@
                     <div class="result-tile accent-gold">
                         <div class="tile-label">ГРЪБЧЕ</div>
                         <div class="tile-value-container">
-                            <span class="tile-value" id="result-spine">16.64</span>
+                            <span class="tile-value" id="result-spine">—</span>
                             <span class="tile-unit">мм</span>
                         </div>
                         <div class="tile-subtext">Обща ширина на гърба</div>
@@ -178,12 +179,13 @@
                     <div class="result-tile accent-teal">
                         <div class="tile-label">ИЗБУТВАНЕ (CREEP)</div>
                         <div class="tile-value-container">
-                            <span class="tile-value" id="result-creep">0.47</span>
+                            <span class="tile-value" id="result-creep">—</span>
                             <span class="tile-unit">мм</span>
                         </div>
-                        <div class="tile-subtext">Относно колата за шиене</div>
+                        <div class="tile-subtext">Вътрешните страници на една кола</div>
                     </div>
                 </div>
+                <div class="pages-warning hidden" id="pages-warning" role="status" aria-live="polite"></div>
 
                 <!-- Live Visual Preview -->
                 <div class="visualizer-container">
@@ -195,7 +197,7 @@
                             
                             <!-- Book spine (Center) -->
                             <div class="book-spine" id="preview-spine-element">
-                                <span class="spine-text" id="preview-spine-text">СПИНА • 200 СТР.</span>
+                                <span class="spine-text" id="preview-spine-text">ГРЪБЧЕ</span>
                             </div>
                             
                             <!-- Book Front cover (Right) -->
@@ -206,8 +208,8 @@
                         </div>
                     </div>
                     <div class="visualizer-legend">
-                        <span class="legend-item"><span class="legend-dot color-spine"></span>Гръбче: <strong id="legend-spine">16.64 мм</strong></span>
-                        <span class="legend-item"><span class="legend-dot color-creep"></span>Избутване: <strong id="legend-creep">0.47 мм</strong></span>
+                        <span class="legend-item"><span class="legend-dot color-spine"></span>Гръбче: <strong id="legend-spine">— мм</strong></span>
+                        <span class="legend-item"><span class="legend-dot color-creep"></span>Избутване: <strong id="legend-creep">— мм</strong></span>
                     </div>
                 </div>
             </section>
@@ -226,11 +228,18 @@
                         <p><strong>Тяло:</strong> страниците × дебелината / 2. При шиене с конци добавяме набухване според колата: 4стр. (+12%), 8стр. (+10%), 16стр. (+8%), 32стр. (+5%). <strong>Лепило:</strong> EVA (+0.5 мм) или PUR (+0.25 мм).</p>
                     </div>
                     <div class="formula-card">
-                        <h4>Твърда корица (Hardcover) & Избутване</h4>
+                        <h4>Твърда корица (Hardcover)</h4>
+                        <div class="math-expr">
+                            Гръбче = Тяло + (2 × Мукава) + 1.5 мм
+                        </div>
+                        <p><strong>Мукава:</strong> избраната дебелина от 1.5 до 3.0 мм. <strong>1.5 мм</strong> е фиксирана добавка за прегъване на облицовката. При закръглен гръб тялото се умножава по 1.15.</p>
+                    </div>
+                    <div class="formula-card">
+                        <h4>Избутване (Creep)</h4>
                         <div class="math-expr">
                             Избутване = (Размер на колата / 4 - 1) × Дебелина на хартия
                         </div>
-                        <p>Добавя се толеранс от 1.5 мм за прегъване на облицовката на мукавата (от 1.5 до 3.0 мм). Избутването се калкулира за вътрешните страници на една отделна кола и важи само при отметнато "Шита с конци" - при несшита книга е 0.</p>
+                        <p>Изместването на най-вътрешния разтвор спрямо външния лист в една кола. Идва от сгъването на листовете един в друг, затова важи и за шити, и за лепени книги от сгънати коли. При „Единични листове“ е 0.</p>
                     </div>
                 </div>
             </div>
@@ -249,6 +258,7 @@
             </div>
             <div class="modal-body">
                 <p class="modal-hint">Редактирайте категорията, името или дебелината (в мм) на съществуваща хартия директно в полетата. Промените се запазват автоматично в браузъра ви.</p>
+                <p class="storage-warning hidden" id="storage-warning">Браузърът блокира локалното хранилище, затова промените важат само докато страницата е отворена. Разрешете данните за сайта, за да се запазват.</p>
                 <div id="paper-list" class="paper-list"></div>
 
                 <div class="paper-add-form">
