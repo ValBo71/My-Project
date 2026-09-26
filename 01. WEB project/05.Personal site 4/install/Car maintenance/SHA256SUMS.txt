@@ -1,0 +1,2 @@
+0517546c19efc1f2ec498152bc9ff8b8d34356d8f67ba02824c53e36985c2161  CarMaintenance-Windows-Setup.exe
+f290c3a4c987acf79c0e2ef1b3cd01de74c0204872c738d5a8f556de42abd7ad  CarMaintenance-macOS-Install.zip

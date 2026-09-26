@@ -1,0 +1,15 @@
+# Installers are not kept in git: they are built from install/*/build-source
+# (Car Maintenance: from its GitHub Release) and published on the site separately.
+install/**/*.exe
+install/**/*.zip
+# Generated installer scripts (they embed the whole app payload)
+install/**/setup.ps1
+install/**/Install *.command
+!install/**/*.template.command
+
+# Build output cache and deployment archives
+.vite/
+.vite.zip
+
+# Impeccable live-mode session state
+site-source/.impeccable/live/

@@ -1,0 +1,6 @@
+wrangler.json
+.dev.vars
+.vite
+site-source
+README-SITE-BG.md
+install/*/build-source

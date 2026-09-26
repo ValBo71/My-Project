@@ -1,0 +1,2 @@
+010b10c29aaf8cecb93022d053e5d040abf7e63d47c8cd37aaff95cb01491e9d  SpineCreepCalculator-Windows-Setup.exe
+028c7a18dc7593e24827cc8a4c30160d33e9ced731a9db23525607ea72e62c2e  SpineCreepCalculator-macOS-Install.zip
