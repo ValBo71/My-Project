@@ -232,13 +232,23 @@ def extract_tech_stack_from_text(text):
         "GitLab CI", "GitHub Actions", "CI/CD", "Jira", "Confluence", "Agile", "Scrum"
     ]
     
+    # Short names that are also ordinary words ("go the extra mile") must match case-sensitively
+    case_sensitive = {"Go", "JS", "TS"}
+
     found_techs = []
     for tech in techs:
         pattern = r'\b' + tech + r'\b'
         if tech == "C\\+\\+":
             pattern = r'\bC\+\+'
-        
-        if re.search(pattern, text, re.IGNORECASE):
+        elif tech == "C#":
+            # '\b' after '#' only matches when a word char follows, so use a lookahead instead
+            pattern = r'\bC#(?!\w)'
+        elif tech == "Go":
+            # Sentence-initial "Go to ..." / "Go-to person" is English, not the language
+            pattern = r'\bGo(?:lang)?\b(?![- ]to\b)'
+
+        flags = 0 if tech in case_sensitive else re.IGNORECASE
+        if re.search(pattern, text, flags) or (tech == "Go" and re.search(r'\bgolang\b', text, re.IGNORECASE)):
             display_name = tech.replace(r'\\', '').replace(r'\+', '+')
             if display_name == "JS": display_name = "JavaScript"
             if display_name == "TS": display_name = "TypeScript"
@@ -381,8 +391,8 @@ def parse_date_to_timestamp(date_str):
                     break
         if month:
             year = now.year
-            # In case we parse an older year or transition over New Year:
-            if month > now.month and now.month == 1:
+            # dev.bg dates carry no year: a month later than the current one can only be last year
+            if month > now.month:
                 year -= 1
             try:
                 dt = datetime(year, month, day, 12, 0, 0)

@@ -9,3 +9,7 @@ jobs.db
 linkedin_session.json
 linkedin_credentials.json
 *.log
+
+# Portable Python downloaded by run_mac.command
+python_portable/
+python_embed.tar.gz
