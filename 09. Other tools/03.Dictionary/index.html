@@ -513,7 +513,7 @@
           <div class="card-panel glass-panel">
             <h2 class="section-title"><i class="fa-solid fa-file-excel text-success"></i> Импорт от Excel файл</h2>
             <p class="section-subtitle">
-              Качете файл в формат `.xlsx`, `.xls` или `.csv`. Файлът трябва да съдържа **две колони**: първата с думите на чуждия език, а втората с превода им на български.
+              Качете файл в формат <code>.xlsx</code>, <code>.xls</code> или <code>.csv</code>. Файлът трябва да съдържа <strong>две колони</strong>: първата с думите на чуждия език, а втората с превода им на български.
             </p>
 
             <div class="import-config-row">
@@ -660,6 +660,11 @@
             <option value="it">Италиански (IT)</option>
             <option value="other">Друг</option>
           </select>
+        </div>
+        <!-- Extra field if Other language is chosen -->
+        <div class="form-group hidden" id="edit-other-lang-container">
+          <label for="edit-lang-other-input">Име на езика (код):</label>
+          <input type="text" id="edit-lang-other-input" class="form-control" placeholder="напр. TR, GR" maxlength="10">
         </div>
         <div class="modal-footer-actions">
           <button type="button" id="btn-cancel-edit" class="btn btn-secondary">Отказ</button>
