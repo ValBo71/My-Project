@@ -2,7 +2,7 @@
  * @title InDesign Booklet Creep Script (Scale-based)
  * @description Скрипт за автоматично хоризонтално скалиране (свиване) на обекти в коли за шиене (Booklet Creep).
  * @author ValBo
- * @version 2.0
+ * @version 2.1
  */
 
 (function() {
@@ -41,15 +41,15 @@
     var sigDropdown = sigGroup.add("dropdownlist", undefined, sigSizes);
     sigDropdown.selection = 3; // 16 страници по подразбиране
 
-    // Поле за начална страница във файла
+    // Поле за начална страница във файла (поредна позиция, не номерацията на секцията)
     var startPageGroup = infoPanel.add("group");
-    startPageGroup.add("statictext", undefined, "Начална страница във файла (номер):");
+    startPageGroup.add("statictext", undefined, "Начална страница (поредна в документа):");
     var startPageInput = startPageGroup.add("edittext", undefined, "1");
     startPageInput.characters = 10;
 
     // Описание на логиката за скалиране
     var descGroup = infoPanel.add("group");
-    var descText = descGroup.add("statictext", undefined, "Скриптът скалира хоризонтално обектите спрямо гръбчето (spine), за да се запази еднакъв размерът на външните полета (фаши) в крайното обрязано изделие.", {multiline: true});
+    var descText = descGroup.add("statictext", undefined, "Скриптът скалира хоризонтално обектите спрямо гръбчето (spine), за да се запази еднакъв размерът на външните полета (фаши) в крайното обрязано изделие. Началната страница е поредната ѝ позиция в документа (1 = първата страница), независимо от номерацията на секциите. Заключените обекти и слоеве се отключват временно и се заключват обратно.", {multiline: true});
     descText.preferredSize.width = 320;
 
     // Група за бутони
@@ -69,8 +69,8 @@
 
         // Валидация на началната страница
         var startPg = parseInt(startPageInput.text, 10);
-        if (isNaN(startPg) || startPg <= 0) {
-            alert("Моля, въведете валидно число за начална страница (например: 1).");
+        if (isNaN(startPg) || startPg <= 0 || startPg > doc.pages.length) {
+            alert("Моля, въведете поредна страница от 1 до " + doc.pages.length + ".");
             return;
         }
 
@@ -91,198 +91,195 @@
     var signatureSize = parseInt(sigDropdown.selection.text, 10);
     var startPageNumber = parseInt(startPageInput.text, 10);
 
-    // Намиране на началната страница в колекцията на InDesign (0-индексирана)
-    var startIndex = -1;
-    for (var p = 0; p < doc.pages.length; p++) {
-        if (doc.pages[p].name == startPageNumber.toString()) {
-            startIndex = p;
-            break;
+    // Началната страница е поредна позиция в документа (1 = първата страница), а не
+    // page.name - то следва номерацията на секцията (римски цифри, рестартирана номерация и т.н.).
+    var startIndex = startPageNumber - 1;
+    var pageCount = doc.pages.length - startIndex;
+
+    // Броят страници трябва да запълва цели коли. Ако последната кола е по-малка
+    // (например 36 страници = 2 x 16 + 4), тя се обработва като отделна по-малка кола.
+    var lastSigSize = pageCount % signatureSize;
+    if (lastSigSize !== 0) {
+        if (lastSigSize % 4 !== 0) {
+            alert("Грешка: " + pageCount + " страници от страница " + startPageNumber + " нататък не могат да се разделят на коли от " +
+                  signatureSize + " страници - остават " + lastSigSize + ", а една кола трябва да е кратна на 4.\n\n" +
+                  "Проверете началната страница и броя страници в документа.", "Непълна кола");
+            return;
+        }
+        if (!confirm(pageCount + " страници не се делят на коли от " + signatureSize + " страници.\n\n" +
+                     "Последната кола ще бъде обработена като отделна кола от " + lastSigSize + " страници. Да продължа ли?",
+                     false, "Непълна последна кола")) {
+            return;
         }
     }
 
-    if (startIndex === -1) {
-        alert("Грешка: Не е намерена страница с номер '" + startPageNumber + "' в документа.");
-        return;
-    }
+    var POINTS_PER_MM = 72 / 25.4;
+    var stats = { pages: 0, items: 0, skipped: 0, masterFailed: 0 };
+    var modified = false;
+    var failure = null;
 
-    // Автоматично отключваме заключените обекти/слоеве, скалираме ги и ги заключваме обратно.
-    var lockedAction = "unlock";
+    // Позиция на страницата в нейната кола и размерът на тази кола
+    function signatureInfo(relIndex) {
+        var fullSigPages = pageCount - lastSigSize;
+        if (relIndex < fullSigPages) {
+            return { size: signatureSize, pageInSig: (relIndex % signatureSize) + 1 };
+        }
+        return { size: lastSigSize, pageInSig: (relIndex - fullSigPages) + 1 };
+    }
 
     // 3. Основна функция за скалиране
     function runCreepScaling() {
-        var originalXUnits = doc.viewPreferences.horizontalMeasurementUnits;
-        // Задаваме мерните единици временно на милиметри за прецизно измерване
-        doc.viewPreferences.horizontalMeasurementUnits = MeasurementUnits.MILLIMETERS;
+        var layersToRelock = [];
+        var itemsToRelock = [];
 
-        var scaledCount = 0;
-        var skippedCount = 0;
+        function unlockLayer(layer) {
+            for (var n = 0; n < layersToRelock.length; n++) {
+                if (layersToRelock[n] === layer) {
+                    return;
+                }
+            }
+            layer.locked = false;
+            layersToRelock.push(layer);
+        }
 
         try {
             for (var i = startIndex; i < doc.pages.length; i++) {
                 var page = doc.pages[i];
-                
-                // Преодоляване (override) на обектите от мастер страницата (parent page), за да могат да се скалират
-                if (page.appliedMaster !== null) {
-                    try {
-                        var masterItems = page.appliedMaster.pageItems.everyItem().getElements();
-                        for (var m = 0; m < masterItems.length; m++) {
-                            try {
-                                masterItems[m].override(page);
-                            } catch (errOverride) {
-                                // Вече презаписан или непреодолим
-                            }
-                        }
-                    } catch (errMaster) {
-                        // Защитна проверка при липса на достъп до мастер страницата
-                    }
-                }
-                
-                var relIndex = i - startIndex;
-                
-                // Позиция на страницата в текущата кола (1-индексирана от 1 до signatureSize)
-                var pageInSig = (relIndex % signatureSize) + 1;
-                
+                var sig = signatureInfo(i - startIndex);
+
                 // Индекс на листа в колата (0-индексиран отвън навътре)
-                var sheetIdx = 0;
-                var halfSig = signatureSize / 2;
-                if (pageInSig <= halfSig) {
-                    sheetIdx = Math.floor((pageInSig - 1) / 2);
+                var sheetIdx;
+                if (sig.pageInSig <= sig.size / 2) {
+                    sheetIdx = Math.floor((sig.pageInSig - 1) / 2);
                 } else {
-                    sheetIdx = Math.floor((signatureSize - pageInSig) / 2);
+                    sheetIdx = Math.floor((sig.size - sig.pageInSig) / 2);
                 }
 
                 // Пресмятане на дебелината на избутване (D = sheetIdx * paperThickness)
                 var displacement = sheetIdx * paperThickness;
                 if (displacement === 0) {
-                    continue; // Най-външният лист не се променя
+                    continue; // Най-външният лист не се променя - и мастер обектите му не се откъсват
                 }
 
-                // Определяне на точка на закотвяне (Anchor) спрямо гръбчето (spine):
-                // Лява страница (LEFT_HAND) -> Гръбчето е отдясно -> Закотвяме отдясно (RIGHT_CENTER)
-                // Дясна страница (RIGHT_HAND) -> Гръбчето е отляво -> Закотвяме отляво (LEFT_CENTER)
-                var anchor = AnchorPoint.LEFT_CENTER_ANCHOR;
+                // Гръбчето (spine) е ръбът на страницата, а не ръбът на обектите:
+                // Лява страница (LEFT_HAND) -> гръбчето е отдясно
+                // Дясна страница (RIGHT_HAND) -> гръбчето е отляво
+                var spineOnRight;
                 if (page.side === PageSideOptions.LEFT_HAND) {
-                    anchor = AnchorPoint.RIGHT_CENTER_ANCHOR;
+                    spineOnRight = true;
                 } else if (page.side === PageSideOptions.RIGHT_HAND) {
-                    anchor = AnchorPoint.LEFT_CENTER_ANCHOR;
+                    spineOnRight = false;
                 } else {
-                    // Ако не е в режим разтвори (facing pages)
-                    if (pageInSig % 2 === 0) {
-                        anchor = AnchorPoint.RIGHT_CENTER_ANCHOR; // Лява
-                    } else {
-                        anchor = AnchorPoint.LEFT_CENTER_ANCHOR; // Дясна
+                    // Ако не е в режим разтвори (facing pages): четните страници са леви
+                    spineOnRight = (sig.pageInSig % 2 === 0);
+                }
+
+                // Координатите на страницата в pasteboard пространството (в пунктове)
+                var topLeft = page.resolve(AnchorPoint.TOP_LEFT_ANCHOR, CoordinateSpaces.PASTEBOARD_COORDINATES)[0];
+                var bottomRight = page.resolve(AnchorPoint.BOTTOM_RIGHT_ANCHOR, CoordinateSpaces.PASTEBOARD_COORDINATES)[0];
+                var pageWidth = bottomRight[0] - topLeft[0];
+                var spinePoint = [spineOnRight ? bottomRight[0] : topLeft[0], (topLeft[1] + bottomRight[1]) / 2];
+
+                // Коефициент на хоризонтално свиване: външният ръб на страницата се прибира с D
+                var scaleX = (pageWidth - displacement * POINTS_PER_MM) / pageWidth;
+                if (!(scaleX > 0)) {
+                    throw new Error("Избутването (" + displacement.toFixed(3) + " мм) е по-голямо от ширината на страница " + page.name + ".");
+                }
+
+                // Откъсване (override) само на мастер обектите, които се виждат на тази страница
+                // (page.masterPageItems - от правилната лява/дясна мастер страница), за да могат да се скалират.
+                var masterItems = page.masterPageItems;
+                for (var m = 0; m < masterItems.length; m++) {
+                    try {
+                        if (masterItems[m].itemLayer.locked) {
+                            unlockLayer(masterItems[m].itemLayer);
+                        }
+                        masterItems[m].override(page);
+                        modified = true;
+                    } catch (errOverride) {
+                        stats.masterFailed++;
                     }
                 }
 
-                // Събиране на обектите на страницата
-                var items = page.pageItems;
-                var pageItemsToProcess = [];
-                
+                // Събиране на обектите на страницата (само тези от най-горно ниво)
+                var items = page.pageItems.everyItem().getElements();
+                var matrix = null;
+                var pageScaled = false;
+
                 for (var j = 0; j < items.length; j++) {
                     var item = items[j];
-                    var isTopLevel = (item.parent instanceof Page || item.parent.constructor.name === "Page" || 
+                    var isTopLevel = (item.parent instanceof Page || item.parent.constructor.name === "Page" ||
                                       item.parent instanceof Spread || item.parent.constructor.name === "Spread");
-                    if (isTopLevel) {
-                        pageItemsToProcess.push(item);
+                    if (!isTopLevel) {
+                        continue;
+                    }
+
+                    // Заключените слоеве и обекти се отключват временно и се заключват обратно накрая
+                    if (item.itemLayer.locked) {
+                        unlockLayer(item.itemLayer);
+                    }
+                    if (item.locked) {
+                        item.locked = false;
+                        itemsToRelock.push(item);
+                    }
+
+                    // Всеки обект се трансформира поотделно (без временна група, която би сменила
+                    // слоя и реда на наслагване) с една и съща матрица около точката на гръбчето в
+                    // pasteboard координати - независимо от завъртане/огледалност на обекта.
+                    // Съдържанието (картинки, текст) се скалира заедно с рамката, както при група.
+                    if (matrix === null) {
+                        matrix = app.transformationMatrices.add({ horizontalScaleFactor: scaleX });
+                    }
+                    try {
+                        item.transform(CoordinateSpaces.PASTEBOARD_COORDINATES, spinePoint, matrix);
+                        modified = true;
+                        pageScaled = true;
+                        stats.items++;
+                    } catch (errItem) {
+                        stats.skipped++;
                     }
                 }
 
-                if (pageItemsToProcess.length === 0) {
-                    continue;
-                }
-
-                // Обработка на заключени слоеве и обекти
-                var itemsToScale = [];
-                var layersToRelock = [];
-                var itemsToRelock = [];
-
-                for (var k = 0; k < pageItemsToProcess.length; k++) {
-                    var item = pageItemsToProcess[k];
-                    var isItemLocked = item.locked;
-                    var isLayerLocked = item.itemLayer.locked;
-
-                    if (isItemLocked || isLayerLocked) {
-                        if (lockedAction === "unlock") {
-                            if (isLayerLocked) {
-                                item.itemLayer.locked = false;
-                                layersToRelock.push(item.itemLayer);
-                            }
-                            if (isItemLocked) {
-                                item.locked = false;
-                                itemsToRelock.push(item);
-                            }
-                            itemsToScale.push(item);
-                        } else {
-                            skippedCount++;
-                        }
-                    } else {
-                        itemsToScale.push(item);
-                    }
-                }
-
-                if (itemsToScale.length === 0) {
-                    continue;
-                }
-
-                // Дефиниране на обекта за скалиране (групираме, ако са повече от 1)
-                var target = null;
-                var wasGrouped = false;
-
-                if (itemsToScale.length > 1) {
-                    target = page.groups.add(itemsToScale);
-                    wasGrouped = true;
-                } else {
-                    target = itemsToScale[0];
-                }
-
-                // Взимаме геометрията на обекта в милиметри [y1, x1, y2, x2]
-                var bounds = target.geometricBounds;
-                var width = bounds[3] - bounds[1];
-
-                if (width > 0) {
-                    // Коефициент на хоризонтално свиване (scaleX)
-                    var scaleX = (width - displacement) / width;
-                    if (scaleX > 0) {
-                        target.resize(
-                            CoordinateSpaces.INNER_COORDINATES,
-                            anchor,
-                            ResizeMethods.MULTIPLYING_CURRENT_DIMENSIONS_BY,
-                            [scaleX, 1.0]
-                        );
-                        scaledCount += itemsToScale.length;
-                    }
-                }
-
-                // Разгрупиране на временната група
-                if (wasGrouped) {
-                    target.ungroup();
-                }
-
-                // Възстановяване на заключенията
-                for (var r = 0; r < itemsToRelock.length; r++) {
-                    itemsToRelock[r].locked = true;
-                }
-                for (var l = 0; l < layersToRelock.length; l++) {
-                    layersToRelock[l].locked = true;
+                if (pageScaled) {
+                    stats.pages++;
                 }
             }
-
-            // Връщане на оригиналните мерни единици
-            doc.viewPreferences.horizontalMeasurementUnits = originalXUnits;
-
-            // Съобщение за край
-            var msg = "Успешно приключване на хоризонталното скалиране!\n\n" +
-                      "- Обработени страници: " + (doc.pages.length - startIndex) + "\n";
-            alert(msg, "Успешно изпълнение");
-
         } catch (err) {
-            // Връщане на оригиналните мерни единици при грешка
-            doc.viewPreferences.horizontalMeasurementUnits = originalXUnits;
-            alert("Грешка при скалирането: " + err.message, "Грешка");
+            failure = err;
+        } finally {
+            // Заключенията се възстановяват винаги, и при грешка
+            for (var r = 0; r < itemsToRelock.length; r++) {
+                try { itemsToRelock[r].locked = true; } catch (e1) {}
+            }
+            for (var l = 0; l < layersToRelock.length; l++) {
+                try { layersToRelock[l].locked = true; } catch (e2) {}
+            }
         }
     }
 
     // 4. Изпълнение на кода в Undo транзакция за лесно отменяне (Ctrl+Z)
     app.doScript(runCreepScaling, ScriptLanguage.JAVASCRIPT, undefined, UndoModes.ENTIRE_SCRIPT, "Booklet Creep Scaling");
+
+    var summary = "- Обработени страници (от " + startPageNumber + " до " + doc.pages.length + "): " + pageCount + "\n" +
+                  "- Свити страници: " + stats.pages + "\n" +
+                  "- Свити обекти: " + stats.items + "\n" +
+                  "- Пропуснати обекти (не могат да се трансформират): " + stats.skipped + "\n" +
+                  "- Мастер обекти, които не могат да се откъснат (остават несвити): " + stats.masterFailed;
+
+    if (failure !== null) {
+        var undoNow = modified && confirm("Грешка при скалирането: " + failure.message + "\n\n" +
+                                          "Част от страниците вече са променени. Да отменя ли всички промени на скрипта?",
+                                          false, "Грешка");
+        if (undoNow) {
+            doc.undo(); // Цялото изпълнение е една Undo стъпка (UndoModes.ENTIRE_SCRIPT)
+        } else if (modified) {
+            alert("Промените остават частични. Можете да ги отмените изцяло с Ctrl+Z (Cmd+Z).\n\n" + summary, "Грешка");
+        } else {
+            alert("Грешка при скалирането: " + failure.message + "\n\nДокументът не е променен.", "Грешка");
+        }
+        return;
+    }
+
+    alert("Успешно приключване на хоризонталното скалиране!\n\n" + summary, "Успешно изпълнение");
 
 })();
