@@ -123,7 +123,7 @@
         </div>
         <div class="form-group">
           <label for="new-password">Парола</label>
-          <input type="password" id="new-password" required minlength="4">
+          <input type="password" id="new-password" required minlength="8">
         </div>
         <div class="form-group">
           <label for="new-role">Роля</label>
@@ -164,6 +164,12 @@
       msgBox.style.display = 'block';
     }
 
+    function escapeHTML(value) {
+      return String(value == null ? '' : value).replace(/[&<>'"]/g, ch => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+      }[ch]));
+    }
+
     function roleLabel(role) {
       const labels = { admin: 'Администратор', read_write: 'Редактиране', read_only: 'Само преглед' };
       return labels[role] || role;
@@ -178,7 +184,7 @@
       const users = await res.json();
       usersTbody.innerHTML = users.map(u => `
         <tr data-id="${u.id}">
-          <td>${u.username}${u.username === currentUsername ? '<span class="self-tag">(вие)</span>' : ''}</td>
+          <td>${escapeHTML(u.username)}${u.username === currentUsername ? '<span class="self-tag">(вие)</span>' : ''}</td>
           <td>
             <select class="role-select" onchange="changeRole(${u.id}, this.value)" ${u.username === currentUsername ? 'disabled' : ''}>
               <option value="read_only" ${u.role === 'read_only' ? 'selected' : ''}>Само преглед</option>
@@ -186,10 +192,10 @@
               <option value="admin" ${u.role === 'admin' ? 'selected' : ''}>Администратор</option>
             </select>
           </td>
-          <td>${u.created_at || ''}</td>
+          <td>${escapeHTML(u.created_at || '')}</td>
           <td class="row-actions">
-            <button class="btn btn-secondary" onclick="resetPassword(${u.id}, '${u.username}')"><i class="fa-solid fa-key"></i> Парола</button>
-            ${u.username === currentUsername ? '' : `<button class="btn btn-danger" onclick="deleteUser(${u.id}, '${u.username}')"><i class="fa-solid fa-trash"></i></button>`}
+            <button class="btn btn-secondary" onclick="resetPassword(${u.id}, ${escapeHTML(JSON.stringify(u.username))})"><i class="fa-solid fa-key"></i> Парола</button>
+            ${u.username === currentUsername ? '' : `<button class="btn btn-danger" onclick="deleteUser(${u.id}, ${escapeHTML(JSON.stringify(u.username))})"><i class="fa-solid fa-trash"></i></button>`}
           </td>
         </tr>
       `).join('');
@@ -211,10 +217,10 @@
     }
 
     async function resetPassword(id, username) {
-      const newPassword = prompt(`Нова парола за "${username}" (поне 4 символа):`);
+      const newPassword = prompt(`Нова парола за "${username}" (поне 8 символа):`);
       if (!newPassword) return;
-      if (newPassword.length < 4) {
-        showMsg('Паролата трябва да е поне 4 символа.', 'error');
+      if (newPassword.length < 8) {
+        showMsg('Паролата трябва да е поне 8 символа.', 'error');
         return;
       }
       const res = await fetch(`/api/users/${id}`, {
