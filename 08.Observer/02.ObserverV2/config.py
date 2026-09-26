@@ -31,5 +31,7 @@ USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTM
 MAX_WORKERS = 10  # Number of parallel threads to fetch job detail pages
 
 # Flask configurations
-FLASK_DEBUG = True
+# Off by default: debug mode enables the Werkzeug debugger and the reloader (which
+# starts the app twice). Set OBSERVER_DEBUG=1 to turn it on while developing.
+FLASK_DEBUG = os.environ.get("OBSERVER_DEBUG") == "1"
 PORT = 5001

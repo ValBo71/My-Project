@@ -1,7 +1,9 @@
 from flask import Flask, render_template, jsonify, request
+from urllib.parse import urlparse
 import logging
 import os
 import sys
+import threading
 
 # Add current directory to python path to avoid import issues
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
@@ -27,14 +29,54 @@ app = Flask(__name__)
 # Initialize database schema
 init_db()
 
+@app.before_request
+def reject_cross_site_posts():
+    """
+    Blocks state-changing requests coming from other websites (CSRF): a page on any
+    site could otherwise auto-submit a form to 127.0.0.1 and e.g. wipe the database.
+    Browsers always send Origin on cross-site POSTs, so a foreign Origin is refused.
+    """
+    if request.method != 'POST':
+        return None
+    origin = request.headers.get('Origin')
+    if origin and urlparse(origin).netloc != request.host:
+        logger.warning(f"Rejected cross-site POST to {request.path} from Origin {origin}")
+        return jsonify({'success': False, 'error': 'Cross-site request rejected.'}), 403
+    return None
+
+# Only one scraping cycle may run at a time: parallel cycles would launch several
+# browsers, log in to LinkedIn repeatedly and race on linkedin_session.json.
+refresh_lock = threading.Lock()
+
+class RefreshInProgress(Exception):
+    pass
+
 def perform_refresh_cycle():
+    """
+    Runs one refresh cycle, refusing to start while another one is running.
+    Returns:
+        tuple: (success_boolean, error_message_string, new_jobs_count)
+    Raises:
+        RefreshInProgress: if another cycle is already running.
+    """
+    if not refresh_lock.acquire(blocking=False):
+        raise RefreshInProgress()
+    try:
+        return _run_refresh_cycle()
+    finally:
+        refresh_lock.release()
+
+def _run_refresh_cycle():
     """
     Coordinates the scraping, parsing, and DB saving workflow.
     Returns:
         tuple: (success_boolean, error_message_string, new_jobs_count)
+        success is True when at least one enabled source worked (or none is enabled);
+        error_message lists the failed ones.
     """
     new_jobs_saved = 0
     errors = []
+    attempted = 0
     
     # Load dynamic URLs from database
     try:
@@ -49,6 +91,7 @@ def perform_refresh_cycle():
     
     # --- Part 1: Scrape dev.bg ---
     if dev_bg_url:
+        attempted += 1
         try:
             logger.info(f"Starting refresh cycle from URL: {dev_bg_url}")
             main_html = fetch_html(dev_bg_url)
@@ -84,6 +127,7 @@ def perform_refresh_cycle():
         
     # --- Part 2: Scrape LinkedIn ---
     if linkedin_url:
+        attempted += 1
         try:
             linkedin_jobs = scrape_linkedin_jobs(linkedin_url)
             for job in linkedin_jobs:
@@ -97,6 +141,7 @@ def perform_refresh_cycle():
         
     # --- Part 3: Scrape jobs.bg ---
     if jobs_bg_url:
+        attempted += 1
         try:
             jobs_bg_jobs = scrape_jobs_bg_jobs(jobs_bg_url)
             for job in jobs_bg_jobs:
@@ -108,8 +153,10 @@ def perform_refresh_cycle():
     else:
         logger.info("jobs.bg URL is empty, skipping jobs.bg scraping.")
         
-    # Success is True if at least one source worked or if no errors occurred
-    success = len(errors) < 3
+    # Success is True if at least one enabled source worked; partial failures are still
+    # reported through error_msg and shown as a warning in the UI. Counting against the
+    # enabled sources matters because a source with an empty URL is skipped entirely.
+    success = attempted == 0 or len(errors) < attempted
     error_msg = "; ".join(errors) if errors else ""
     
     logger.info(f"Refresh completed. Saved {new_jobs_saved} new jobs in total.")
@@ -119,33 +166,36 @@ def perform_refresh_cycle():
 def index():
     """
     Main dashboard route.
-    Performs an automatic refresh cycle. If the refresh fails, 
-    displays an error notification but still loads the existing database jobs.
+    Renders the jobs already stored in the database right away; the page then
+    starts the refresh cycle in the background via /api/refresh.
     """
-    # 1. Run the refresh cycle
-    success, error_msg, new_count = perform_refresh_cycle()
-    
-    # 2. Retrieve all jobs from the database (both old and newly scraped)
     jobs = get_all_jobs()
     companies = get_all_companies()
-    
+
     return render_template(
         'index.html',
         jobs=jobs,
         companies=companies,
-        refresh_success=success,
-        refresh_error=error_msg,
-        new_jobs_count=new_count,
+        refresh_success=True,
+        refresh_error="",
+        new_jobs_count=0,
         scraper_urls=get_scraper_urls()
     )
 
 @app.route('/api/refresh', methods=['POST'])
 def api_refresh():
     """
-    API endpoint to trigger a manual refresh from the UI.
-    Returns status and statistics in JSON format.
+    API endpoint to trigger a refresh from the UI (automatically on page load or manually).
+    Returns status and statistics in JSON format, or 409 if a refresh is already running.
     """
-    success, error_msg, new_count = perform_refresh_cycle()
+    try:
+        success, error_msg, new_count = perform_refresh_cycle()
+    except RefreshInProgress:
+        return jsonify({
+            'success': False,
+            'in_progress': True,
+            'error': 'Вече тече обновяване. Изчакайте да приключи.'
+        }), 409
     jobs = get_all_jobs()
     
     return jsonify({
@@ -259,10 +309,10 @@ def api_update_settings():
     API endpoint to update a search URL for a given source.
     Expects JSON: { "source": "dev.bg"|"jobs.bg"|"LinkedIn", "url": "..." }
     """
-    data = request.get_json()
-    if not data or 'source' not in data or 'url' not in data:
+    data = request.get_json(silent=True)
+    if not isinstance(data, dict) or 'source' not in data or not isinstance(data.get('url'), str):
         return jsonify({'success': False, 'error': 'Невалидни данни за заявката.'}), 400
-        
+
     source = data['source']
     url = data['url'].strip()
     
@@ -282,7 +332,13 @@ def api_update_settings():
 def api_clear_database():
     """
     API endpoint to clear all jobs and companies from the database.
+    Expects JSON: { "confirm": "CLEAR" }. Requiring a JSON body means a plain HTML
+    form from another site cannot trigger it (on top of the Origin check).
     """
+    data = request.get_json(silent=True)
+    if not request.is_json or not isinstance(data, dict) or data.get('confirm') != 'CLEAR':
+        return jsonify({'success': False, 'error': 'Липсва потвърждение за изчистване.'}), 400
+
     success = clear_jobs_and_companies()
     if success:
         return jsonify({
