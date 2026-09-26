@@ -818,6 +818,26 @@ footer {
 	margin: 0 7px;
 	color: #c7c7c7;
 }
+/* ValBo Apps mark: a white rounded square with the "V" cut out in the footer colour,
+   so it reads like the other icons and turns orange on hover like them */
+.social .valbo-apps-mark {
+	display: inline-block;
+	width: 20px;
+	height: 20px;
+	line-height: 20px;
+	vertical-align: 3px;
+	background: #fff;
+	color: #000;
+	border-radius: 4px;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 14px;
+	font-weight: 900;
+	text-align: center;
+	transition: background-color .2s ease;
+}
+.social a:hover .valbo-apps-mark {
+	background: #FF7A00;
+}
 .contact ul li {
 	margin-bottom: 10px;
 }
