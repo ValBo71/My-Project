@@ -152,7 +152,8 @@ with zipfile.ZipFile(OUT / 'CarMaintenance-macOS-Install.zip', 'w', zipfile.ZIP_
 
 # 5. checksums
 names = sorted(p.name for p in OUT.iterdir())
-(OUT / 'SHA256SUMS.txt').write_text(''.join(f'{sha256(OUT / n)}  {n}\n' for n in names), encoding='utf-8')
+# LF line endings even on Windows (write_text would write CRLF, which sha256sum -c rejects)
+(OUT / 'SHA256SUMS.txt').write_bytes(''.join(f'{sha256(OUT / n)}  {n}\n' for n in names).encode('utf-8'))
 
 shutil.rmtree(WORK, ignore_errors=True)
 print(OUT)
