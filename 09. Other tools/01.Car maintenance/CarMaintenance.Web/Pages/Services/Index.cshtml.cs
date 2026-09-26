@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using CarMaintenance.Core.Entities;
 using CarMaintenance.Core.Enums;
 using CarMaintenance.Infrastructure.Data;
+using CarMaintenance.Infrastructure.Services;
 using CarMaintenance.Web.Services;
 using System;
 using System.Collections.Generic;
@@ -121,22 +122,53 @@ namespace CarMaintenance.Web.Pages.Services
                 _context.ServiceRecords.Remove(record);
                 await _context.SaveChangesAsync();
 
-                // Recalculate car's current mileage to the max of what remains in history.
-                // If no history remains, leave the car's mileage untouched instead of zeroing it.
-                var maxMileage = await _context.MileageHistories
-                    .Where(m => m.CarId == carId)
-                    .Select(m => (int?)m.Mileage)
-                    .MaxAsync();
-
-                if (maxMileage.HasValue)
+                var car = await _context.Cars.FindAsync(carId);
+                if (car == null)
                 {
-                    var car = await _context.Cars.FindAsync(carId);
-                    if (car != null)
+                    return RedirectToPage();
+                }
+
+                // Only roll the car's mileage back if this record is what raised it. Then use the
+                // most recent remaining reading - not the highest one, which would undo a manual
+                // correction downwards. With no history left, the mileage is left untouched.
+                if (record.Mileage == car.CurrentMileage)
+                {
+                    var latestMileage = await _context.MileageHistories
+                        .Where(m => m.CarId == carId)
+                        .OrderByDescending(m => m.Date)
+                        .ThenByDescending(m => m.Id)
+                        .Select(m => (int?)m.Mileage)
+                        .FirstOrDefaultAsync();
+
+                    if (latestMileage.HasValue)
                     {
-                        car.CurrentMileage = maxMileage.Value;
-                        await _context.SaveChangesAsync();
+                        car.CurrentMileage = latestMileage.Value;
                     }
                 }
+
+                // Rules of the same category may have taken their "last done" values from this
+                // record (Services/Create). Re-derive them from the remaining records, picking the
+                // highest mileage like Create does; with none left, the rule has no data (Gray).
+                var rules = await _context.MaintenanceRules.Where(r => r.CarId == carId).ToListAsync();
+                foreach (var rule in rules)
+                {
+                    if (rule.Category == record.Category
+                        && rule.LastDoneMileage == record.Mileage
+                        && rule.LastDoneDate == record.Date)
+                    {
+                        var previous = await _context.ServiceRecords
+                            .Where(s => s.CarId == carId && s.Category == record.Category)
+                            .OrderByDescending(s => s.Mileage)
+                            .ThenByDescending(s => s.Date)
+                            .FirstOrDefaultAsync();
+
+                        rule.LastDoneMileage = previous?.Mileage;
+                        rule.LastDoneDate = previous?.Date;
+                    }
+                    MaintenanceCalculator.CalculateNextDue(rule, car.CurrentMileage);
+                }
+
+                await _context.SaveChangesAsync();
             }
 
             return RedirectToPage();

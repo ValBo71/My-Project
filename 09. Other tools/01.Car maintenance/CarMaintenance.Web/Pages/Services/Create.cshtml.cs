@@ -70,6 +70,12 @@ namespace CarMaintenance.Web.Pages.Services
                 }
             }
 
+            var car = await _context.Cars.FindAsync(ServiceRecord.CarId);
+            if (car == null)
+            {
+                return RedirectToPage("/Cars/Index");
+            }
+
             // Set computed fields
             ServiceRecord.TotalCost = ServiceRecord.PartsCost + ServiceRecord.LaborCost;
 
@@ -108,8 +114,7 @@ namespace CarMaintenance.Web.Pages.Services
             _context.MileageHistories.Add(mileageHistory);
 
             // Update car current mileage if it is higher than the car's current mileage
-            var car = await _context.Cars.FindAsync(ServiceRecord.CarId);
-            if (car != null && ServiceRecord.Mileage > car.CurrentMileage)
+            if (ServiceRecord.Mileage > car.CurrentMileage)
             {
                 car.CurrentMileage = ServiceRecord.Mileage;
             }
@@ -130,7 +135,7 @@ namespace CarMaintenance.Web.Pages.Services
                         rule.LastDoneDate = ServiceRecord.Date;
                     }
                 }
-                CarMaintenance.Infrastructure.Services.MaintenanceCalculator.CalculateNextDue(rule, car?.CurrentMileage ?? ServiceRecord.Mileage);
+                CarMaintenance.Infrastructure.Services.MaintenanceCalculator.CalculateNextDue(rule, car.CurrentMileage);
             }
             await _context.SaveChangesAsync();
 

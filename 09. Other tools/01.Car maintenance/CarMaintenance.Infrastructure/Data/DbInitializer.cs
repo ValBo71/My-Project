@@ -3,6 +3,7 @@ using System.Linq;
 using CarMaintenance.Core.Entities;
 using CarMaintenance.Core.Enums;
 using CarMaintenance.Infrastructure.Services;
+using Microsoft.EntityFrameworkCore;
 
 namespace CarMaintenance.Infrastructure.Data
 {
@@ -10,7 +11,12 @@ namespace CarMaintenance.Infrastructure.Data
     {
         public static void Initialize(ApplicationDbContext context)
         {
-            context.Database.EnsureCreated();
+            // EnsureCreated only builds the schema for a brand-new database; it never alters an
+            // existing one. Columns added after the first release are therefore upgraded here.
+            if (!context.Database.EnsureCreated())
+            {
+                UpgradeSchema(context);
+            }
 
             // Look for any cars.
             if (context.Cars.Any())
@@ -223,6 +229,20 @@ namespace CarMaintenance.Infrastructure.Data
             context.MaintenanceRules.Add(rule2);
 
             context.SaveChanges();
+        }
+
+        // Idempotent upgrades for databases created by an earlier version of the app.
+        private static void UpgradeSchema(ApplicationDbContext context)
+        {
+            // MileageHistories.ServiceRecordId links a history row to the service record that created it.
+            context.Database.ExecuteSqlRaw(@"
+IF COL_LENGTH('dbo.MileageHistories', 'ServiceRecordId') IS NULL
+BEGIN
+    ALTER TABLE dbo.MileageHistories ADD ServiceRecordId int NULL;
+    EXEC('CREATE INDEX IX_MileageHistories_ServiceRecordId ON dbo.MileageHistories (ServiceRecordId)');
+    EXEC('ALTER TABLE dbo.MileageHistories ADD CONSTRAINT FK_MileageHistories_ServiceRecords_ServiceRecordId
+          FOREIGN KEY (ServiceRecordId) REFERENCES dbo.ServiceRecords (Id)');
+END");
         }
     }
 }

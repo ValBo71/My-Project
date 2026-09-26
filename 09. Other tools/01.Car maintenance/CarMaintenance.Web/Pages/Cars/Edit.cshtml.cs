@@ -45,15 +45,26 @@ namespace CarMaintenance.Web.Pages.Cars
 
         public async Task<IActionResult> OnPostAsync()
         {
-            if (!ModelState.IsValid)
-            {
-                return Page();
-            }
-
             var carToUpdate = await _context.Cars.FindAsync(Car.Id);
             if (carToUpdate == null)
             {
                 return NotFound();
+            }
+
+            if (UploadedImage != null && UploadedImage.Length > 0)
+            {
+                var validation = FileUploadValidator.Validate(UploadedImage, FileUploadValidator.ImageExtensions, FileUploadValidator.ImageContentTypes, FileUploadValidator.MaxImageSizeBytes);
+                if (!validation.IsValid)
+                {
+                    ModelState.AddModelError(nameof(UploadedImage), validation.Error!);
+                }
+            }
+
+            if (!ModelState.IsValid)
+            {
+                // The image path isn't posted by the form; restore it so the page still shows the photo.
+                Car.ImagePath = carToUpdate.ImagePath;
+                return Page();
             }
 
             carToUpdate.Make = Car.Make;
@@ -81,16 +92,9 @@ namespace CarMaintenance.Web.Pages.Cars
 
             carToUpdate.Notes = Car.Notes;
 
-            // Handle image upload if a new one was provided
+            // Handle image upload if a new one was provided (already validated above)
             if (UploadedImage != null && UploadedImage.Length > 0)
             {
-                var validation = FileUploadValidator.Validate(UploadedImage, FileUploadValidator.ImageExtensions, FileUploadValidator.ImageContentTypes, FileUploadValidator.MaxImageSizeBytes);
-                if (!validation.IsValid)
-                {
-                    ModelState.AddModelError(nameof(UploadedImage), validation.Error!);
-                    return Page();
-                }
-
                 var newImagePath = await FileUploadValidator.SaveAsync(UploadedImage, _uploadFolder, "/uploads/cars");
 
                 // Delete old image if it wasn't the default one

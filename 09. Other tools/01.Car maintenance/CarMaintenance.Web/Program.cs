@@ -5,7 +5,12 @@ using CarMaintenance.Web.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddRazorPages();
+// The entities are bound directly by the forms. With nullable reference types enabled, MVC
+// would treat every non-nullable navigation property (e.g. ServiceRecord.Car) as implicitly
+// [Required]; the forms never post it, so ModelState was always invalid and nothing saved.
+// Every field that really is required carries an explicit [Required] attribute instead.
+builder.Services.AddRazorPages()
+    .AddMvcOptions(o => o.SuppressImplicitRequiredAttributeForNonNullableReferenceTypes = true);
 builder.Services.AddScoped<ActiveCarService>();
 
 // Add DbContext
