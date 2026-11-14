@@ -77,7 +77,7 @@ namespace AutomationExercise.ApiTests.Tests
         public async Task VerifyLogin_WithValidDetails_ShouldReturnSuccess()
         {
             // Act
-            var response = await _accountClient.VerifyLoginAsync(TestUsers.DefaultEmail, TestUsers.DefaultPassword);
+            var response = await _accountClient.VerifyLoginAsync(Settings.DefaultUser.Email, Settings.DefaultUser.Password);
 
             // Assert
             Assert.That(response.Status, Is.EqualTo(200), "HTTP Status code should be 200 OK");
@@ -97,7 +97,7 @@ namespace AutomationExercise.ApiTests.Tests
         public async Task VerifyLogin_WithoutEmail_ShouldReturnBadRequest()
         {
             // Act
-            var response = await _accountClient.VerifyLoginWithoutEmailAsync(TestUsers.DefaultPassword);
+            var response = await _accountClient.VerifyLoginWithoutEmailAsync(Settings.DefaultUser.Password);
 
             // Assert
             Assert.That(response.Status, Is.EqualTo(200), "HTTP Status code should be 200 OK");

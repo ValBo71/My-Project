@@ -12,12 +12,25 @@ namespace AutomationExercise.RestSharp.ApiTests.Config
             Configuration = new ConfigurationBuilder()
                 .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
                 .AddJsonFile("Config/appsettings.json", optional: false, reloadOnChange: true)
+                // The login account is kept out of the repository: appsettings.Local.json is git-ignored.
+                .AddJsonFile("Config/appsettings.Local.json", optional: true, reloadOnChange: false)
                 .Build();
         }
 
         public static string BaseUrl => Configuration["BaseUrl"] ?? "https://automationexercise.com";
-        public static string DefaultEmail => Configuration["DefaultUser:Email"] ?? "testuser@example.com";
-        public static string DefaultPassword => Configuration["DefaultUser:Password"] ?? "***REMOVED***";
+        public static string DefaultEmail => Required("DefaultUser:Email");
+        public static string DefaultPassword => Required("DefaultUser:Password");
         public static int TimeoutMilliseconds => int.TryParse(Configuration["Api:TimeoutMilliseconds"], out var timeout) ? timeout : 30000;
+
+        private static string Required(string key)
+        {
+            var value = Configuration[key];
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                throw new InvalidOperationException($"'{key}' is not set. Copy Config/appsettings.Local.example.json to Config/appsettings.Local.json and fill it in.");
+            }
+
+            return value;
+        }
     }
 }

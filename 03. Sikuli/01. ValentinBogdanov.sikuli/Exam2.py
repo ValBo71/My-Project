@@ -7,7 +7,12 @@ import time
 # ==============================================================================
 TEMP_MAIL_URL = "https://temp-mail.org/en/"
 JIRA_DASHBOARD_URL = "https://sandbox.xpand-it.com/secure/Dashboard.jspa"
-DEFAULT_PASSWORD = "***REMOVED***"
+# The password this script sets on the sandbox account is kept out of the repository:
+# local_settings.py is git-ignored, local_settings.example.py shows what it holds.
+try:
+    from local_settings import DEFAULT_PASSWORD
+except ImportError:
+    raise Exception("Copy local_settings.example.py to local_settings.py and set DEFAULT_PASSWORD.")
 
 # Timeouts (in seconds)
 DEFAULT_TIMEOUT = 30

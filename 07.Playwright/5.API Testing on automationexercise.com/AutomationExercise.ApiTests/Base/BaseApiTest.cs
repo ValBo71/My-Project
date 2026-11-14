@@ -22,6 +22,8 @@ namespace AutomationExercise.ApiTests.Base
             var config = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("Config/appsettings.json", optional: false, reloadOnChange: true)
+                // The login account is kept out of the repository: appsettings.Local.json is git-ignored.
+                .AddJsonFile("Config/appsettings.Local.json", optional: true, reloadOnChange: false)
                 .Build();
 
             Settings = new TestSettings
@@ -29,8 +31,8 @@ namespace AutomationExercise.ApiTests.Base
                 BaseUrl = config["BaseUrl"] ?? "https://automationexercise.com",
                 DefaultUser = new DefaultUserCredentials
                 {
-                    Email = config["DefaultUser:Email"] ?? "testuser@example.com",
-                    Password = config["DefaultUser:Password"] ?? "***REMOVED***"
+                    Email = Required(config, "DefaultUser:Email"),
+                    Password = Required(config, "DefaultUser:Password")
                 },
                 Api = new ApiSettings
                 {
@@ -39,6 +41,17 @@ namespace AutomationExercise.ApiTests.Base
             };
 
             PlaywrightInstance = await Playwright.CreateAsync();
+        }
+
+        private static string Required(IConfiguration config, string key)
+        {
+            var value = config[key];
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                throw new InvalidOperationException($"'{key}' is not set. Copy Config/appsettings.Local.example.json to Config/appsettings.Local.json and fill it in.");
+            }
+
+            return value;
         }
 
         [SetUp]

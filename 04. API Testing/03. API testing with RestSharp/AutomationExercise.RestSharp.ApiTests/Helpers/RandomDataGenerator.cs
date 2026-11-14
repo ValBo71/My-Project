@@ -8,7 +8,7 @@ namespace AutomationExercise.RestSharp.ApiTests.Helpers
 
         public static string GenerateUniqueEmail()
         {
-            return $"testuser+api_{DateTime.UtcNow:yyyyMMddHHmmssfff}@abv.bg";
+            return $"testuser+api_{DateTime.UtcNow:yyyyMMddHHmmssfff}@example.com";
         }
 
         public static string GenerateName()

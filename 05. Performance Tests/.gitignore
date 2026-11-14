@@ -1,0 +1,3 @@
+# Local credentials stay on this machine. The *.example.* file next to each one shows the expected content.
+01. JMeter/02.AutomationExercise/test-users.csv
+02. K6/test-users.json

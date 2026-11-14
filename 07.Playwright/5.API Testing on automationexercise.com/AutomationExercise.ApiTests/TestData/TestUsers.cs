@@ -5,9 +5,6 @@ namespace AutomationExercise.ApiTests.TestData
 {
     public static class TestUsers
     {
-        public static readonly string DefaultEmail = "testuser@example.com";
-        public static readonly string DefaultPassword = "***REMOVED***";
-
         public static CreateUserRequest GenerateRegisterUserRequest()
         {
             var uniqueEmail = RandomDataGenerator.GenerateUniqueEmail();

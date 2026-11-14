@@ -1,5 +1,6 @@
 package testCases.forum;
 
+import credentials.LocalCredentials;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
@@ -7,8 +8,8 @@ import pages.forum.ForumHomePage;
 
 public class ForumTopicCreationTests extends BaseTest {
 
-    private final String EMAIL = "pencho@example.com";
-    private final String PASSWORD = "***REMOVED***";
+    private final String EMAIL = LocalCredentials.get("forum.email");
+    private final String PASSWORD = LocalCredentials.get("forum.password");
     private final ForumHomePage homePage = new ForumHomePage(actions.getDriver());
 
     @After

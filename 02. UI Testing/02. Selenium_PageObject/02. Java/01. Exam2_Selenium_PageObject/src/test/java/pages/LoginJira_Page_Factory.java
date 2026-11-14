@@ -29,7 +29,7 @@ public class LoginJira_Page_Factory {
     }
 
     public void enterEmail() {
-        enterEmail("jira-user");
+        enterEmail(LocalCredentials.get("jira.username"));
     }
 
     public void enterPassword(String password) {
@@ -37,7 +37,7 @@ public class LoginJira_Page_Factory {
     }
 
     public void enterPassword() {
-        enterPassword("***REMOVED***");
+        enterPassword(LocalCredentials.get("jira.password"));
     }
 
     public void clickLogInButton() {

@@ -1,12 +1,13 @@
 package stepDefinitions;
 
+import credentials.LocalCredentials;
 import org.jbehave.core.annotations.*;
 import org.junit.Assert;
 
 public class StepDefinitions extends BaseStepDefinitions {
 
-    private final String EMAIL = "pencho@example.com";
-    private final String PASSWORD = "123456";
+    private final String EMAIL = LocalCredentials.get("forum.email");
+    private final String PASSWORD = LocalCredentials.get("forum.bdd.password");
 
     @BeforeScenario
     public void authenticateRegisteredUser(){
