@@ -66,8 +66,8 @@ ProjectGoogleApiTest/
 - **Apache Maven** installed and configured on your system's PATH.
 
 ### Configuration
-Update your API Token inside the property file located at:
-`src/test/resources/userData.properties`
+Copy `src/test/resources/userData.example.properties` to
+`src/test/resources/userData.properties` (git-ignored, stays on your machine) and put your API token in it:
 ```properties
 TOKEN=your_actual_google_api_key
 ```

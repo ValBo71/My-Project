@@ -17,3 +17,4 @@
 
 # Local credentials stay on this machine. The *.example.* file next to each one shows the expected content.
 **/appsettings.Local.json
+**/userData.properties

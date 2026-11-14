@@ -1,0 +1,3 @@
+# Findings that exist only in old commits. Format: commit:file:rule:line
+# Google API key committed in 2025; removed from the working tree, history cleanup pending.
+45d10546ec9a5f5fb26cca51de013644aa2ac502:04. API Testing/02. API testing with RestAssured/02. ProjectGoogleApi/ProjectGoogleApiTest/src/test/resources/userData.properties:gcp-api-key:1
